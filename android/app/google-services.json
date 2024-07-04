@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66676988689",
+    "project_id": "sherlock-5ca63",
+    "storage_bucket": "sherlock-5ca63.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66676988689:android:8d4c7fec0ee33874604ab0",
+        "android_client_info": {
+          "package_name": "guidevtecgmail.com.sherlock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiySBTugPGXzIEJcdxTF9a4BZ7YqJSeDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
