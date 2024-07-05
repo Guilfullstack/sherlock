@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:js';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/view/page/home_page.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -13,8 +16,10 @@ class AuthException implements Exception {
 }
 
 class UserController {
-  TextEditingController email = TextEditingController();
+  TextEditingController login = TextEditingController();
   TextEditingController password = TextEditingController();
+  UserAdm? userAdm;
+  UserTeam? userTeam;
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
@@ -30,6 +35,36 @@ class UserController {
     userAdm.date = DateTime.now();
     await userAdmDoc.set(userAdm);
     return Future<UserAdm>.value(userAdm);
+  }
+
+  Future<void> loginSystem(
+      BuildContext context, String login, String password) async {
+    try {
+      final snaphotAdm = await userAdmRef
+          .where("login", isEqualTo: login)
+          .where("password", isEqualTo: password)
+          .limit(1)
+          .get();
+      if (snaphotAdm.docs.isNotEmpty) {
+        print("Vai para página ControlPanel");
+      } else {
+        final snaphotTeam = await userTeamref
+            .where("login", isEqualTo: login)
+            .where("password", isEqualTo: password)
+            .limit(1)
+            .get();
+        if (snaphotTeam.docs.isNotEmpty) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          print("usuario não encontrado");
+        }
+      }
+    } catch (e) {
+      print("Erro: " + e.toString());
+    }
   }
 
   /*
