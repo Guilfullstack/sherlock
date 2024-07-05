@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/user_adm.dart';
+import 'package:sherlock/model/user_team.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -34,10 +35,12 @@ class LoginPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    UserAdm newAdm = UserAdm(
+                    print(userController.email.text);
+                    print(userController.password.text);
+                    UserTeam newAdm = UserTeam(
                         login: userController.email.text,
                         password: userController.password.text);
-                    userController.addUserAdm(newAdm);
+                    userController.addUserTeam(newAdm);
                   },
                   child: const Text('Cadastro'),
                 ),

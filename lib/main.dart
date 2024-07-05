@@ -9,10 +9,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (context) => UserController())],
-    child: MaterialApp(
+  runApp(
+    // MultiProvider(
+    // providers: [ChangeNotifierProvider(create: (context) => UserController())],
+    MaterialApp(
       home: LoginPage(),
     ),
-  ));
+  );
 }

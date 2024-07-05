@@ -49,9 +49,9 @@ class UserTeam {
 
   dynamic toJson() => {
         "id": id,
-        "login": id,
-        "password": id,
-        "name": id,
+        "login": login,
+        "password": password,
+        "name": name,
         "date": date != null ? Timestamp.fromDate(date!) : null,
         "status": status,
         "credit": credit,

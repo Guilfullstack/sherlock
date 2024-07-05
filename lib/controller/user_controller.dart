@@ -12,7 +12,7 @@ class AuthException implements Exception {
   );
 }
 
-class UserController extends ChangeNotifier {
+class UserController {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -25,16 +25,11 @@ class UserController extends ChangeNotifier {
   }
 
   Future<UserAdm> addUserAdm(UserAdm userAdm) async {
-    try {
-      DocumentReference<UserAdm> userAdmDoc = userAdmref.doc();
-      userAdm.id = userAdmDoc.id;
-      userAdm.date = DateTime.now();
-      await userAdmDoc.set(userAdm);
-      return Future<UserAdm>.value(userAdm);
-    } catch (e) {
-      print("erro: " + e.toString());
-      return userAdm;
-    }
+    DocumentReference<UserAdm> userAdmDoc = userAdmRef.doc();
+    userAdm.id = userAdmDoc.id;
+    userAdm.date = DateTime.now();
+    await userAdmDoc.set(userAdm);
+    return Future<UserAdm>.value(userAdm);
   }
 
   /*
