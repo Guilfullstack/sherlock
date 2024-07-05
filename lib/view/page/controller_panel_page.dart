@@ -17,31 +17,41 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
         ),
         body: const Column(
           children: [
-            Card(
-              child: ListTile(
-                title: Text('Adicionar Equipes'),
-                subtitle: Column(children: [
-                  //campo text nome
-                  //campo text senha
-                  //compo text confirma senha
-                  Row(
+            SizedBox(
+              width: 100,
+              height: 100,
+              child: Card(
+                child: ListTile(
+                  title: Text('Adicionar Equipes'),
+                  subtitle: Column(
                     children: [
-                      //Botão adicionar equipes
-                      //Botão remover equipes
-                      //Dropdown para acessar o historico das equpes Historico
-                    ],
-                  ),
-                  Card(
-                    child: ListTile(
-                      title: Text('Equipes'),
-                      subtitle: Column(
+                      //campo text nome
+                      //campo text senha
+                      //compo text confirma senha
+                      Row(
                         children: [
-                          //Lista de equipes,
+                          //Botão adicionar equipes
+                          //Botão remover equipes
+                          //Dropdown para acessar o historico das equpes Historico
                         ],
                       ),
-                    ),
-                  )
-                ],),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 100,
+              height: 100,
+              child: Card(
+                child: ListTile(
+                  title: Text('Equipes'),
+                  subtitle: Column(
+                    children: [
+                      //Lista de equipes,
+                    ],
+                  ),
+                ),
               ),
             )
           ],
