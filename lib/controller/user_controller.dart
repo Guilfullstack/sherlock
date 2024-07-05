@@ -1,7 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:sherlock/model/user_adm.dart';
+import 'package:sherlock/model/user_team.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -11,10 +12,32 @@ class AuthException implements Exception {
   );
 }
 
-class LoginController extends ChangeNotifier {
-  TextEditingController? email;
-  TextEditingController? password;
+class UserController extends ChangeNotifier {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
 
+  Future<UserTeam> addUserTeam(UserTeam userTeam) async {
+    DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
+    userTeam.id = userTeamDoc.id;
+    userTeam.date = DateTime.now();
+    await userTeamDoc.set(userTeam);
+    return Future<UserTeam>.value(userTeam);
+  }
+
+  Future<UserAdm> addUserAdm(UserAdm userAdm) async {
+    try {
+      DocumentReference<UserAdm> userAdmDoc = userAdmref.doc();
+      userAdm.id = userAdmDoc.id;
+      userAdm.date = DateTime.now();
+      await userAdmDoc.set(userAdm);
+      return Future<UserAdm>.value(userAdm);
+    } catch (e) {
+      print("erro: " + e.toString());
+      return userAdm;
+    }
+  }
+
+  /*
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? user;
   bool isLoading = true;
@@ -74,5 +97,5 @@ class LoginController extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
-  }
+  }*/
 }
