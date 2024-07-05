@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 
+// ignore: must_be_immutable
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
   UserController userController = UserController();
