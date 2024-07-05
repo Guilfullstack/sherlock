@@ -56,7 +56,7 @@ class UserController {
         if (snaphotTeam.docs.isNotEmpty) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
           print("usuario não encontrado");

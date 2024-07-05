@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sherlock/controller/user_controller.dart';
-import 'package:sherlock/model/user_adm.dart';
-import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,7 +7,7 @@ class LoginPage extends StatelessWidget {
   UserController userController = UserController();
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>(); // Chave para o formulário
+    final formKey = GlobalKey<FormState>(); // Chave para o formulário
 
     return Scaffold(
       backgroundColor: Colors.black87,
@@ -27,7 +24,7 @@ class LoginPage extends StatelessWidget {
                 'images/logo.png',
               ),
               Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(
                   children: [
                     ImputTextFormField(
@@ -43,13 +40,6 @@ class LoginPage extends StatelessWidget {
                 widthFactor: 0.5,
                 child: ElevatedButton(
                   onPressed: () async {
-                    // Verifica se o formulário é válido
-                    if (_formKey.currentState!.validate()) {
-                      String login = userController.login.text;
-                      String password = userController.password.text;
-
-                      print('Login: $login, Password: $password');
-                    }
                     userController.loginSystem(
                         context,
                         userController.login.text,
@@ -58,8 +48,8 @@ class LoginPage extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple,
                     foregroundColor: Colors.white,
-                    textStyle: TextStyle(fontSize: 20),
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    textStyle: const TextStyle(fontSize: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                   ),
                   child: const Text('Login'),
                 ),

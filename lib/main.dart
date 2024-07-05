@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
-import 'package:sherlock/view/page/loginPage.dart';
+import 'package:sherlock/view/page/login_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
