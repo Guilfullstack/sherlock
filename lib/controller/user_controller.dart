@@ -1,6 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:js';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/model/user_adm.dart';
@@ -46,7 +44,7 @@ class UserController {
           .limit(1)
           .get();
       if (snaphotAdm.docs.isNotEmpty) {
-        print("Vai para página ControlPanel");
+        debugPrint("Vai para página ControlPanel");
       } else {
         final snaphotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -55,15 +53,16 @@ class UserController {
             .get();
         if (snaphotTeam.docs.isNotEmpty) {
           Navigator.pushReplacement(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
-          print("usuario não encontrado");
+          debugPrint("usuario não encontrado");
         }
       }
     } catch (e) {
-      print("Erro: " + e.toString());
+      debugPrint('Erro: $e.toString()');
     }
   }
 

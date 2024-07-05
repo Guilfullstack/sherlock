@@ -12,7 +12,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Image.asset(
+          'images/logo.png',
+        ),
         title: const Text('Sherlock'),
+        centerTitle: true,
       ),
       body: const Center(
         child: Column(

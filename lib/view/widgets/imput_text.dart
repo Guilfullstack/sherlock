@@ -4,7 +4,8 @@ class ImputTextFormField extends StatelessWidget {
   final String title;
   final TextEditingController controller;
 
-  ImputTextFormField({required this.title, required this.controller});
+  const ImputTextFormField(
+      {super.key, required this.title, required this.controller});
 
   @override
   Widget build(BuildContext context) {
