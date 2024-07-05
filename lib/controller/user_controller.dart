@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/view/page/controller_panel_page.dart';
 import 'package:sherlock/view/page/home_page.dart';
 
 class AuthException implements Exception {
@@ -45,6 +46,11 @@ class UserController {
           .get();
       if (snaphotAdm.docs.isNotEmpty) {
         debugPrint("Vai para página ControlPanel");
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(builder: (context) => const ControllerPanelPage()),
+        );
       } else {
         final snaphotTeam = await userTeamref
             .where("login", isEqualTo: login)
