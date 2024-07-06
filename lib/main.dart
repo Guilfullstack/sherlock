@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/firebase_options.dart';
+import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 
 Future<void> main() async {
@@ -10,9 +11,9 @@ Future<void> main() async {
   runApp(
     // MultiProvider(
     // providers: [ChangeNotifierProvider(create: (context) => UserController())],
-    MaterialApp(
+    const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: HomePage(),
     ),
   );
 }
