@@ -38,21 +38,31 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               FractionallySizedBox(
-                widthFactor: 0.5,
-                child: ElevatedButton(
+                widthFactor: 0.4,
+                child: TextButton(
                   onPressed: () async {
-                    userController.loginSystem(
-                        context,
-                        userController.login.text,
-                        userController.password.text);
+                    if (formKey.currentState!.validate()) {
+                      userController.loginSystem(
+                          context,
+                          userController.login.text,
+                          userController.password.text);
+                    }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(fontSize: 20),
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        side: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color.fromARGB(255, 90, 29, 160)),
                   ),
-                  child: const Text('Login'),
+                  child: const Text('Login',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400)),
                 ),
               ),
             ],

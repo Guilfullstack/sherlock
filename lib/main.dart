@@ -11,6 +11,7 @@ Future<void> main() async {
     // MultiProvider(
     // providers: [ChangeNotifierProvider(create: (context) => UserController())],
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: LoginPage(),
     ),
   );
