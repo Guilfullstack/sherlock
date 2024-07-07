@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 
 class ListTeamController extends StatefulWidget {
-  
   final String? equipe;
-   const ListTeamController({super.key, this.equipe});
-
-  
+  final Function()? onTapEdit;
+  final Function()? onTapRemove;
+  final Function()? onTapHistory;
+  final bool? onDesktop;
+  final double? credit;
+  final String? status;
+  const ListTeamController({
+    super.key,
+    this.equipe,
+    this.onTapEdit,
+    this.onTapRemove,
+    this.onTapHistory,
+    this.onDesktop = false,
+    this.credit,
+    this.status,
+  });
 
   @override
   State<ListTeamController> createState() => _ListTeamControllerState();
@@ -14,53 +26,65 @@ class ListTeamController extends StatefulWidget {
 class _ListTeamControllerState extends State<ListTeamController> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.equipe ?? "Sem nome"),
-      leading: const CircleAvatar(
-        child: Icon(Icons.people),
-      ),
-      trailing: PopupMenuButton<String>(
-  onSelected: (String value) {
-    // Ação a ser tomada quando um item do menu for selecionado
-    print('Você selecionou: $value');
-  },
-  itemBuilder: (BuildContext context) {
-    return [
-      const PopupMenuItem<String>(
-        value: 'Opção 1',
-        child: Row(
-          children: [
-            Icon(Icons.edit),
-            SizedBox(width: 8),
-            Text('Opção 1'),
-          ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          widget.equipe ?? "Sem nome",
+          style: TextStyle(
+            color: ThemeData().primaryColorLight,
+          ),
+        ),
+        subtitle: Text(
+            "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit ?? "0"}"),
+        leading: const CircleAvatar(
+          backgroundColor: Color.fromARGB(255, 95, 95, 95),
+          child: Icon(
+            Icons.people,
+            color: Colors.black,
+          ),
+        ),
+        trailing: PopupMenuButton<String>(
+          tooltip: "Menu",
+          itemBuilder: (BuildContext context) {
+            return [
+              PopupMenuItem<String>(
+                onTap: widget.onTapEdit,
+                child: const Row(
+                  children: [
+                    Icon(Icons.edit),
+                    SizedBox(width: 8),
+                    Text('Editar'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                onTap: widget.onTapRemove,
+                child: const Row(
+                  children: [
+                    Icon(Icons.delete),
+                    SizedBox(width: 8),
+                    Text('Remover'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                enabled: widget.onDesktop == false ? true : false,
+                onTap: widget.onTapHistory,
+                child: const Row(
+                  children: [
+                    Icon(Icons.history),
+                    SizedBox(width: 8),
+                    Text('Historico'),
+                  ],
+                ),
+              ),
+            ];
+          },
+          icon: const Icon(Icons.more_vert), // Ícone do botão de ação
         ),
       ),
-      const PopupMenuItem<String>(
-        value: 'Opção 2',
-        child: Row(
-          children: [
-            Icon(Icons.delete),
-            SizedBox(width: 8),
-            Text('Opção 2'),
-          ],
-        ),
-      ),
-      const PopupMenuItem<String>(
-        value: 'Opção 3',
-        child: Row(
-          children: [
-            Icon(Icons.share),
-            SizedBox(width: 8),
-            Text('Opção 3'),
-          ],
-        ),
-      ),
-    ];
-  },
-  icon: const Icon(Icons.more_vert), // Ícone do botão de ação
-),
-
     );
   }
 }

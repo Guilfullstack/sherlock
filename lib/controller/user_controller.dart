@@ -14,17 +14,31 @@ class AuthException implements Exception {
   );
 }
 
-class UserController {
+class UserController extends ChangeNotifier {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKeyEditTeam = GlobalKey<FormState>();
+  TextEditingController id = TextEditingController();
   TextEditingController login = TextEditingController();
   TextEditingController password = TextEditingController();
+  TextEditingController loginEdit = TextEditingController();
+  TextEditingController passwordEdit = TextEditingController();
   UserAdm? userAdm;
   UserTeam? userTeam;
+
+  List<UserTeam> listTeamn = [];
+  bool loading = false;
+  bool update = false;
+  bool history = false;
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
     userTeam.id = userTeamDoc.id;
     userTeam.date = DateTime.now();
     await userTeamDoc.set(userTeam);
+    listTeamn.insert(0, userTeam);
+    login.clear();
+    password.clear();
+    notifyListeners();
     return Future<UserTeam>.value(userTeam);
   }
 
@@ -69,6 +83,53 @@ class UserController {
       }
     } catch (e) {
       debugPrint('Erro: $e.toString()');
+    }
+  }
+
+  Future loadTeams() async {
+    final snapshot = await userTeamref.get();
+    listTeamn.clear();
+    for (var doc in snapshot.docs) {
+      listTeamn.add(UserTeam.fromJson(doc));
+    }
+    notifyListeners();
+  }
+
+  Future removeTeams(String id) async {
+    await userTeamref.doc(id).delete();
+    listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
+    notifyListeners();
+  }
+
+  Future updateTeams(UserTeam newUserTeam) async {
+    try {
+      // Encontrar a equipe existente
+      int index = listTeamn.indexWhere((team) => team.id == newUserTeam.id);
+      if (index != -1) {
+        UserTeam oldUserTeam = listTeamn[index];
+
+        // Criar um mapa para os campos que foram alterados
+        Map<String, dynamic> updatedFields = {};
+
+        if (oldUserTeam.name != newUserTeam.name) {
+          updatedFields['name'] = newUserTeam.name;
+        }
+        if (oldUserTeam.login != newUserTeam.login) {
+          updatedFields['login'] = newUserTeam.login;
+        }
+        if (oldUserTeam.password != newUserTeam.password) {
+          updatedFields['password'] = newUserTeam.password;
+        }
+
+        // Se houver campos atualizados, atualize o documento no Firestore
+        if (updatedFields.isNotEmpty) {
+          await userTeamref.doc(newUserTeam.id).update(updatedFields);
+          listTeamn[index] = newUserTeam;
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      print("Erro ao atualizar equipe: $e");
     }
   }
 

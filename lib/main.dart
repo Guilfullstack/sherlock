@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
+import 'package:sherlock/view/page/controller_panel_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 
 Future<void> main() async {
@@ -8,10 +11,20 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
-    // MultiProvider(
-    // providers: [ChangeNotifierProvider(create: (context) => UserController())],
-    MaterialApp(
-      home: LoginPage(),
+    ChangeNotifierProvider(
+      create: (context) => UserController(),
+      child: MaterialApp(
+        theme: ThemeData(
+          primaryColorLight: Colors.white,
+          scaffoldBackgroundColor: Colors.black87,
+          listTileTheme: const ListTileThemeData(
+            tileColor: Colors.black,
+          ),
+          cardColor: const Color.fromARGB(
+              255, 189, 189, 189), // Cor dos Cards definida em RGB
+        ),
+        home: LoginPage(),
+      ),
     ),
   );
 }
