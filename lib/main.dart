@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/view/page/controller_panel_page.dart';
+import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 
 Future<void> main() async {

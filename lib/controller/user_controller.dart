@@ -78,7 +78,31 @@ class UserController extends ChangeNotifier {
             MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
-          debugPrint("usuario não encontrado");
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+                'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
+          ));
+          /*
+          showDialog(
+            // ignore: use_build_context_synchronously
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Usuário não encontrado'),
+                content:
+                    const Text('Verifique suas credenciais e tente novamente.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Fecha o AlertDialog
+                    },
+                  ),
+                ],
+              );
+            },
+          );*/
         }
       }
     } catch (e) {
