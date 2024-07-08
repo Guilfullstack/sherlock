@@ -21,7 +21,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
     super.initState();
     userController.listTeamSubscription;
     //Provider.of<UserController>(context, listen: false).subscribeToTeams();
-    userController.loadTeams();
+    //userController.loadTeams();
   }
 
   @override

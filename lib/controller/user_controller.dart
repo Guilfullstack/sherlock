@@ -128,8 +128,8 @@ class UserController extends ChangeNotifier {
 
   Future removeTeams(String id) async {
     await userTeamref.doc(id).delete();
-    listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
-    notifyListeners();
+    //listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
+    //notifyListeners();
   }
 
   Future updateTeams(UserTeam newUserTeam) async {
