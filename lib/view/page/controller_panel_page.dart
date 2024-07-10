@@ -19,8 +19,15 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<UserController>(context, listen: false).loadTeams();
+    userController.listTeamSubscription;
+    //Provider.of<UserController>(context, listen: false).subscribeToTeams();
     //userController.loadTeams();
+  }
+
+  @override
+  void dispose() {
+    userController.listTeamSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -33,97 +40,107 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ChangeNotifierProvider<UserController>(
-            create: (context) => UserController()..loadTeams(),
+            create: (context) => UserController(),
             child: Consumer<UserController>(
-                builder: (context, userController, child) {
-              return Center(
-                child: Wrap(
-                  children: [
-                    SizedBox(
-                      //width: 500,
-                      height: MediaQuery.of(context).size.width > 1024
-                          ? MediaQuery.of(context).size.height - 100
-                          : MediaQuery.of(context).size.height / 2 - 50,
-                      child: Card(
-                        elevation: 3,
-                        shadowColor: const Color.fromRGBO(189, 189, 189, 189),
-                        color: const Color.fromRGBO(189, 189, 189, 189),
-                        child: Form(
-                          key: userController.formKey,
-                          child: _addTeams(context, false, userController),
+              builder: (context, userController, child) {
+                return Center(
+                  child: Wrap(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.width > 1024
+                            ? MediaQuery.of(context).size.height - 100
+                            : MediaQuery.of(context).size.height / 2 - 50,
+                        child: Card(
+                          elevation: 3,
+                          shadowColor: const Color.fromRGBO(189, 189, 189, 189),
+                          color: const Color.fromRGBO(189, 189, 189, 189),
+                          child: Form(
+                            key: userController.formKey,
+                            child: _addTeams(context, false, userController),
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      height: MediaQuery.of(context).size.width > 1024
-                          ? MediaQuery.of(context).size.height - 100
-                          : MediaQuery.of(context).size.height / 2 - 50,
-                      child: Card(
-                        elevation: 3,
-                        shadowColor: const Color.fromRGBO(189, 189, 189, 189),
-                        color: const Color.fromRGBO(189, 189, 189, 189),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: ListView.builder(
-                            itemCount: userController.listTeamn.length,
-                            itemBuilder: (context, index) {
-                              final team = userController.listTeamn[index];
-                              if (userController.listTeamn.isEmpty) {
+                      //lista das equipes
+                      SizedBox(
+                        width: 500,
+                        height: MediaQuery.of(context).size.width > 1024
+                            ? MediaQuery.of(context).size.height - 100
+                            : MediaQuery.of(context).size.height / 2 - 50,
+                        child: Card(
+                          color: const Color.fromRGBO(189, 189, 189, 189),
+                          child: StreamBuilder<List<UserTeam>>(
+                            stream: userController.teamStream,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                                 return const Center(
-                                    child: Text(
-                                  "Sem equipes",
-                                  style: TextStyle(color: Colors.white),
-                                ));
-                              } else {
-                                return ListTeamController(
-                                  equipe: team.name,
-                                  onTapRemove: () {
-                                    userController
-                                        .removeTeams(team.id.toString());
-                                  },
-                                  onTapEdit: () {
-                                    setState(() {
-                                      showModalBottomSheet(
-                                          backgroundColor: Colors.black,
-                                          isScrollControlled: false,
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            print(MediaQuery.of(context)
-                                                .size
-                                                .width);
-                                            userController.id.text =
-                                                team.id ?? "";
-                                            userController.loginEdit.text =
-                                                team.login ?? "";
-                                            userController.passwordEdit.text =
-                                                team.password ?? "";
-                                            return Form(
-                                              key: userController
-                                                  .formKeyEditTeam,
-                                              child: _addTeams(context, true,
-                                                  userController),
-                                            );
-                                          });
-                                    });
-                                  },
-                                  onDesktop:
-                                      MediaQuery.of(context).size.width > 1329
-                                          ? true
-                                          : false,
-                                  onTapHistory: () {},
-                                );
+                                    child: CircularProgressIndicator());
                               }
+                              if (snapshot.hasError) {
+                                return const Center(
+                                    child: Text('Erro ao carregas as equipes'));
+                              }
+                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const Center(
+                                    child: Text('Não há nenhuma equipe'));
+                              }
+
+                              final listTeamn = snapshot.data!;
+
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: ListView.builder(
+                                  itemCount: listTeamn.length,
+                                  itemBuilder: (context, index) {
+                                    final team = listTeamn[index];
+                                    return ListTeamController(
+                                      equipe: team.name,
+                                      credit: team.credit,
+                                      onTapRemove: () {
+                                        userController
+                                            .removeTeams(team.id.toString());
+                                      },
+                                      onTapEdit: () {
+                                        setState(() {
+                                          showModalBottomSheet(
+                                            backgroundColor: Colors.black,
+                                            isScrollControlled: false,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              userController.id.text =
+                                                  team.id ?? "";
+                                              userController.loginEdit.text =
+                                                  team.login ?? "";
+                                              userController.passwordEdit.text =
+                                                  team.password ?? "";
+                                              return Form(
+                                                key: userController
+                                                    .formKeyEditTeam,
+                                                child: _addTeams(context, true,
+                                                    userController),
+                                              );
+                                            },
+                                          );
+                                        });
+                                      },
+                                      onDesktop:
+                                          MediaQuery.of(context).size.width >
+                                              1329,
+                                      onTapHistory: () {},
+                                    );
+                                  },
+                                ),
+                              );
                             },
                           ),
                         ),
                       ),
-                    ),
-                    history(context)
-                  ],
-                ),
-              );
-            }),
+                      history(context)
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -178,14 +195,25 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
       constraints: const BoxConstraints(
         maxWidth: 500,
       ),
-      child: Column(
+      child: ListView(
         children: [
-          Text(
-            update == false ? 'Adicionar Equipe' : 'Atualizar Equipe',
-            style: const TextStyle(fontSize: 18, color: Colors.purple),
+          Center(
+            child: Text(
+              update == false ? 'Adicionar Equipe' : 'Atualizar Equipe',
+              style: const TextStyle(fontSize: 18, color: Colors.purple),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: ImputTextFormField(
+              title: 'Nome da Equipe',
+              controller: update == false
+                  ? userController.name
+                  : userController.nameEdit,
+            ),
           ),
           ImputTextFormField(
-            title: 'Nome da Equipe',
+            title: 'Login da Equipe',
             controller: update == false
                 ? userController.login
                 : userController.loginEdit,
@@ -221,6 +249,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                               name: userController.login.text,
                               login: userController.login.text,
                               password: userController.password.text,
+                              credit: 0,
                             );
                             setState(() {
                               userController.loading = true;
@@ -251,7 +280,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                             Text(update == false ? "Adicionar" : "Atualizar"))
                     : const Center(child: CircularProgressIndicator()),
               ),
-
+              //botão historico
               Visibility(
                 visible:
                     MediaQuery.of(context).size.width > 1329 || update == true

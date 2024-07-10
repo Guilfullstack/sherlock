@@ -1,4 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+import 'dart:js_interop';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +22,10 @@ class UserController extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> formKeyEditTeam = GlobalKey<FormState>();
   TextEditingController id = TextEditingController();
+  TextEditingController name = TextEditingController();
   TextEditingController login = TextEditingController();
   TextEditingController password = TextEditingController();
+  TextEditingController nameEdit = TextEditingController();
   TextEditingController loginEdit = TextEditingController();
   TextEditingController passwordEdit = TextEditingController();
   UserAdm? userAdm;
@@ -30,6 +35,8 @@ class UserController extends ChangeNotifier {
   bool loading = false;
   bool update = false;
   bool history = false;
+
+  StreamSubscription<QuerySnapshot>? listTeamSubscription;
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
@@ -126,8 +133,8 @@ class UserController extends ChangeNotifier {
 
   Future removeTeams(String id) async {
     await userTeamref.doc(id).delete();
-    listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
-    notifyListeners();
+    //listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
+    //notifyListeners();
   }
 
   Future updateTeams(UserTeam newUserTeam) async {
@@ -162,8 +169,41 @@ class UserController extends ChangeNotifier {
     }
   }
 
-/*
-  //final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<List<UserTeam>> get teamStream {
+    return _firestore.collection('Teams').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return UserTeam.fromJson(doc.data());
+      }).toList();
+    });
+  }
+
+  // subscribeToTeams() {
+  //   try {
+  //     listTeamSubscription = userAdmRef.snapshots().listen(
+  //       (querySnapshot) {
+  //         List<UserTeam> trufasAtualizados = querySnapshot.docs
+  //             .map((doc) => UserTeam.fromJson(doc.data()))
+  //             .toList();
+
+  //         listTeamn = List.from(trufasAtualizados);
+
+  //         listTeamn.clear();
+  //         notifyListeners();
+  //         print("equipes ${listTeamn.length}");
+  //         for (var user in trufasAtualizados) {
+  //           listTeamn.add(user);
+  //         }
+  //       },
+  //     );
+  //   } catch (e) {
+  //     print("Erro ao assinar a coleção: $e");
+  //   }
+  // }
+
+  /*
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   User? user;
   bool isLoading = true;
   
