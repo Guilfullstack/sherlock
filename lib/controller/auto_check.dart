@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/view/page/home_page.dart';
-import 'package:sherlock/view/page/loginPage.dart';
+import 'package:sherlock/view/page/login_page.dart';
 
 class AuthCheck extends StatefulWidget {
   const AuthCheck({super.key});
@@ -15,7 +15,7 @@ class AuthCheck extends StatefulWidget {
 class _AuthCheckState extends State<AuthCheck> {
   @override
   Widget build(BuildContext context) {
-    LoginController auth = Provider.of<LoginController>(context);
+    UserController auth = Provider.of<UserController>(context);
 
     if (auth.isLoading) {
       return loading();
