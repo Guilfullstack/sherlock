@@ -54,6 +54,7 @@ class UserController extends ChangeNotifier {
     userAdm.id = userAdmDoc.id;
     userAdm.date = DateTime.now();
     await userAdmDoc.set(userAdm);
+    notifyListeners();
     return Future<UserAdm>.value(userAdm);
   }
 

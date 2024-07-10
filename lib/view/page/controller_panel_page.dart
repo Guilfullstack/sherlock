@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 import 'package:sherlock/view/widgets/list_team_controller.dart';
@@ -34,6 +35,22 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    backgroundColor: Colors.black,
+                    content: SizedBox(
+                        height: 300,
+                        width: 300,
+                        child: _addTeams(context, true, false, userController)),
+                  );
+                });
+          },
+          child: const Icon(Icons.add),
+        ),
         appBar: AppBar(
           title: const Text('Controller Panel'),
         ),
@@ -56,7 +73,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                           color: const Color.fromRGBO(189, 189, 189, 189),
                           child: Form(
                             key: userController.formKey,
-                            child: _addTeams(context, false, userController),
+                            child: _addTeams(
+                                context, false, false, userController),
                           ),
                         ),
                       ),
@@ -109,6 +127,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                                             builder: (BuildContext context) {
                                               userController.id.text =
                                                   team.id ?? "";
+                                              userController.nameEdit.text =
+                                                  team.name ?? "";
                                               userController.loginEdit.text =
                                                   team.login ?? "";
                                               userController.passwordEdit.text =
@@ -116,8 +136,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                                               return Form(
                                                 key: userController
                                                     .formKeyEditTeam,
-                                                child: _addTeams(context, true,
-                                                    userController),
+                                                child: _addTeams(context, false,
+                                                    true, userController),
                                               );
                                             },
                                           );
@@ -189,8 +209,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
     );
   }
 
-  Container _addTeams(
-      BuildContext context, bool update, UserController userController) {
+  Container _addTeams(BuildContext context, bool addAdm, bool update,
+      UserController userController) {
     return Container(
       constraints: const BoxConstraints(
         maxWidth: 500,
@@ -199,17 +219,24 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
         children: [
           Center(
             child: Text(
-              update == false ? 'Adicionar Equipe' : 'Atualizar Equipe',
+              update == false
+                  ? addAdm == true
+                      ? "Adicionar Administrador"
+                      : 'Adicionar Equipe'
+                  : 'Atualizar Equipe',
               style: const TextStyle(fontSize: 18, color: Colors.purple),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
-            child: ImputTextFormField(
-              title: 'Nome da Equipe',
-              controller: update == false
-                  ? userController.name
-                  : userController.nameEdit,
+            child: Visibility(
+              visible: addAdm == true ? false : true,
+              child: ImputTextFormField(
+                title: 'Nome da Equipe',
+                controller: update == false
+                    ? userController.name
+                    : userController.nameEdit,
+              ),
             ),
           ),
           ImputTextFormField(
@@ -244,25 +271,44 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                 child: userController.loading == false
                     ? ElevatedButton(
                         onPressed: () async {
+                          //adiciona equipe
                           if (update == false) {
-                            final newUserTeams = UserTeam(
-                              name: userController.login.text,
-                              login: userController.login.text,
-                              password: userController.password.text,
-                              credit: 0,
-                            );
-                            setState(() {
-                              userController.loading = true;
-                            });
+                            if (addAdm == true) {
+                              setState(() {
+                                userController.loading = true;
+                                print("Foi");
+                              });
+                              final newUserAdm = UserAdm(
+                                login: userController.login.text,
+                                password: userController.password.text,
+                              );
+                              await userController.addUserAdm(newUserAdm);
+                              setState(() {
+                                userController.loading = false;
+                              });
+                              Navigator.pop(context);
+                            } else if (addAdm == false) {
+                              final newUserTeams = UserTeam(
+                                name: userController.name.text,
+                                login: userController.login.text,
+                                password: userController.password.text,
+                                credit: 0,
+                              );
+                              setState(() {
+                                userController.loading = true;
+                              });
 
-                            await userController.addUserTeam(newUserTeams);
-                            setState(() {
-                              userController.loading = false;
-                            });
-                          } else {
+                              await userController.addUserTeam(newUserTeams);
+                              setState(() {
+                                userController.loading = false;
+                              });
+                            }
+
+                            //adicionar adm
+                          } else if (update == true) {
                             final newUserTeamsEdit = UserTeam(
                               id: userController.id.text,
-                              name: userController.loginEdit.text,
+                              name: userController.nameEdit.text,
                               login: userController.loginEdit.text,
                               password: userController.passwordEdit.text,
                             );
