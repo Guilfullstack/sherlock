@@ -15,16 +15,23 @@ Future<void> main() async {
     ChangeNotifierProvider(
       create: (context) => UserController(),
       child: MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => LoginPage(),
+          '/home': (context) =>
+              const HomePage(), // Substitua `HomePage` pela sua tela principal
+          '/login': (context) => LoginPage(),
+          '/controll': (context) => const ControllerPanelPage(),
+        },
         theme: ThemeData(
           primaryColorLight: Colors.white,
           scaffoldBackgroundColor: Colors.black87,
           listTileTheme: const ListTileThemeData(
             tileColor: Colors.black,
           ),
-          cardColor: const Color.fromARGB(
-              255, 189, 189, 189), // Cor dos Cards definida em RGB
+          cardColor:
+              Color.fromARGB(255, 117, 21, 21), // Cor dos Cards definida em RGB
         ),
-        home: LoginPage(),
       ),
     ),
   );

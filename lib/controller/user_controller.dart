@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:js_interop';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -68,11 +69,13 @@ class UserController extends ChangeNotifier {
           .get();
       if (snaphotAdm.docs.isNotEmpty) {
         debugPrint("Vai para página ControlPanel");
+        /*
         Navigator.pushReplacement(
           // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (context) => const ControllerPanelPage()),
-        );
+        );*/
+        Navigator.pushReplacementNamed(context, '/controll');
       } else {
         final snaphotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -80,11 +83,13 @@ class UserController extends ChangeNotifier {
             .limit(1)
             .get();
         if (snaphotTeam.docs.isNotEmpty) {
+          /*
           Navigator.pushReplacement(
             // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(builder: (context) => const HomePage()),
-          );
+          );*/
+          Navigator.pushReplacementNamed(context, '/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             backgroundColor: Colors.redAccent,
@@ -202,6 +207,7 @@ class UserController extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? user;
   bool isLoading = true;
+  
   LoginController() {
     autcheck();
   }
