@@ -67,10 +67,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      /*userController.loginSystem(
-                          context,
-                          userController.login.text,
-                          userController.password.text);*/
                       userController.loginSystem(
                           context,
                           userController.login.text.trim(),

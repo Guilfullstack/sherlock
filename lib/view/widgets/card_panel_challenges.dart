@@ -10,7 +10,7 @@ class CardPanelChallenges extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Center(
+        const Center(
           child: Text(
             'Provas',
             style: TextStyle(

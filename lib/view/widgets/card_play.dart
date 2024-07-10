@@ -7,11 +7,11 @@ class CardPlay extends StatelessWidget {
   final bool isUsed;
   final CartaTipo tipo;
   const CardPlay({
-    Key? key,
+    super.key,
     required this.src,
     required this.isUsed,
     required this.tipo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
-import 'dart:js_interop';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_team.dart';
-import 'package:sherlock/view/page/controller_panel_page.dart';
-import 'package:sherlock/view/page/home_page.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -59,6 +55,46 @@ class UserController extends ChangeNotifier {
     return Future<UserAdm>.value(userAdm);
   }
 
+  Future<void> loginSystem(
+      BuildContext context, String login, String password) async {
+    try {
+      final snaphotAdm = await userAdmRef
+          .where("login", isEqualTo: login)
+          .where("password", isEqualTo: password)
+          .limit(1)
+          .get();
+      if (snaphotAdm.docs.isNotEmpty) {
+        await _saveLoginState(true, login);
+        Navigator.pushReplacementNamed(context, '/controll');
+      } else {
+        final snaphotTeam = await userTeamref
+            .where("login", isEqualTo: login)
+            .where("password", isEqualTo: password)
+            .limit(1)
+            .get();
+        if (snaphotTeam.docs.isNotEmpty) {
+          await _saveLoginState(true, login);
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+                'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
+          ));
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro: $e.toString()');
+    }
+  }
+
+  Future<void> _saveLoginState(bool isLoggedIn, String login) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+    await prefs.setString('login', login);
+  }
+
+/*
   Future<void> loginSystem(
       BuildContext context, String login, String password) async {
     try {
@@ -121,7 +157,7 @@ class UserController extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro: $e.toString()');
     }
-  }
+  }*/
 
   Future loadTeams() async {
     final snapshot = await userTeamref.get();

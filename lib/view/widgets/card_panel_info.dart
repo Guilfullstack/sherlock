@@ -14,7 +14,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
     return Card(
       color: Colors.grey[800],
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.white),
+        side: const BorderSide(color: Colors.white),
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
