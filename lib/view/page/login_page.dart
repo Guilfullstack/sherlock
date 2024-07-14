@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/view/page/controller_panel_page.dart';
+import 'package:sherlock/view/page/home_page.dart';
+import 'package:sherlock/view/page/staff_page.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,17 +24,43 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    String category = prefs.getString('category') ?? '';
 
     if (isLoggedIn) {
-      // Navega para a tela inicial se o usuário estiver logado
-      Navigator.pushReplacementNamed(context, '/controll');
+      // Navega para a tela correspondente com base na categoria do usuário
+      switch (category) {
+        case 'Adm':
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ControllerPanelPage()));
+          break;
+        case 'Equipe':
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+          break;
+        case 'Staff':
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const StaffPage())); // Substitua 'StaffPage' pela página correta.
+          break;
+        default:
+          // Caso não haja uma categoria válida, volte para a tela de login
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      checkLoginStatus();
+    });
+    //checkLoginStatus();
   }
 
   @override
