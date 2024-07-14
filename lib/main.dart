@@ -19,7 +19,6 @@ void clearHiveData() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  clearHiveData();
   // Inicializa o Hive com o diretório de documentos do aplicativo
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   await Hive.initFlutter(

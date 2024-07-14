@@ -7,7 +7,6 @@ import 'package:sherlock/view/widgets/card_funtions.dart';
 import 'package:sherlock/view/widgets/card_panel_challenges.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
 import 'package:sherlock/view/widgets/challanges.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,13 +45,18 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(color: Colors.white),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.info)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.info)),
-          TextButton(
-              onPressed: () {
-                userController.logout(context);
-              },
-              child: Text('Log Out'))
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.info,
+                color: Colors.purple,
+              )),
+          IconButton(
+              onPressed: () => userController.logout(context),
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.purple,
+              )),
         ],
         shape: const Border(
           bottom: BorderSide(
@@ -93,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              CardPanelChallenges(
+              const CardPanelChallenges(
                 listchalanges: [
                   Challenge(name: "Prova", isUnlocked: true),
                   Challenge(name: "Prova", isUnlocked: true),
@@ -106,9 +110,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.key),
         onPressed: () {},
         backgroundColor: Colors.grey,
+        child: const Icon(
+          Icons.key,
+          color: Colors.purple,
+        ),
       ),
     );
   }
