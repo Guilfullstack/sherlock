@@ -35,6 +35,34 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              SizedBox(
+                  height: 300, child: listUsers(context, userController, 250)),
+              ExpansionTile(
+                title: const Text("Adicionar ADM"),
+                children: [
+                  Container(
+                    color: Colors.black,
+                    height: 300,
+                    child: _addTeams(context, true, false, userController),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text("Adicionar Staff"),
+                children: [
+                  Container(
+                    color: Colors.black,
+                    height: 300,
+                    child: _addTeams(context, true, false, userController),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             showDialog(
@@ -79,83 +107,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                         ),
                       ),
                       //lista das equipes
-                      SizedBox(
-                        width: 500,
-                        height: MediaQuery.of(context).size.width > 1024
-                            ? MediaQuery.of(context).size.height - 100
-                            : MediaQuery.of(context).size.height / 2 - 50,
-                        child: Card(
-                          color: const Color.fromRGBO(189, 189, 189, 189),
-                          child: StreamBuilder<List<UserTeam>>(
-                            stream: userController.teamStream,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              }
-                              if (snapshot.hasError) {
-                                debugPrint("${snapshot.error}");
-                                return const Center(
-                                    child: Text('Erro ao carregas as equipes'));
-                              }
-                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return const Center(
-                                    child: Text('Não há nenhuma equipe'));
-                              }
-
-                              final listTeamn = snapshot.data!;
-
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: ListView.builder(
-                                  itemCount: listTeamn.length,
-                                  itemBuilder: (context, index) {
-                                    final team = listTeamn[index];
-                                    return ListTeamController(
-                                      equipe: team.name,
-                                      credit: team.credit,
-                                      onTapRemove: () {
-                                        userController
-                                            .removeTeams(team.id.toString());
-                                      },
-                                      onTapEdit: () {
-                                        setState(() {
-                                          showModalBottomSheet(
-                                            backgroundColor: Colors.black,
-                                            isScrollControlled: false,
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              userController.id.text =
-                                                  team.id ?? "";
-                                              userController.nameEdit.text =
-                                                  team.name ?? "";
-                                              userController.loginEdit.text =
-                                                  team.login ?? "";
-                                              userController.passwordEdit.text =
-                                                  team.password ?? "";
-                                              return Form(
-                                                key: userController
-                                                    .formKeyEditTeam,
-                                                child: _addTeams(context, false,
-                                                    true, userController),
-                                              );
-                                            },
-                                          );
-                                        });
-                                      },
-                                      onDesktop:
-                                          MediaQuery.of(context).size.width >
-                                              1329,
-                                      onTapHistory: () {},
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
+                      listUsers(context, userController, 500),
                       history(context)
                     ],
                   ),
@@ -163,6 +115,76 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
               },
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  SizedBox listUsers(
+      BuildContext context, UserController userController, double width) {
+    return SizedBox(
+      width: width,
+      height: MediaQuery.of(context).size.width > 1024
+          ? MediaQuery.of(context).size.height - 100
+          : MediaQuery.of(context).size.height / 2 - 50,
+      child: Card(
+        color: const Color.fromRGBO(189, 189, 189, 189),
+        child: StreamBuilder<List<UserTeam>>(
+          stream: userController.teamStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              debugPrint("${snapshot.error}");
+              return const Center(child: Text('Erro ao carregas as equipes'));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Não há nenhuma equipe'));
+            }
+
+            final listTeamn = snapshot.data!;
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: ListView.builder(
+                itemCount: listTeamn.length,
+                itemBuilder: (context, index) {
+                  final team = listTeamn[index];
+                  return ListTeamController(
+                    equipe: team.name,
+                    credit: team.credit,
+                    onTapRemove: () {
+                      userController.removeTeams(team.id.toString());
+                    },
+                    onTapEdit: () {
+                      setState(() {
+                        showModalBottomSheet(
+                          backgroundColor: Colors.black,
+                          isScrollControlled: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            userController.id.text = team.id ?? "";
+                            userController.nameEdit.text = team.name ?? "";
+                            userController.loginEdit.text = team.login ?? "";
+                            userController.passwordEdit.text =
+                                team.password ?? "";
+                            return Form(
+                              key: userController.formKeyEditTeam,
+                              child: _addTeams(
+                                  context, false, true, userController),
+                            );
+                          },
+                        );
+                      });
+                    },
+                    onDesktop: MediaQuery.of(context).size.width > 1329,
+                    onTapHistory: () {},
+                  );
+                },
+              ),
+            );
+          },
         ),
       ),
     );
@@ -272,12 +294,11 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                 child: userController.loading == false
                     ? ElevatedButton(
                         onPressed: () async {
-                          //adiciona equipe
+                          //add ADM
                           if (update == false) {
                             if (addAdm == true) {
                               setState(() {
                                 userController.loading = true;
-                                debugPrint("Foi");
                               });
                               final newUserAdm = UserAdm(
                                 login: userController.login.text,
@@ -288,6 +309,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                                 userController.loading = false;
                               });
                               exitWindows;
+                              //add Equipe
                             } else if (addAdm == false) {
                               final newUserTeams = UserTeam(
                                 name: userController.name.text,
@@ -304,8 +326,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                                 userController.loading = false;
                               });
                             }
-
-                            //adicionar adm
+                            //Atualizar Equipe
                           } else if (update == true) {
                             final newUserTeamsEdit = UserTeam(
                               id: userController.id.text,
@@ -314,6 +335,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                               password: userController.passwordEdit.text,
                             );
                             setState(() {
+                              print("id:${userController.id.text}");
                               userController.loading = true;
                             });
                             await userController.updateTeams(newUserTeamsEdit);

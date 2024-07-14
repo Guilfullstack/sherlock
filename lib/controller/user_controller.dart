@@ -270,29 +270,34 @@ class UserController extends ChangeNotifier {
 
   Future updateTeams(UserTeam newUserTeam) async {
     try {
-      // Encontrar a equipe existente
-      int index = listTeamn.indexWhere((team) => team.id == newUserTeam.id);
-      if (index != -1) {
-        UserTeam oldUserTeam = listTeamn[index];
+      // Buscar documentos na coleção "Formulario" que correspondem ao "idPaciente" especificado
+      QuerySnapshot querySnapshot =
+          await userTeamref.where('id', isEqualTo: newUserTeam.id).get();
 
-        // Criar um mapa para os campos que foram alterados
-        Map<String, dynamic> updatedFields = {};
+      // Função auxiliar para construir dinamicamente o mapa de atualização
+      Map<String, dynamic> buildUpdateData(UserTeam userTeam) {
+        Map<String, dynamic> data = {};
 
-        if (oldUserTeam.name != newUserTeam.name) {
-          updatedFields['name'] = newUserTeam.name;
+        if (userTeam.name != null && nameEdit.text.isNotEmpty) {
+          data['name'] = nameEdit.text;
         }
-        if (oldUserTeam.login != newUserTeam.login) {
-          updatedFields['login'] = newUserTeam.login;
+        if (userTeam.login != null && loginEdit.text.isNotEmpty) {
+          data['login'] = loginEdit.text;
         }
-        if (oldUserTeam.password != newUserTeam.password) {
-          updatedFields['password'] = newUserTeam.password;
+        if (userTeam.password != null && passwordEdit.text.isNotEmpty) {
+          data['password'] = passwordEdit.text;
         }
 
-        // Se houver campos atualizados, atualize o documento no Firestore
-        if (updatedFields.isNotEmpty) {
-          await userTeamref.doc(newUserTeam.id).update(updatedFields);
-          listTeamn[index] = newUserTeam;
-          notifyListeners();
+        return data;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+        DocumentSnapshot document = querySnapshot.docs.first;
+        Map<String, dynamic> updateData = buildUpdateData(newUserTeam);
+
+        if (updateData.isNotEmpty) {
+          await document.reference.update(updateData);
         }
       }
     } catch (e) {
@@ -304,6 +309,13 @@ class UserController extends ChangeNotifier {
 
   Stream<List<UserTeam>> get teamStream {
     return _firestore.collection('Teams').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return UserTeam.fromJson(doc.data());
+      }).toList();
+    });
+  }
+  Stream<List<UserTeam>> get admStream {
+    return _firestore.collection('Adm').snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         return UserTeam.fromJson(doc.data());
       }).toList();
