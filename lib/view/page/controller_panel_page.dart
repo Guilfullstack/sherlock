@@ -57,7 +57,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ChangeNotifierProvider<UserController>(
-            create: (context) => UserController(),
+            create: (context) => UserController()..teamStream,
             child: Consumer<UserController>(
               builder: (context, userController, child) {
                 return Center(
@@ -95,6 +95,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                                     child: CircularProgressIndicator());
                               }
                               if (snapshot.hasError) {
+                                debugPrint("${snapshot.error}");
                                 return const Center(
                                     child: Text('Erro ao carregas as equipes'));
                               }
@@ -276,7 +277,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                             if (addAdm == true) {
                               setState(() {
                                 userController.loading = true;
-                                print("Foi");
+                                debugPrint("Foi");
                               });
                               final newUserAdm = UserAdm(
                                 login: userController.login.text,
@@ -286,7 +287,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                               setState(() {
                                 userController.loading = false;
                               });
-                              Navigator.pop(context);
+                              exitWindows;
                             } else if (addAdm == false) {
                               final newUserTeams = UserTeam(
                                 name: userController.name.text,
@@ -319,7 +320,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                             setState(() {
                               userController.loading = false;
                             });
-                            Navigator.pop(context);
+                            exitWindows;
                           }
                         },
                         child:
@@ -336,7 +337,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
                   onPressed: () {
                     setState(() {
                       historyVisible = true;
-                      print(userController.history);
+                      debugPrint("${userController.history}");
                     });
 
                     showModalBottomSheet(
@@ -376,5 +377,9 @@ class _ControllerPanelPageState extends State<ControllerPanelPage> {
         ],
       ),
     );
+  }
+
+  exitWindows() {
+    Navigator.pop(context);
   }
 }

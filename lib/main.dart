@@ -30,7 +30,7 @@ Future<void> main() async {
             tileColor: Colors.black,
           ),
           cardColor:
-              Color.fromARGB(255, 117, 21, 21), // Cor dos Cards definida em RGB
+              const Color.fromARGB(255, 117, 21, 21), // Cor dos Cards definida em RGB
         ),
       ),
     ),

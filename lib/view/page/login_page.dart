@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (isLoggedIn) {
       // Navega para a tela inicial se o usuário estiver logado
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/controll');
     }
   }
 

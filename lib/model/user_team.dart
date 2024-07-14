@@ -37,14 +37,14 @@ class UserTeam {
 
   factory UserTeam.fromJson(dynamic json) {
     return UserTeam(
-        id: json["id"],
-        login: json["login"],
-        password: json["password"],
-        name: json["name"],
-        date:
-            json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
-        status: json["status"],
-        credit: json["credit"]);
+      id: json["id"],
+      login: json["login"],
+      password: json["password"],
+      name: json["name"],
+      date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
+      status: json["status"],
+      credit: (json["credit"] as num?)?.toDouble(),
+    );
   }
 
   dynamic toJson() => {

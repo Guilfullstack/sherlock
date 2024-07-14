@@ -202,7 +202,7 @@ class UserController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      print("Erro ao atualizar equipe: $e");
+      debugPrint("Erro ao atualizar equipe: $e");
     }
   }
 
