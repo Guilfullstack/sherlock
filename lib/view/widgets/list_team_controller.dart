@@ -37,7 +37,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
           ),
         ),
         subtitle: Text(
-            "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit ?? "0"}"),
+            "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}"),
         leading: const CircleAvatar(
           backgroundColor: Color.fromARGB(255, 95, 95, 95),
           child: Icon(
