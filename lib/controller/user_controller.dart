@@ -2,12 +2,14 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/controller_panel_page.dart';
 import 'package:sherlock/view/page/home_page.dart';
+import 'package:sherlock/view/page/login_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
 
 class AuthException implements Exception {
@@ -94,6 +96,7 @@ class UserController extends ChangeNotifier {
       debugPrint('Erro: $e.toString()');
     }
   }*/
+
   Future<void> loginSystem(
       BuildContext context, String login, String password) async {
     try {
@@ -115,7 +118,22 @@ class UserController extends ChangeNotifier {
             .get();
 
         if (snapshotTeam.docs.isNotEmpty) {
-          await _saveLoginState(true, login, 'Equipe');
+          await _saveLoginState(true, login, 'Team');
+
+          // Armazena o usuário na caixa do Hive
+          final user = UserTeam(
+            id: snapshotTeam.docs.first.id,
+            login: snapshotTeam.docs.first.data().login,
+            password: snapshotTeam.docs.first.data().password,
+            name: snapshotTeam.docs.first.data().name,
+            date: snapshotTeam.docs.first.data().date,
+            status: snapshotTeam.docs.first.data().status,
+            credit: snapshotTeam.docs.first.data().credit,
+          );
+
+          final userBox = Hive.box<UserTeam>('userTeamBox');
+          await userBox.put('currentUser', user);
+
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomePage()));
         } else {
@@ -144,6 +162,22 @@ class UserController extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro: $e');
     }
+  }
+
+  Future<void> logout(BuildContext context) async {
+    // Limpar SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    // Limpar Hive
+    var userTeamBox = Hive.box<UserTeam>('userTeamBox');
+    await userTeamBox.clear();
+
+    // Navegar para a página de login
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
   }
 
   Future<void> _saveLoginState(
