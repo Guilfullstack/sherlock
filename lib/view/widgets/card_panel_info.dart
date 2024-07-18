@@ -1,9 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
+import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_play.dart';
 
 class CardPanelInfo extends StatefulWidget {
-  const CardPanelInfo({super.key});
+  final double credit;
+  final Status status;
 
+  CardPanelInfo({
+    Key? key,
+    required this.credit,
+    required this.status,
+  }) : super(key: key);
   @override
   State<CardPanelInfo> createState() => _CardPanelInfoState();
 }
@@ -18,7 +27,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -26,20 +35,20 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Saldo:',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 25,
                 ),
                 Text(
-                  'R\$ 20,00',
-                  style: TextStyle(color: Colors.purple, fontSize: 20),
+                  'R\$ ${widget.credit}',
+                  style: const TextStyle(color: Colors.purple, fontSize: 20),
                 ),
               ],
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(right: 100),
               child: Divider(
                 color: Colors.purple,
@@ -47,22 +56,22 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                 //height: 30,
               ),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Status:',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  'Em jogo',
+                  '${widget.status}',
                   style: TextStyle(color: Colors.pink, fontSize: 18),
                 ),
               ],
             ),
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(right: 100),
               child: Divider(
                 color: Colors.purple,
@@ -70,7 +79,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                 //height: 30,
               ),
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
