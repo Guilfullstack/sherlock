@@ -5,7 +5,7 @@ final userStaffRef = FirebaseFirestore.instance
     .collection("Staff")
     .withConverter<UserStaff>(
         fromFirestore: (snapshots, _) => UserStaff.fromJson(snapshots.data()!),
-        toFirestore: (userAdm, _) => userAdm.toJson());
+        toFirestore: (userStaff, _) => userStaff.toJson());
 
 class UserStaff {
   String? id;
@@ -34,6 +34,6 @@ class UserStaff {
         "id": id,
         "login": login,
         "password": password,
-        "date": date?.toIso8601String(),
+        "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }

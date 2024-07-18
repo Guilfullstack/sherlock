@@ -25,9 +25,11 @@ class UserController extends ChangeNotifier {
   TextEditingController name = TextEditingController();
   TextEditingController login = TextEditingController();
   TextEditingController password = TextEditingController();
+  TextEditingController passwordComfirm = TextEditingController();
   TextEditingController nameEdit = TextEditingController();
   TextEditingController loginEdit = TextEditingController();
   TextEditingController passwordEdit = TextEditingController();
+  TextEditingController passwordEditComfirm = TextEditingController();
   UserAdm? userAdm;
   UserTeam? userTeam;
 
@@ -37,6 +39,7 @@ class UserController extends ChangeNotifier {
   bool history = false;
 
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
@@ -57,6 +60,15 @@ class UserController extends ChangeNotifier {
     await userAdmDoc.set(userAdm);
     notifyListeners();
     return Future<UserAdm>.value(userAdm);
+  }
+
+  Future<UserStaff> addUserStaff(UserStaff userStaff) async {
+    DocumentReference<UserStaff> userStaffDoc = userStaffRef.doc();
+    userStaff.id = userStaffDoc.id;
+    userStaff.date = DateTime.now();
+    await userStaffDoc.set(userStaff);
+    notifyListeners();
+    return Future<UserStaff>.value(userStaff);
   }
 
   /*
@@ -228,15 +240,26 @@ class UserController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future removeTeams(String id) async {
-    await userTeamref.doc(id).delete();
+  Future removeUser(int category, String id) async {
+    switch (category) {
+      case 0:
+        await userTeamref.doc(id).delete();
+        break;
+      case 1:
+        await userAdmRef.doc(id).delete();
+        break;
+      case 2:
+        await userStaffRef.doc(id).delete();
+        break;
+      default:
+    }
+
     //listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
     //notifyListeners();
   }
 
   Future updateTeams(UserTeam newUserTeam) async {
     try {
-      // Buscar documentos na coleção "Formulario" que correspondem ao "idPaciente" especificado
       QuerySnapshot querySnapshot =
           await userTeamref.where('id', isEqualTo: newUserTeam.id).get();
 
@@ -271,7 +294,71 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Future updateAdm(UserAdm newUserAdm) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await userAdmRef.where('id', isEqualTo: newUserAdm.id).get();
+
+      // Função auxiliar para construir dinamicamente o mapa de atualização
+      Map<String, dynamic> buildUpdateData(UserAdm userAdm) {
+        Map<String, dynamic> data = {};
+
+        if (userAdm.login != null && loginEdit.text.isNotEmpty) {
+          data['login'] = loginEdit.text;
+        }
+        if (userAdm.password != null && passwordEdit.text.isNotEmpty) {
+          data['password'] = passwordEdit.text;
+        }
+
+        return data;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+        DocumentSnapshot document = querySnapshot.docs.first;
+        Map<String, dynamic> updateData = buildUpdateData(newUserAdm);
+
+        if (updateData.isNotEmpty) {
+          await document.reference.update(updateData);
+        }
+      }
+    } catch (e) {
+      debugPrint("Erro ao atualizar equipe: $e");
+    }
+  }
+
+  Future updateStaff(UserStaff newUserStaff) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await userStaffRef.where('id', isEqualTo: newUserStaff.id).get();
+
+      // Função auxiliar para construir dinamicamente o mapa de atualização
+      Map<String, dynamic> buildUpdateData(UserStaff userStaff) {
+        Map<String, dynamic> data = {};
+
+        if (userStaff.login != null && loginEdit.text.isNotEmpty) {
+          data['login'] = loginEdit.text;
+        }
+        if (userStaff.password != null && passwordEdit.text.isNotEmpty) {
+          data['password'] = passwordEdit.text;
+        }
+
+        return data;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+        DocumentSnapshot document = querySnapshot.docs.first;
+        Map<String, dynamic> updateData = buildUpdateData(newUserStaff);
+
+        if (updateData.isNotEmpty) {
+          await document.reference.update(updateData);
+        }
+      }
+    } catch (e) {
+      debugPrint("Erro ao atualizar equipe: $e");
+    }
+  }
 
   Stream<List<UserTeam>> get teamStream {
     return _firestore.collection('Teams').snapshots().map((querySnapshot) {
@@ -280,10 +367,19 @@ class UserController extends ChangeNotifier {
       }).toList();
     });
   }
-  Stream<List<UserTeam>> get admStream {
+
+  Stream<List<UserAdm>> get admStream {
     return _firestore.collection('Adm').snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
-        return UserTeam.fromJson(doc.data());
+        return UserAdm.fromJson(doc.data());
+      }).toList();
+    });
+  }
+
+  Stream<List<UserStaff>> get staffStream {
+    return _firestore.collection('Staff').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return UserStaff.fromJson(doc.data());
       }).toList();
     });
   }

@@ -34,6 +34,6 @@ class UserAdm {
         "id": id,
         "login": login,
         "password": password,
-        "date": date?.toIso8601String(),
+        "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }
