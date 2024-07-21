@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:sherlock/model/code.dart';
 
 class PlayController extends ChangeNotifier {
@@ -132,5 +133,23 @@ class PlayController extends ChangeNotifier {
       default:
         return null;
     }
+  }
+
+  //Operações com o  Hive
+  Future<void> saveCodesHive(List<Code> codes) async {
+    final box = Hive.box<Code>('codeBox');
+
+    // Limpa a caixa antes de adicionar novos códigos (opcional)
+    await box.clear();
+
+    // Adiciona cada código à caixa
+    for (var code in codes) {
+      await box.add(code);
+    }
+  }
+
+  Future<List<Code>> getCodesHive() async {
+    final box = Hive.box<Code>('codeBox');
+    return box.values.toList() as List<Code>;
   }
 }

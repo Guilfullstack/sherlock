@@ -1,13 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-enum Category {
-  freezing, //congelar
-  protect, //proteger
-  pay, //pagar
-  receive, //receber
-  stage, //prova
-}
+import 'package:hive/hive.dart';
+part 'code.g.dart'; // Referência para o arquivo gerado
 
 final userCodeRef = FirebaseFirestore.instance
     .collection("Code")
@@ -15,14 +9,29 @@ final userCodeRef = FirebaseFirestore.instance
         fromFirestore: (snapshots, _) => Code.fromJson(snapshots.data()!),
         toFirestore: (userCode, _) => userCode.toJson());
 
-class Code {
+@HiveType(typeId: 2)
+class Code extends HiveObject {
+  @HiveField(0)
   String? id;
+
+  @HiveField(1)
   String? token;
+
+  @HiveField(2)
   Category? category;
+
+  @HiveField(3)
   String? description;
+
+  @HiveField(4)
   String? puzzle;
+
+  @HiveField(5)
   double? value;
+
+  @HiveField(6)
   DateTime? date;
+
   Code({
     this.id,
     this.token,
@@ -50,7 +59,7 @@ class Code {
         "token": token,
         "category": category != null ? categoryToString(category!) : null,
         "description": description,
-        "puzzle":puzzle,
+        "puzzle": puzzle,
         "value": value,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
@@ -88,4 +97,22 @@ class Code {
         return null;
     }
   }
+}
+
+@HiveType(typeId: 3)
+enum Category {
+  @HiveField(0)
+  freezing,
+
+  @HiveField(1)
+  protect,
+
+  @HiveField(2)
+  pay,
+
+  @HiveField(3)
+  receive,
+
+  @HiveField(4)
+  stage,
 }

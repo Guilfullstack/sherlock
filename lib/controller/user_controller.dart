@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sherlock/controller/play_controller.dart';
+import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -32,9 +34,6 @@ class UserController extends ChangeNotifier {
   TextEditingController loginEdit = TextEditingController();
   TextEditingController passwordEdit = TextEditingController();
   TextEditingController passwordEditComfirm = TextEditingController();
-  //codigos
-  UserAdm? userAdm;
-  UserTeam? userTeam;
 
   List<UserTeam> listTeamn = [];
   bool loading = false;
@@ -43,6 +42,7 @@ class UserController extends ChangeNotifier {
 
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final PlayController playController = PlayController();
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
@@ -74,41 +74,39 @@ class UserController extends ChangeNotifier {
     return Future<UserStaff>.value(userStaff);
   }
 
-  /*
-  Future<void> loginSystem(
-      BuildContext context, String login, String password) async {
-    try {
-      final snaphotAdm = await userAdmRef
-          .where("login", isEqualTo: login)
-          .where("password", isEqualTo: password)
-          .limit(1)
-          .get();
-      if (snaphotAdm.docs.isNotEmpty) {
-        await _saveLoginState(true, login);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => ControllerPanelPage()));
-      } else {
-        final snaphotTeam = await userTeamref
-            .where("login", isEqualTo: login)
-            .where("password", isEqualTo: password)
-            .limit(1)
-            .get();
-        if (snaphotTeam.docs.isNotEmpty) {
-          await _saveLoginState(true, login);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => HomePage()));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-                'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
-          ));
-        }
-      }
-    } catch (e) {
-      debugPrint('Erro: $e.toString()');
-    }
-  }*/
+  Future<void> logout(BuildContext context) async {
+    // Limpar SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    // Limpar Hive
+    var userTeamBox = Hive.box<UserTeam>('userTeamBox');
+    await userTeamBox.clear();
+
+    // Navegar para a página de login
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+  }
+
+  Future<void> _saveLoginState(
+      bool isLoggedIn, String login, String category) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', isLoggedIn);
+    await prefs.setString('login', login);
+    await prefs.setString('category', category);
+  }
+
+  Future<void> saveUserHive(UserTeam user) async {
+    var box = Hive.box<UserTeam>('userTeamBox');
+    await box.put('currentUser', user);
+  }
+
+  Future<UserTeam?> getUserHive() async {
+    var box = Hive.box<UserTeam>('userTeamBox');
+    return box.get('currentUser');
+  }
 
   Future<void> loginSystem(
       BuildContext context, String login, String password) async {
@@ -121,8 +119,10 @@ class UserController extends ChangeNotifier {
 
       if (snapshotAdm.docs.isNotEmpty) {
         await _saveLoginState(true, login, 'Adm');
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => ControllerPanelPage()));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ControllerPanelPage()));
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -133,22 +133,53 @@ class UserController extends ChangeNotifier {
         if (snapshotTeam.docs.isNotEmpty) {
           await _saveLoginState(true, login, 'Team');
 
+          //Recebendo lista de codigos
+          try {
+            // Obtém os documentos da coleção Code
+            final querySnapshot = await userCodeRef.get();
+
+            // Mapeia os documentos para uma lista de objetos Code
+            final List<Code> codes = querySnapshot.docs.map((doc) {
+              return doc.data(); // Usa o conversor para obter o objeto Code
+            }).toList();
+
+            // Salva a lista de códigos usando o playController
+            playController.saveCodesHive(codes);
+            var listcode = await playController.getCodesHive();
+
+            for (var code in listcode) {
+              print('Code ID: ${code.id}');
+              print('Token: ${code.token}');
+              print(
+                  'Category: ${code.category != null ? Code.categoryToString(code.category!) : 'Unknown'}');
+              print('Description: ${code.description}');
+              print('Puzzle: ${code.puzzle}');
+              print('Value: ${code.value}');
+              print('Date: ${code.date}');
+              print('----------------------------------');
+            }
+          } catch (e) {
+            // Lida com erros durante a obtenção dos dados
+            print('Error fetching codes: $e');
+          }
+
           // Armazena o usuário na caixa do Hive
           final user = UserTeam(
-            id: snapshotTeam.docs.first.id,
-            login: snapshotTeam.docs.first.data().login,
-            password: snapshotTeam.docs.first.data().password,
-            name: snapshotTeam.docs.first.data().name,
-            date: snapshotTeam.docs.first.data().date,
-            status: snapshotTeam.docs.first.data().status,
-            credit: snapshotTeam.docs.first.data().credit,
-          );
+              id: snapshotTeam.docs.first.id,
+              login: snapshotTeam.docs.first.data().login,
+              password: snapshotTeam.docs.first.data().password,
+              name: snapshotTeam.docs.first.data().name,
+              date: snapshotTeam.docs.first.data().date,
+              status: snapshotTeam.docs.first.data().status,
+              credit: snapshotTeam.docs.first.data().credit,
+              listTokenDesbloqued:
+                  snapshotTeam.docs.first.data().listTokenDesbloqued);
 
-          final userBox = Hive.box<UserTeam>('userTeamBox');
-          await userBox.put('currentUser', user);
-
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => HomePage()));
+          //final userBox = Hive.box<UserTeam>('userTeamBox');
+          //await userBox.put('currentUser', user);
+          saveUserHive(user);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
         } else {
           final snapshotStaff = await userStaffRef
               .where("login", isEqualTo: login)
@@ -175,30 +206,6 @@ class UserController extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro: $e');
     }
-  }
-
-  Future<void> logout(BuildContext context) async {
-    // Limpar SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    // Limpar Hive
-    var userTeamBox = Hive.box<UserTeam>('userTeamBox');
-    await userTeamBox.clear();
-
-    // Navegar para a página de login
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
-  }
-
-  Future<void> _saveLoginState(
-      bool isLoggedIn, String login, String category) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', isLoggedIn);
-    await prefs.setString('login', login);
-    await prefs.setString('category', category);
   }
 
 /*
