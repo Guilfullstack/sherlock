@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
               MaterialPageRoute(
                   builder: (context) => const ControllerPanelPage()));
           break;
-        case 'Equipe':
+        case 'Team':
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
           break;
@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.black87,
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
