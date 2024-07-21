@@ -20,6 +20,7 @@ class Code {
   String? token;
   Category? category;
   String? description;
+  String? puzzle;
   double? value;
   DateTime? date;
   Code({
@@ -27,6 +28,7 @@ class Code {
     this.token,
     this.category,
     this.description,
+    this.puzzle,
     this.value,
     this.date,
   });
@@ -37,6 +39,7 @@ class Code {
       token: json["token"],
       category: categoryFromString(json["category"]),
       description: json["description"],
+      puzzle: json['puzzle'],
       value: json["value"],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
@@ -47,6 +50,7 @@ class Code {
         "token": token,
         "category": category != null ? categoryToString(category!) : null,
         "description": description,
+        "puzzle":puzzle,
         "value": value,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };

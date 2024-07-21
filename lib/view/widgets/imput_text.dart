@@ -7,6 +7,7 @@ class ImputTextFormField extends StatelessWidget {
   final bool? enabled;
   final bool? obscure;
   final Widget? icon;
+  final int? maxLines;
   const ImputTextFormField(
       {super.key,
       required this.title,
@@ -14,13 +15,16 @@ class ImputTextFormField extends StatelessWidget {
       this.validator,
       this.enabled,
       this.obscure,
-      this.icon});
+      this.icon,
+      this.maxLines});
 
   @override
   Widget build(BuildContext context) {
     return FractionallySizedBox(
       widthFactor: 0.7, // Define 50% da largura da tela
       child: TextFormField(
+        minLines: 1,
+        maxLines: maxLines ?? 1,
         obscureText: obscure ?? false,
         validator: validator ??
             (value) {

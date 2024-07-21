@@ -27,8 +27,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   late TabController _tabController;
   ValueNotifier<bool> isHistoryVisible = ValueNotifier<bool>(true);
   String value = "Historico 1";
-  Category value2 = Category.stage;
-  Category value2Edit = Category.stage;
+  Category value2 = Category.receive;
+  Category value2Edit = Category.receive;
 
   @override
   void initState() {
@@ -63,22 +63,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () {
-        //     showDialog(
-        //         context: context,
-        //         builder: (BuildContext context) {
-        //           return AlertDialog(
-        //             backgroundColor: Colors.black,
-        //             content: SizedBox(
-        //                 height: 300,
-        //                 width: 300,
-        //                 child: _addTeams(context, true, false, userController)),
-        //           );
-        //         });
-        //   },
-        //   child: const Icon(Icons.add),
-        // ),
         appBar: AppBar(
           title: const Text('Painel de controle'),
           bottom: TabBar(
@@ -540,6 +524,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             playController.tokenEdit.text = code.token ?? "";
                             playController.descriptionEdit.text =
                                 code.description ?? "";
+                            playController.puzzleEdit.text = code.puzzle ?? "";
                             playController.valueEdit.text =
                                 code.value.toString();
                             value2Edit = code.category!;
@@ -659,7 +644,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
 
   Container _addTeams(BuildContext context, bool addAdm, bool update,
       bool staff, UserController userController) {
-    bool obscureVisible = true;
+    bool obscureVisible = true, obsucreVisibleComfirm = true;
     return Container(
       constraints: const BoxConstraints(
         maxWidth: 400,
@@ -702,302 +687,345 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                 ? userController.login
                 : userController.loginEdit,
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: ImputTextFormField(
-              obscure: obscureVisible,
-              title: 'Senha',
-              controller: update == false
-                  ? userController.password
-                  : userController.passwordEdit,
-              validator: (value) => value.length < 5
-                  ? 'Precisa  ter no minimo 5 caracteres'
-                  : null,
-            ),
-          ),
-          ImputTextFormField(
-            title: 'Confirmar Senha',
-            controller: update == false
-                ? userController.passwordComfirm
-                : userController.passwordEditComfirm,
-            validator: (value) => value != userController.passwordEdit.text
-                ? "Senhas diferentes"
-                : value.length < 5
-                    ? "Sua senha deve ter mínimo 5 aracteres"
-                    : value!.isEmpty
-                        ? "Confirme sua senha"
-                        : null,
-          ),
           StatefulBuilder(builder: (BuildContext context, setState) {
-            return Row(
-              mainAxisAlignment:
-                  MediaQuery.of(context).size.width > 1329 || update == true
-                      ? MainAxisAlignment.center
-                      : MainAxisAlignment.spaceEvenly,
+            return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: userController.loading == false
-                      ? ElevatedButton(
-                          onPressed: () async {
-                            if (update == true) {
-                              if (userController.formKeyEditTeam.currentState!
-                                  .validate()) {
-                                if (staff == false &&
-                                    addAdm == true &&
-                                    update == true) {
-                                  //atualizar adm
-                                  final newUserAdmEdit = UserAdm(
-                                    id: userController.id.text,
-                                    login: userController.loginEdit.text,
-                                    password: userController.passwordEdit.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .updateAdm(newUserAdmEdit);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                  //exitWindows();
-                                }
-                                if (staff == true && update == true && addAdm) {
-                                  //atualizar staff
-                                  final newUserStaffEdit = UserStaff(
-                                    id: userController.id.text,
-                                    login: userController.loginEdit.text,
-                                    password: userController.passwordEdit.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .updateStaff(newUserStaffEdit);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                  //exitWindows();
-                                }
-                                if (staff == true && update == false) {
-                                  //add Staff
-                                  final newUserStaff = UserStaff(
-                                    login: userController.login.text,
-                                    password: userController.password.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .addUserStaff(newUserStaff);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                } else {
-                                  if (update == false) {
-                                    //addAdm
-                                    if (addAdm == true) {
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      final newUserAdm = UserAdm(
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                      );
-                                      await userController
-                                          .addUserAdm(newUserAdm);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      //add Equipe
-                                    } else if (addAdm == false) {
-                                      final newUserTeams = UserTeam(
-                                        name: userController.name.text,
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                        credit: 0,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-
-                                      await userController
-                                          .addUserTeam(newUserTeams);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                    }
-                                    //Atualizar Equipe
-                                  } else if (update == true) {
-                                    // atualizar equipe
-                                    final newUserTeamsEdit = UserTeam(
-                                      id: userController.id.text,
-                                      name: userController.nameEdit.text,
-                                      login: userController.loginEdit.text,
-                                      password:
-                                          userController.passwordEdit.text,
-                                    );
-                                    setState(() {
-                                      userController.loading = true;
-                                    });
-                                    await userController
-                                        .updateTeams(newUserTeamsEdit);
-                                    setState(() {
-                                      userController.loading = false;
-                                    });
-                                    exitWindows();
-                                  }
-                                }
-                              }
-                            } else {
-                              if (userController.formKey.currentState!
-                                  .validate()) {
-                                if (staff == false &&
-                                    addAdm == true &&
-                                    update == true) {
-                                  //atualizar adm
-                                  final newUserAdmEdit = UserAdm(
-                                    id: userController.id.text,
-                                    login: userController.loginEdit.text,
-                                    password: userController.passwordEdit.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .updateAdm(newUserAdmEdit);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                  exitWindows();
-                                }
-                                if (staff == true && update == true) {
-                                  //atualizar staff
-                                  final newUserStaffEdit = UserStaff(
-                                    id: userController.id.text,
-                                    login: userController.loginEdit.text,
-                                    password: userController.passwordEdit.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .updateStaff(newUserStaffEdit);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                  exitWindows();
-                                }
-                                if (staff == true && update == false) {
-                                  //add Staff
-                                  final newUserStaff = UserStaff(
-                                    login: userController.login.text,
-                                    password: userController.password.text,
-                                  );
-                                  setState(() {
-                                    userController.loading = true;
-                                  });
-                                  await userController
-                                      .addUserStaff(newUserStaff);
-                                  setState(() {
-                                    userController.loading = false;
-                                  });
-                                } else {
-                                  if (update == false) {
-                                    //addAdm
-                                    if (addAdm == true) {
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      final newUserAdm = UserAdm(
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                      );
-                                      await userController
-                                          .addUserAdm(newUserAdm);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      //exitWindows;
-                                      //add Equipe
-                                    } else if (addAdm == false) {
-                                      final newUserTeams = UserTeam(
-                                        name: userController.name.text,
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                        credit: 0,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-
-                                      await userController
-                                          .addUserTeam(newUserTeams);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                    }
-                                    //Atualizar Equipe
-                                  } else if (update == true) {
-                                    // atualizar equipe
-                                    final newUserTeamsEdit = UserTeam(
-                                      id: userController.id.text,
-                                      name: userController.nameEdit.text,
-                                      login: userController.loginEdit.text,
-                                      password:
-                                          userController.passwordEdit.text,
-                                    );
-                                    setState(() {
-                                      userController.loading = true;
-                                    });
-                                    await userController
-                                        .updateTeams(newUserTeamsEdit);
-                                    setState(() {
-                                      userController.loading = false;
-                                    });
-                                    exitWindows();
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          child:
-                              Text(update == false ? "Adicionar" : "Atualizar"))
-                      : const Center(child: CircularProgressIndicator()),
-                ),
-                //botão historico
-                Visibility(
-                  visible:
-                      MediaQuery.of(context).size.width > 1329 || update == true
-                          ? false
-                          : true,
-                  child: StatefulBuilder(
-                      builder: (BuildContext context, setState) {
-                    return ElevatedButton(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                  child: ImputTextFormField(
+                    obscure: obscureVisible,
+                    icon: IconButton(
                       onPressed: () {
                         setState(() {
-                          historyVisible = true;
-                          debugPrint("${userController.history}");
+                          obscureVisible = !obscureVisible;
                         });
-
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Form(
-                                  key: userController.formKeyEditTeam,
-                                  child: history(context, true));
-                            });
-                        historyVisible = false;
                       },
-                      child: const Text("Historico"),
-                    );
-                  }),
+                      icon: Icon(
+                        obscureVisible == false
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.purple,
+                      ),
+                    ),
+                    title: 'Senha',
+                    controller: update == false
+                        ? userController.password
+                        : userController.passwordEdit,
+                    validator: (value) => value.length < 5
+                        ? 'Precisa  ter no minimo 5 caracteres'
+                        : null,
+                  ),
                 ),
+                ImputTextFormField(
+                  obscure: obsucreVisibleComfirm,
+                  icon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obsucreVisibleComfirm = !obsucreVisibleComfirm;
+                      });
+                    },
+                    icon: Icon(
+                      obsucreVisibleComfirm == false
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  title: 'Confirmar Senha',
+                  controller: update == false
+                      ? userController.passwordComfirm
+                      : userController.passwordEditComfirm,
+                  validator: (value) =>
+                      value != userController.passwordEdit.text
+                          ? "Senhas diferentes"
+                          : value.length < 5
+                              ? "Sua senha deve ter mínimo 5 aracteres"
+                              : value!.isEmpty
+                                  ? "Confirme sua senha"
+                                  : null,
+                ),
+                Row(
+                  mainAxisAlignment:
+                      MediaQuery.of(context).size.width > 1329 || update == true
+                          ? MainAxisAlignment.center
+                          : MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: userController.loading == false
+                          ? ElevatedButton(
+                              onPressed: () async {
+                                if (update == true) {
+                                  if (userController
+                                      .formKeyEditTeam.currentState!
+                                      .validate()) {
+                                    if (staff == false &&
+                                        addAdm == true &&
+                                        update == true) {
+                                      //atualizar adm
+                                      final newUserAdmEdit = UserAdm(
+                                        id: userController.id.text,
+                                        login: userController.loginEdit.text,
+                                        password:
+                                            userController.passwordEdit.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .updateAdm(newUserAdmEdit);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      //exitWindows();
+                                    }
+                                    if (staff == true &&
+                                        update == true &&
+                                        addAdm) {
+                                      //atualizar staff
+                                      final newUserStaffEdit = UserStaff(
+                                        id: userController.id.text,
+                                        login: userController.loginEdit.text,
+                                        password:
+                                            userController.passwordEdit.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .updateStaff(newUserStaffEdit);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      //exitWindows();
+                                    }
+                                    if (staff == true && update == false) {
+                                      //add Staff
+                                      final newUserStaff = UserStaff(
+                                        login: userController.login.text,
+                                        password: userController.password.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .addUserStaff(newUserStaff);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                    } else {
+                                      if (update == false) {
+                                        //addAdm
+                                        if (addAdm == true) {
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
+                                          final newUserAdm = UserAdm(
+                                            login: userController.login.text,
+                                            password:
+                                                userController.password.text,
+                                          );
+                                          await userController
+                                              .addUserAdm(newUserAdm);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                          //add Equipe
+                                        } else if (addAdm == false) {
+                                          final newUserTeams = UserTeam(
+                                            name: userController.name.text,
+                                            login: userController.login.text,
+                                            password:
+                                                userController.password.text,
+                                            credit: 0,
+                                          );
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
 
-                // Botão adicionar equipes
-                // Botão remover equipes
-                // Dropdown para acessar o histórico das equipes
+                                          await userController
+                                              .addUserTeam(newUserTeams);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                        }
+                                        //Atualizar Equipe
+                                      } else if (update == true) {
+                                        // atualizar equipe
+                                        final newUserTeamsEdit = UserTeam(
+                                          id: userController.id.text,
+                                          name: userController.nameEdit.text,
+                                          login: userController.loginEdit.text,
+                                          password:
+                                              userController.passwordEdit.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .updateTeams(newUserTeamsEdit);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        exitWindows();
+                                      }
+                                    }
+                                  }
+                                } else {
+                                  if (userController.formKey.currentState!
+                                      .validate()) {
+                                    if (staff == false &&
+                                        addAdm == true &&
+                                        update == true) {
+                                      //atualizar adm
+                                      final newUserAdmEdit = UserAdm(
+                                        id: userController.id.text,
+                                        login: userController.loginEdit.text,
+                                        password:
+                                            userController.passwordEdit.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .updateAdm(newUserAdmEdit);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      exitWindows();
+                                    }
+                                    if (staff == true && update == true) {
+                                      //atualizar staff
+                                      final newUserStaffEdit = UserStaff(
+                                        id: userController.id.text,
+                                        login: userController.loginEdit.text,
+                                        password:
+                                            userController.passwordEdit.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .updateStaff(newUserStaffEdit);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      exitWindows();
+                                    }
+                                    if (staff == true && update == false) {
+                                      //add Staff
+                                      final newUserStaff = UserStaff(
+                                        login: userController.login.text,
+                                        password: userController.password.text,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await userController
+                                          .addUserStaff(newUserStaff);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                    } else {
+                                      if (update == false) {
+                                        //addAdm
+                                        if (addAdm == true) {
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
+                                          final newUserAdm = UserAdm(
+                                            login: userController.login.text,
+                                            password:
+                                                userController.password.text,
+                                          );
+                                          await userController
+                                              .addUserAdm(newUserAdm);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                          //exitWindows;
+                                          //add Equipe
+                                        } else if (addAdm == false) {
+                                          final newUserTeams = UserTeam(
+                                            name: userController.name.text,
+                                            login: userController.login.text,
+                                            password:
+                                                userController.password.text,
+                                            credit: 0,
+                                          );
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
+
+                                          await userController
+                                              .addUserTeam(newUserTeams);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                        }
+                                        //Atualizar Equipe
+                                      } else if (update == true) {
+                                        // atualizar equipe
+                                        final newUserTeamsEdit = UserTeam(
+                                          id: userController.id.text,
+                                          name: userController.nameEdit.text,
+                                          login: userController.loginEdit.text,
+                                          password:
+                                              userController.passwordEdit.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .updateTeams(newUserTeamsEdit);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        exitWindows();
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              child: Text(
+                                  update == false ? "Adicionar" : "Atualizar"))
+                          : const Center(child: CircularProgressIndicator()),
+                    ),
+                    //botão historico
+                    Visibility(
+                      visible: MediaQuery.of(context).size.width > 1329 ||
+                              update == true
+                          ? false
+                          : true,
+                      child: StatefulBuilder(
+                          builder: (BuildContext context, setState) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              historyVisible = true;
+                              debugPrint("${userController.history}");
+                            });
+
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Form(
+                                      key: userController.formKeyEditTeam,
+                                      child: history(context, true));
+                                });
+                            historyVisible = false;
+                          },
+                          child: const Text("Historico"),
+                        );
+                      }),
+                    ),
+
+                    // Botão adicionar equipes
+                    // Botão remover equipes
+                    // Dropdown para acessar o histórico das equipes
+                  ],
+                ),
               ],
             );
           }),
@@ -1025,7 +1053,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: ImputTextFormField(
-              title: 'Nome',
+              title: 'Descrição',
               controller: update == true
                   ? playController.descriptionEdit
                   : playController.description,
@@ -1041,7 +1069,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       : playController.token.text = generateRandomCode(6);
                 },
                 icon: const Icon(Icons.generating_tokens),
-                color: Colors.amber,
+                color: Colors.purple,
               ),
               title: 'Codigo',
               controller: update == true
@@ -1069,6 +1097,17 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     });
                   },
                 ),
+                if (value2 == Category.stage || value2Edit == Category.stage)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: ImputTextFormField(
+                      maxLines: 4,
+                      title: 'Enigma',
+                      controller: update == true
+                          ? playController.puzzleEdit
+                          : playController.puzzle,
+                    ),
+                  ),
                 categorySelected(
                   'Adicionar',
                   update == true ? value2Edit : value2,
@@ -1138,72 +1177,80 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                         : playController.value,
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: userController.loading == false
+                          ? ElevatedButton(
+                              onPressed: () async {
+                                if (update == true) {
+                                  //update code
+                                  if (playController
+                                      .formKeyPlayEdit.currentState!
+                                      .validate()) {
+                                    playController.categoryEdit.text =
+                                        playController
+                                                .categoryToString(value2Edit) ??
+                                            "";
+                                    final updateCode = Code(
+                                      id: playController.id.text,
+                                      token: playController.tokenEdit.text,
+                                      description:
+                                          playController.descriptionEdit.text,
+                                      puzzle: playController.puzzleEdit.text,
+                                      category: value2Edit,
+                                      value: playController
+                                              .valueEdit.text.isEmpty
+                                          ? 0
+                                          : double.parse(
+                                              playController.valueEdit.text),
+                                    );
+                                    // setState(() {
+                                    //   userController.loading = true;
+                                    // });
+                                    await playController.updateCode(updateCode);
+                                    // setState(() {
+                                    //   userController.loading = false;
+                                    // });
+                                    exitWindows();
+                                  }
+                                } else if (update == false) {
+                                  if (playController.formKeyPlay.currentState!
+                                      .validate()) {
+                                    //add code
+                                    final newCode = Code(
+                                      token: playController.token.text,
+                                      description:
+                                          playController.description.text,
+                                      puzzle: playController.puzzle.text,
+                                      category: value2,
+                                      value: playController.value.text.isEmpty
+                                          ? 0
+                                          : double.parse(
+                                              playController.value.text),
+                                    );
+                                    // setState(() {
+                                    //   userController.loading = true;
+                                    // });
+                                    await playController.addCode(newCode);
+                                    // setState(() {
+                                    //   userController.loading = false;
+                                    // });
+                                    playController.token.clear();
+                                  }
+                                }
+                              },
+                              child: Text(
+                                  update == true ? "Atualizar" : "Adicionar"))
+                          : const Center(child: CircularProgressIndicator()),
+                    ),
+                  ],
+                ),
               ],
             );
           }),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: userController.loading == false
-                    ? ElevatedButton(
-                        onPressed: () async {
-                          if (update == true) {
-                            //update code
-                            if (playController.formKeyPlayEdit.currentState!
-                                .validate()) {
-                              playController.categoryEdit.text =
-                                  playController.categoryToString(value2Edit) ??
-                                      "";
-                              final updateCode = Code(
-                                id: playController.id.text,
-                                token: playController.tokenEdit.text,
-                                description:
-                                    playController.descriptionEdit.text,
-                                category: value2Edit,
-                                value: playController.valueEdit.text.isEmpty
-                                    ? 0
-                                    : double.parse(
-                                        playController.valueEdit.text),
-                              );
-                              // setState(() {
-                              userController.loading = true;
-                              // });
-                              await playController.updateCode(updateCode);
-                              // setState(() {
-                              userController.loading = false;
-                              // });
-                              exitWindows();
-                            }
-                          } else if (update == false) {
-                            if (playController.formKeyPlay.currentState!
-                                .validate()) {
-                              //add code
-                              final newCode = Code(
-                                token: playController.token.text,
-                                description: playController.description.text,
-                                category: value2,
-                                value: playController.value.text.isEmpty
-                                    ? 0
-                                    : double.parse(playController.value.text),
-                              );
-                              setState(() {
-                                userController.loading = true;
-                              });
-                              await playController.addCode(newCode);
-                              setState(() {
-                                userController.loading = false;
-                              });
-                              playController.token.clear();
-                            }
-                          }
-                        },
-                        child: Text(update == true ? "Atualizar" : "Adicionar"))
-                    : const Center(child: CircularProgressIndicator()),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -1221,15 +1268,15 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         right: 8.0,
       ),
       child: RadioListTile<Category>(
-        tileColor: Colors.purple,
-        activeColor: Colors.green,
+        tileColor: Colors.black87,
+        activeColor: Colors.purple,
         title: Text(
           titulo,
-          // style: const TextStyle(
-          //   color: Colors.green,
-          //   fontWeight: FontWeight.bold,
-          //   fontSize: 24,
-          // ),
+          style: const TextStyle(
+            color: Colors.white,
+            // fontWeight: FontWeight.bold,
+            // fontSize: 24,
+          ),
         ),
         value: valor,
         groupValue: groupValue,

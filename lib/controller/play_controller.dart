@@ -12,11 +12,13 @@ class PlayController extends ChangeNotifier {
   final TextEditingController token = TextEditingController();
   final TextEditingController category = TextEditingController();
   final TextEditingController description = TextEditingController();
+  final TextEditingController puzzle = TextEditingController();
   final TextEditingController value = TextEditingController(text: "0");
   // token edit
   final TextEditingController tokenEdit = TextEditingController();
   final TextEditingController categoryEdit = TextEditingController();
   final TextEditingController descriptionEdit = TextEditingController();
+  final TextEditingController puzzleEdit = TextEditingController();
   final TextEditingController valueEdit = TextEditingController();
 
   Future<Code> addCode(Code code) async {
@@ -76,6 +78,9 @@ class PlayController extends ChangeNotifier {
         }
         if (code.value != null && valueEdit.text.isNotEmpty) {
           data['value'] = double.parse(valueEdit.text);
+        }
+        if (code.value != null && puzzleEdit.text.isNotEmpty) {
+          data['puzzle'] = double.parse(puzzleEdit.text);
         }
 
         return data;
