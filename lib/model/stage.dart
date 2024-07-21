@@ -9,13 +9,11 @@ class Stage {
   String id;
   String token;
   String description;
-  bool isUnlocked;
   DateTime? date;
   Stage({
     required this.id,
     required this.token,
     required this.description,
-    required this.isUnlocked,
     this.date,
   });
 
@@ -24,7 +22,6 @@ class Stage {
       id: json["id"],
       token: json["token"],
       description: json["description"],
-      isUnlocked: json['isUnlocked'],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
   }
@@ -33,7 +30,6 @@ class Stage {
         "id": id,
         "token": token,
         "description": description,
-        'isUnlocked':isUnlocked,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }

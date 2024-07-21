@@ -16,18 +16,18 @@ final userCodeRef = FirebaseFirestore.instance
         toFirestore: (userCode, _) => userCode.toJson());
 
 class Code {
-  String id;
-  String token;
-  Category category;
-  String description;
-  int value;
+  String? id;
+  String? token;
+  Category? category;
+  String? description;
+  double? value;
   DateTime? date;
   Code({
-    required this.id,
-    required this.token,
-    required this.category,
-    required this.description,
-    required this.value,
+    this.id,
+    this.token,
+    this.category,
+    this.description,
+    this.value,
     this.date,
   });
 
@@ -35,7 +35,7 @@ class Code {
     return Code(
       id: json["id"],
       token: json["token"],
-      category: json["category"],
+      category: _categoryFromString(json["category"]),
       description: json["description"],
       value: json["value"],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
@@ -45,9 +45,43 @@ class Code {
   Map<String, dynamic> toJson() => {
         "id": id,
         "token": token,
-        "category": category,
+        "category": category != null ? _categoryToString(category!) : null,
         "description": description,
         "value": value,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
+
+  static String? _categoryToString(Category category) {
+    switch (category) {
+      case Category.freezing:
+        return 'freezing';
+      case Category.protect:
+        return 'protect';
+      case Category.pay:
+        return 'pay';
+      case Category.receive:
+        return 'receive';
+      case Category.stage:
+        return 'stage';
+      default:
+        return null;
+    }
+  }
+
+  static Category? _categoryFromString(String? category) {
+    switch (category) {
+      case 'freezing':
+        return Category.freezing;
+      case 'protect':
+        return Category.protect;
+      case 'pay':
+        return Category.pay;
+      case 'receive':
+        return Category.receive;
+      case 'stage':
+        return Category.stage;
+      default:
+        return null;
+    }
+  }
 }

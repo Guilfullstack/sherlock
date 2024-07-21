@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -20,11 +22,12 @@ class ControllerPanelPage extends StatefulWidget {
 class _ControllerPanelPageState extends State<ControllerPanelPage>
     with SingleTickerProviderStateMixin {
   UserController userController = UserController();
+  UserController playController = UserController();
   bool historyVisible = false;
   late TabController _tabController;
   ValueNotifier<bool> isHistoryVisible = ValueNotifier<bool>(true);
   String value = "Historico 1";
-  String value2 = "valor";
+  Category value2 = Category.stage;
 
   @override
   void initState() {
@@ -248,10 +251,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   Padding pageTolken() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ChangeNotifierProvider<UserController>(
-        create: (context) => UserController()..staffStream,
-        child: Consumer<UserController>(
-          builder: (context, userController, child) {
+      child: ChangeNotifierProvider<PlayController>(
+        create: (context) => PlayController()..codeStream,
+        child: Consumer<PlayController>(
+          builder: (context, playController, child) {
             return Center(
               child: Wrap(
                 children: [
@@ -264,13 +267,13 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
                       color: const Color.fromRGBO(189, 189, 189, 189),
                       child: Form(
-                        key: userController.formKey,
-                        child: _addTolkien(context, userController),
+                        key: playController.formKeyPlay,
+                        child: _addTolkien(context, playController),
                       ),
                     ),
                   ),
                   //lista das equipes
-                  listUsersStaff(context, userController, 400),
+                  listCode(context, playController, 400),
                   // history(context)
                 ],
               ),
@@ -470,6 +473,76 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             key: userController.formKeyEditTeam,
                             child: _addTeams(
                                 context, false, true, true, userController),
+                          );
+                        },
+                      );
+                    },
+                    onDesktop: MediaQuery.of(context).size.width > 1329,
+                    onTapHistory: () {},
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+// listar codigos
+  SizedBox listCode(
+      BuildContext context, PlayController playController, double width) {
+    return SizedBox(
+      width: width,
+      height: MediaQuery.of(context).size.width > 830
+          ? MediaQuery.of(context).size.height - 140
+          : MediaQuery.of(context).size.height / 2 - 50,
+      child: Card(
+        color: const Color.fromRGBO(189, 189, 189, 189),
+        child: StreamBuilder<List<Code>>(
+          stream: playController.codeStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              debugPrint("${snapshot.error}");
+              return const Center(child: Text('Erro ao carrega Codigos'));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Não há nenhum Codigo'));
+            }
+
+            final listAdm = snapshot.data!;
+
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: ListView.builder(
+                itemCount: listAdm.length,
+                itemBuilder: (context, index) {
+                  final code = listAdm[index];
+                  return ListTeamController(
+                    user: true,
+                    equipe: code.description,
+                    //credit: code.credit,
+                    onTapRemove: () {
+                      playController.removePlay(0, code.id.toString());
+                    },
+                    onTapEdit: () {
+                      showModalBottomSheet(
+                        backgroundColor: Colors.black,
+                        isScrollControlled: false,
+                        context: context,
+                        builder: (BuildContext context) {
+                          playController.id.text = code.id ?? "";
+                          playController.token.text = code.token ?? "";
+                          playController.description.text =
+                              code.description ?? "";
+                          playController.value.text = code.value.toString();
+                          return Form(
+                            key: playController.formKeyPlay,
+                            child: _addTeams(
+                                context, true, true, false, userController),
                           );
                         },
                       );
@@ -921,7 +994,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   }
 
 // add codigo
-  Container _addTolkien(BuildContext context, UserController userController) {
+  Container _addTolkien(BuildContext context, PlayController playController) {
     return Container(
       constraints: const BoxConstraints(
         maxWidth: 400,
@@ -938,13 +1011,12 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: ImputTextFormField(
-                title: 'Descrição', controller: userController.name),
+                title: 'Descrição', controller: playController.description),
           ),
-          ImputTextFormField(
-              title: 'Codigo', controller: userController.setting),
+          ImputTextFormField(title: 'Codigo', controller: playController.token),
           IconButton(
             onPressed: () {
-              userController.setting.text = generateRandomCode(6);
+              playController.token.text = generateRandomCode(6);
             },
             icon: const Icon(Icons.generating_tokens),
             color: Colors.amber,
@@ -956,68 +1028,62 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                 categorySelected(
                   'Prova',
                   value2,
-                  'tarefa',
+                  Category.stage,
                   (value) {
                     setState(() {
-                      value2 = 'tarefa';
+                      value2 = Category.stage;
                     });
                   },
                 ),
                 categorySelected(
                   'Adicionar',
                   value2,
-                  'adicionar',
+                  Category.receive,
                   (value) {
                     setState(() {
-                      value2 = 'adicionar';
+                      value2 = Category.pay;
                     });
                   },
                 ),
                 categorySelected(
                   'Subtrair',
                   value2,
-                  'subtrair',
+                  Category.pay,
                   (value) {
                     setState(() {
-                      value2 = 'subtrair';
+                      value2 = Category.receive;
                     });
                   },
                 ),
                 categorySelected(
                   'Congelar',
                   value2,
-                  'congelar',
+                  Category.freezing,
                   (value) {
                     setState(() {
-                      value2 = 'congelar';
+                      value2 = Category.freezing;
                     });
                   },
                 ),
                 categorySelected(
                   'Escudo',
                   value2,
-                  'escudo',
+                  Category.protect,
                   (value) {
                     setState(() {
-                      value2 = 'escudo';
+                      value2 = Category.protect;
                     });
                   },
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: ImputTextFormField(
-                    enabled: value2 == "adicionar" || value2 == "subtrair"
-                        ? true
-                        : false,
+                    enabled:
+                        value2 == Category.pay || value2 == Category.receive
+                            ? true
+                            : false,
                     title: 'Valor',
-                    controller: userController.valueTolkien,
-                    validator: (value) => value != userController.password.text
-                        ? "Senhas diferentes"
-                        : value.length < 6
-                            ? "Sua senha deve ter mínimo 6 aracteres"
-                            : value!.isEmpty
-                                ? "Confirme sua senha"
-                                : null,
+                    controller: playController.value,
                   ),
                 ),
               ],
@@ -1030,7 +1096,29 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                 padding: const EdgeInsets.all(8.0),
                 child: userController.loading == false
                     ? ElevatedButton(
-                        onPressed: () async {}, child: const Text("Adicionar"))
+                        onPressed: () async {
+                          if (playController.formKeyPlay.currentState!
+                              .validate()) {
+                            print("${playController.token.text}");
+                            print("${playController.description.text}");
+                            print("${playController.value.text}");
+                            print("${value2}");
+                            final newCode = Code(
+                              token: playController.token.text,
+                              description: playController.description.text,
+                              category: value2,
+                              value: double.parse(playController.value.text),
+                            );
+                            setState(() {
+                              userController.loading = true;
+                            });
+                            await playController.addCode(newCode);
+                            setState(() {
+                              userController.loading = false;
+                            });
+                          }
+                        },
+                        child: const Text("Adicionar"))
                     : const Center(child: CircularProgressIndicator()),
               ),
             ],
@@ -1044,14 +1132,14 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     Navigator.pop(context);
   }
 
-  Padding categorySelected(String titulo, String valor, String groupValue,
-      Function(String?)? onChanged) {
+  Padding categorySelected(String titulo, Category valor, Category groupValue,
+      Function(Category?)? onChanged) {
     return Padding(
       padding: const EdgeInsets.only(
         left: 8.0,
         right: 8.0,
       ),
-      child: RadioListTile(
+      child: RadioListTile<Category>(
         tileColor: Colors.grey,
         activeColor: Colors.green,
         title: Text(

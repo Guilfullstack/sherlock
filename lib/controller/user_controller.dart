@@ -33,8 +33,6 @@ class UserController extends ChangeNotifier {
   TextEditingController passwordEdit = TextEditingController();
   TextEditingController passwordEditComfirm = TextEditingController();
   //codigos
-  TextEditingController setting = TextEditingController();
-  TextEditingController valueTolkien = TextEditingController();
   UserAdm? userAdm;
   UserTeam? userTeam;
 
