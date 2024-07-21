@@ -8,6 +8,7 @@ class ListTeamController extends StatefulWidget {
   final bool? onDesktop;
   final double? credit;
   final String? status;
+  final bool? user;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -17,6 +18,7 @@ class ListTeamController extends StatefulWidget {
     this.onDesktop = false,
     this.credit,
     this.status,
+    this.user = false,
   });
 
   @override
@@ -36,8 +38,10 @@ class _ListTeamControllerState extends State<ListTeamController> {
             color: ThemeData().primaryColorLight,
           ),
         ),
-        subtitle: Text(
-            "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}"),
+        subtitle: widget.user == false
+            ? Text(
+                "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}")
+            : null,
         leading: const CircleAvatar(
           backgroundColor: Color.fromARGB(255, 95, 95, 95),
           child: Icon(

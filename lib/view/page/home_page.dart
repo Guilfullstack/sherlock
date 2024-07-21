@@ -26,10 +26,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _retrieveCurrentUser() async {
-    userTeamBox = Hive.box<UserTeam>('userTeamBox');
-    setState(() {
-      currentUser = userTeamBox.get('currentUser');
-    });
+    try {
+      userTeamBox = Hive.box<UserTeam>('userTeamBox');
+      setState(() {
+        currentUser = userTeamBox.get('currentUser');
+      });
+    } catch (e) {
+      print("erro home: $e");
+    }
   }
 
   @override

@@ -38,7 +38,7 @@ dependencies:
   firebase_auth: ^5.1.1
   provider: ^6.1.2
   cloud_firestore: ^5.0.2
-  hive: ^2.2.3
+  hive:
   hive_flutter: ^1.1.0
 
 dev_dependencies:
