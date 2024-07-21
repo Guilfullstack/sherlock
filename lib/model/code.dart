@@ -35,7 +35,7 @@ class Code {
     return Code(
       id: json["id"],
       token: json["token"],
-      category: _categoryFromString(json["category"]),
+      category: categoryFromString(json["category"]),
       description: json["description"],
       value: json["value"],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
@@ -45,40 +45,40 @@ class Code {
   Map<String, dynamic> toJson() => {
         "id": id,
         "token": token,
-        "category": category != null ? _categoryToString(category!) : null,
+        "category": category != null ? categoryToString(category!) : null,
         "description": description,
         "value": value,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 
-  static String? _categoryToString(Category category) {
+  static String? categoryToString(Category category) {
     switch (category) {
       case Category.freezing:
-        return 'freezing';
+        return 'Pausado';
       case Category.protect:
-        return 'protect';
+        return 'Escudo';
       case Category.pay:
-        return 'pay';
+        return 'Subtrair';
       case Category.receive:
-        return 'receive';
+        return 'Adicionar';
       case Category.stage:
-        return 'stage';
+        return 'Prova';
       default:
         return null;
     }
   }
 
-  static Category? _categoryFromString(String? category) {
+  static Category? categoryFromString(String? category) {
     switch (category) {
-      case 'freezing':
+      case 'Pausado':
         return Category.freezing;
-      case 'protect':
+      case 'Escudo':
         return Category.protect;
-      case 'pay':
+      case 'Subtrair':
         return Category.pay;
-      case 'receive':
+      case 'Adicionar':
         return Category.receive;
-      case 'stage':
+      case 'Prova':
         return Category.stage;
       default:
         return null;

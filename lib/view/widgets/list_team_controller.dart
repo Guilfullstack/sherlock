@@ -8,7 +8,9 @@ class ListTeamController extends StatefulWidget {
   final bool? onDesktop;
   final double? credit;
   final String? status;
+  final String? category;
   final bool? user;
+  final bool? code;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -19,6 +21,8 @@ class ListTeamController extends StatefulWidget {
     this.credit,
     this.status,
     this.user = false,
+    this.code = false,
+    this.category,
   });
 
   @override
@@ -36,18 +40,44 @@ class _ListTeamControllerState extends State<ListTeamController> {
           widget.equipe ?? "Sem nome",
           style: TextStyle(
             color: ThemeData().primaryColorLight,
+            
           ),
         ),
-        subtitle: widget.user == false
-            ? Text(
-                "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}")
-            : null,
-        leading: const CircleAvatar(
-          backgroundColor: Color.fromARGB(255, 95, 95, 95),
-          child: Icon(
-            Icons.people,
-            color: Colors.black,
-          ),
+        subtitle: widget.code == true
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Categoria: ${widget.category ?? ""}",
+                    style: TextStyle(color: ThemeData().primaryColorLight),
+                  ),
+                  if (widget.credit != 0)
+                    Text(
+                      "Valor: ${widget.credit}",
+                      style: TextStyle(color: ThemeData().primaryColorLight),
+                    ),
+                  Text(
+                    "Código: ${widget.status ?? ""}",
+                    style: TextStyle(color: ThemeData().primaryColorLight),
+                  ),
+                ],
+              )
+            : widget.user == false
+                ? Text(
+                    "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}")
+                : null,
+        leading: CircleAvatar(
+          backgroundColor: const Color.fromARGB(255, 95, 95, 95),
+          child: widget.code == true
+              ? const Icon(
+                  Icons.token,
+                  color: Colors.black,
+                )
+              : const Icon(
+                  Icons.people,
+                  color: Colors.black,
+                ),
         ),
         trailing: PopupMenuButton<String>(
           tooltip: "Menu",
