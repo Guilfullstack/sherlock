@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   UserController userController = UserController();
-
+  bool _obscureText = true;
   // Função para verificar se o usuário está logado
   Future<void> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -66,7 +66,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>(); // Chave para o formulário
-
     return Scaffold(
       backgroundColor: Colors.black87,
       body: Center(
@@ -87,7 +86,24 @@ class _LoginPageState extends State<LoginPage> {
                         title: "Login", controller: userController.login),
                     const SizedBox(height: 20),
                     ImputTextFormField(
-                        title: "Senha", controller: userController.password),
+                      title: "Senha",
+                      controller: userController.password,
+                      obscure: true,
+                      icon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.blue,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText =
+                                !_obscureText; // Alternar entre visível e oculto
+                          });
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
