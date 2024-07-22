@@ -1,46 +1,36 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sherlock/model/code.dart';
 
-enum Category {
-  freezing, //congelar
-  protect, //proteger
-  pay, //pagar
-  receive, //receber
-  stage, //prova
-}
-
-final userCodeRef = FirebaseFirestore.instance
-    .collection("Code")
-    .withConverter<Code>(
-        fromFirestore: (snapshots, _) => Code.fromJson(snapshots.data()!),
+final userStageRef = FirebaseFirestore.instance
+    .collection("Stage")
+    .withConverter<Stage>(
+        fromFirestore: (snapshots, _) => Stage.fromJson(snapshots.data()!),
         toFirestore: (userCode, _) => userCode.toJson());
 
-class Code {
+class Stage {
   String? id;
   String? token;
   Category? category;
   String? description;
   String? puzzle;
-  double? value;
   DateTime? date;
-  Code({
+  Stage({
     this.id,
     this.token,
     this.category,
     this.description,
     this.puzzle,
-    this.value,
     this.date,
   });
 
-  factory Code.fromJson(Map<String, dynamic> json) {
-    return Code(
+  factory Stage.fromJson(Map<String, dynamic> json) {
+    return Stage(
       id: json["id"],
       token: json["token"],
       category: categoryFromString(json["category"]),
       description: json["description"],
       puzzle: json['puzzle'],
-      value: json["value"],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
   }
@@ -50,8 +40,7 @@ class Code {
         "token": token,
         "category": category != null ? categoryToString(category!) : null,
         "description": description,
-        "puzzle": puzzle,
-        "value": value,
+        "puzzle":puzzle,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 

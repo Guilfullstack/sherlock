@@ -11,6 +11,7 @@ class ListTeamController extends StatefulWidget {
   final String? category;
   final bool? user;
   final bool? code;
+  final bool? stage;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -23,6 +24,7 @@ class ListTeamController extends StatefulWidget {
     this.user = false,
     this.code = false,
     this.category,
+    this.stage,
   });
 
   @override
@@ -40,7 +42,6 @@ class _ListTeamControllerState extends State<ListTeamController> {
           widget.equipe ?? "Sem nome",
           style: TextStyle(
             color: ThemeData().primaryColorLight,
-            
           ),
         ),
         subtitle: widget.code == true
@@ -52,9 +53,9 @@ class _ListTeamControllerState extends State<ListTeamController> {
                     "Categoria: ${widget.category ?? ""}",
                     style: TextStyle(color: ThemeData().primaryColorLight),
                   ),
-                  if (widget.credit != 0)
+                  if (widget.stage != true)
                     Text(
-                      "Valor: ${widget.credit}",
+                      "Valor: ${widget.credit == 0 ? "Sem valor" : widget.credit}",
                       style: TextStyle(color: ThemeData().primaryColorLight),
                     ),
                   Text(

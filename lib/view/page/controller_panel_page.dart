@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -22,13 +23,13 @@ class ControllerPanelPage extends StatefulWidget {
 class _ControllerPanelPageState extends State<ControllerPanelPage>
     with SingleTickerProviderStateMixin {
   UserController userController = UserController();
-  UserController playController = UserController();
+  PlayController playController = PlayController();
   bool historyVisible = false;
   late TabController _tabController;
   ValueNotifier<bool> isHistoryVisible = ValueNotifier<bool>(true);
   String value = "Historico 1";
-  Category value2 = Category.receive;
-  Category value2Edit = Category.receive;
+  Category value2 = Category.protect;
+  Category value2Edit = Category.protect;
 
   @override
   void initState() {
@@ -46,6 +47,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   @override
   void dispose() {
     userController.listTeamSubscription?.cancel();
+    playController.dispose();
     super.dispose();
   }
 
@@ -109,7 +111,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
               builder: (context, value, child) {
                 return value
                     ? history(context, true)
-                    : listUsers(context, userController, 400);
+                    : listCodeStage(context, playController, 400);
               },
             ),
           ],
@@ -253,7 +255,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       color: const Color.fromRGBO(189, 189, 189, 189),
                       child: Form(
                           key: playController.formKeyPlay,
-                          child: _addTolkien(context, playController, false)),
+                          child: _addTolkien(
+                              context, playController, false, false)),
                     ),
                   ),
                   //lista das equipes
@@ -475,7 +478,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
 
 // listar codigos
   SizedBox listCode(
-      BuildContext context, PlayController playController, double width) {
+    BuildContext context,
+    PlayController playController,
+    double width,
+  ) {
     return SizedBox(
       width: width,
       height: MediaQuery.of(context).size.width > 830
@@ -491,70 +497,178 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             }
             if (snapshot.hasError) {
               debugPrint("${snapshot.error}");
-              return const Center(child: Text('Erro ao carrega Codigos'));
+              return const Center(child: Text('Erro ao carregar Códigos'));
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('Não há nenhum Codigo'));
+              return const Center(child: Text('Não há nenhum Código'));
             }
 
             final listCode = snapshot.data!;
 
             return Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: ListView.builder(
-                itemCount: listCode.length,
-                itemBuilder: (context, index) {
-                  final code = listCode[index];
-                  return ListTeamController(
-                    user: true,
-                    code: true,
-                    equipe: code.description,
-                    status: code.token,
-                    credit: code.value,
-                    category: playController
-                        .categoryToString(code.category as Category),
-                    onTapRemove: () {
-                      playController.removePlay(0, code.id.toString());
-                    },
-                    onTapEdit: () {
-                      showDialog(
-                          context: context,
-                          builder: (builder) {
-                            playController.id.text = code.id ?? "";
-                            playController.tokenEdit.text = code.token ?? "";
-                            playController.descriptionEdit.text =
-                                code.description ?? "";
-                            playController.puzzleEdit.text = code.puzzle ?? "";
-                            playController.valueEdit.text =
-                                code.value.toString();
-                            value2Edit = code.category!;
-                            return Form(
-                              key: playController.formKeyPlayEdit,
-                              child: AlertDialog(
-                                backgroundColor: Colors.black87,
-                                content: SizedBox(
-                                  height: 500,
-                                  width: 450,
-                                  child: _addTolkien(
-                                      context, playController, true),
-                                ),
-                              ),
-                            );
-                          });
-                      // showModalBottomSheet(
-                      //   backgroundColor: Colors.black,
-                      //   isScrollControlled: false,
-                      //   context: context,
-                      //   builder: (BuildContext context) {},
-                      // );
-                    },
-                    onDesktop: MediaQuery.of(context).size.width > 1329,
-                    onTapHistory: () {},
-                  );
-                },
+              child: Column(
+                children: [
+                  const Center(
+                    child: Text(
+                      'Lista de Codigos',
+                      style: TextStyle(fontSize: 18, color: Colors.purple),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: listCode.length,
+                      itemBuilder: (context, index) {
+                        final code = listCode[index];
+                        return ListTeamController(
+                          user: true,
+                          code: true,
+                          equipe: code.description,
+                          status: code.token,
+                          credit: code.value,
+                          category: playController
+                              .categoryToString(code.category as Category),
+                          onTapRemove: () {
+                            playController.removePlay(0, code.id.toString());
+                          },
+                          onTapEdit: () {
+                            showDialog(
+                                context: context,
+                                builder: (builder) {
+                                  playController.id.text = code.id ?? "";
+                                  playController.tokenEdit.text =
+                                      code.token ?? "";
+                                  playController.descriptionEdit.text =
+                                      code.description ?? "";
+                                  playController.puzzleEdit.text =
+                                      code.puzzle ?? "";
+                                  playController.valueEdit.text =
+                                      code.value.toString();
+                                  value2Edit = code.category!;
+                                  return Form(
+                                    key: playController.formKeyPlayEdit,
+                                    child: AlertDialog(
+                                      backgroundColor: Colors.black87,
+                                      content: SizedBox(
+                                        height: 500,
+                                        width: 450,
+                                        child: _addTolkien(context,
+                                            playController, true, false),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          onDesktop: MediaQuery.of(context).size.width > 1329,
+                          onTapHistory: () {},
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Padding listCodeStage(
+    BuildContext context,
+    PlayController playController,
+    double width,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      child: SizedBox(
+        width: width,
+        height: MediaQuery.of(context).size.width > 830
+            ? MediaQuery.of(context).size.height - 140
+            : MediaQuery.of(context).size.height / 2 - 50,
+        child: Card(
+          color: const Color.fromRGBO(189, 189, 189, 189),
+          child: StreamBuilder<List<Stage>>(
+            stream: playController.codeStreamFilter,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                debugPrint("${snapshot.error}");
+                return const Center(child: Text('Erro ao carregar Códigos'));
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('Não há nenhum Código'));
+              }
+
+              final listCode = snapshot.data!;
+
+              return Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Column(
+                  children: [
+                    const Center(
+                      child: Text(
+                        'Lista de Provas',
+                        style: TextStyle(fontSize: 18, color: Colors.purple),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: listCode.length,
+                        itemBuilder: (context, index) {
+                          final code = listCode[index];
+                          return ListTeamController(
+                            user: true,
+                            code: true,
+                            stage: true,
+                            equipe: code.description,
+                            status: code.token,
+                            credit: 0,
+                            category: playController
+                                .categoryToString(code.category as Category),
+                            onTapRemove: () {
+                              playController.removePlay(1, code.id.toString());
+                            },
+                            onTapEdit: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (builder) {
+                                    playController.id.text = code.id ?? "";
+                                    playController.tokenEdit.text =
+                                        code.token ?? "";
+                                    playController.descriptionEdit.text =
+                                        code.description ?? "";
+                                    playController.puzzleEdit.text =
+                                        code.puzzle ?? "";
+                                    playController.valueEdit.text = "0";
+                                    value2Edit = code.category!;
+                                    return Form(
+                                      key: playController.formKeyPlayEdit,
+                                      child: AlertDialog(
+                                        backgroundColor: Colors.black87,
+                                        content: SizedBox(
+                                          height: 500,
+                                          width: 450,
+                                          child: _addTolkien(context,
+                                              playController, true, true),
+                                        ),
+                                      ),
+                                    );
+                                  });
+                            },
+                            onDesktop: MediaQuery.of(context).size.width > 1329,
+                            onTapHistory: () {},
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -1035,8 +1149,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   }
 
 // add codigo
-  Container _addTolkien(
-      BuildContext context, PlayController playController, bool update) {
+  Container _addTolkien(BuildContext context, PlayController playController,
+      bool update, bool editStage) {
     return Container(
       constraints: const BoxConstraints(
         maxWidth: 400,
@@ -1082,23 +1196,33 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
           StatefulBuilder(builder: (BuildContext context, setState) {
             return Column(
               children: [
-                categorySelected(
-                  'Prova',
-                  update == true ? value2Edit : value2,
-                  Category.stage,
-                  (value) {
-                    setState(() {
-                      update == true
-                          ? value2Edit = Category.stage
-                          : value2 = Category.stage;
-                      update == true
-                          ? playController.valueEdit.text = "0"
-                          : playController.value.text = "0";
-                    });
-                  },
+                Visibility(
+                  visible:
+                      editStage == true && update == true || update == false
+                          ? true
+                          : false,
+                  child: categorySelected(
+                    'Prova',
+                    update == true ? value2Edit : value2,
+                    Category.stage,
+                    (value) {
+                      setState(() {
+                        update == true
+                            ? value2Edit = Category.stage
+                            : value2 = Category.stage;
+                        update == true
+                            ? playController.valueEdit.text = "0"
+                            : playController.value.text = "0";
+                      });
+                    },
+                  ),
                 ),
-                if (value2 == Category.stage || value2Edit == Category.stage)
-                  Padding(
+                Visibility(
+                  visible:
+                      value2 == Category.stage || value2Edit == Category.stage
+                          ? true
+                          : false,
+                  child: Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: ImputTextFormField(
                       maxLines: 4,
@@ -1108,73 +1232,86 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           : playController.puzzle,
                     ),
                   ),
-                categorySelected(
-                  'Adicionar',
-                  update == true ? value2Edit : value2,
-                  Category.receive,
-                  (value) {
-                    setState(() {
-                      update == true
-                          ? value2Edit = Category.receive
-                          : value2 = Category.receive;
-                    });
-                  },
                 ),
-                categorySelected(
-                  'Subtrair',
-                  update == true ? value2Edit : value2,
-                  Category.pay,
-                  (value) {
-                    setState(() {
-                      update == true
-                          ? value2Edit = Category.pay
-                          : value2 = Category.pay;
-                    });
-                  },
-                ),
-                categorySelected(
-                  'Congelar',
-                  update == true ? value2Edit : value2,
-                  Category.freezing,
-                  (value) {
-                    setState(() {
-                      update == true
-                          ? value2Edit = Category.freezing
-                          : value2 = Category.freezing;
-                      update == true
-                          ? playController.valueEdit.text = "0"
-                          : playController.value.text = "0";
-                    });
-                  },
-                ),
-                categorySelected(
-                  'Escudo',
-                  update == true ? value2Edit : value2,
-                  Category.protect,
-                  (value) {
-                    setState(() {
-                      update == true
-                          ? value2Edit = Category.protect
-                          : value2 = Category.protect;
-                      update == true
-                          ? playController.valueEdit.text = "0"
-                          : playController.value.text = "0";
-                    });
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: ImputTextFormField(
-                    enabled: value2 == Category.pay ||
-                            value2 == Category.receive ||
-                            value2Edit == Category.pay ||
-                            value2Edit == Category.receive
-                        ? true
-                        : false,
-                    title: 'Valor',
-                    controller: update == true
-                        ? playController.valueEdit
-                        : playController.value,
+                Visibility(
+                  visible: (value2 == Category.stage ||
+                              value2Edit == Category.stage) &&
+                          update == true &&
+                          editStage == true
+                      ? false
+                      : true,
+                  child: Column(
+                    children: [
+                      categorySelected(
+                        'Adicionar',
+                        update == true ? value2Edit : value2,
+                        Category.receive,
+                        (value) {
+                          setState(() {
+                            update == true
+                                ? value2Edit = Category.receive
+                                : value2 = Category.receive;
+                          });
+                        },
+                      ),
+                      categorySelected(
+                        'Subtrair',
+                        update == true ? value2Edit : value2,
+                        Category.pay,
+                        (value) {
+                          setState(() {
+                            update == true
+                                ? value2Edit = Category.pay
+                                : value2 = Category.pay;
+                          });
+                        },
+                      ),
+                      categorySelected(
+                        'Congelar',
+                        update == true ? value2Edit : value2,
+                        Category.freezing,
+                        (value) {
+                          setState(() {
+                            update == true
+                                ? value2Edit = Category.freezing
+                                : value2 = Category.freezing;
+                            update == true
+                                ? playController.valueEdit.text = "0"
+                                : playController.value.text = "0";
+                          });
+                        },
+                      ),
+                      categorySelected(
+                        'Escudo',
+                        update == true ? value2Edit : value2,
+                        Category.protect,
+                        (value) {
+                          setState(() {
+                            update == true
+                                ? value2Edit = Category.protect
+                                : value2 = Category.protect;
+                            update == true
+                                ? playController.valueEdit.text = "0"
+                                : playController.value.text = "0";
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: ImputTextFormField(
+                          enabled: value2 == Category.pay ||
+                                  value2 == Category.receive ||
+                                  value2Edit == Category.pay ||
+                                  value2Edit == Category.receive
+                              ? true
+                              : false,
+                          title: 'Valor',
+                          controller: update == true
+                              ? playController.valueEdit
+                              : playController.value,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Row(
@@ -1190,55 +1327,104 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                   if (playController
                                       .formKeyPlayEdit.currentState!
                                       .validate()) {
-                                    playController.categoryEdit.text =
-                                        playController
-                                                .categoryToString(value2Edit) ??
-                                            "";
-                                    final updateCode = Code(
-                                      id: playController.id.text,
-                                      token: playController.tokenEdit.text,
-                                      description:
-                                          playController.descriptionEdit.text,
-                                      puzzle: playController.puzzleEdit.text,
-                                      category: value2Edit,
-                                      value: playController
-                                              .valueEdit.text.isEmpty
-                                          ? 0
-                                          : double.parse(
-                                              playController.valueEdit.text),
-                                    );
-                                    // setState(() {
-                                    //   userController.loading = true;
-                                    // });
-                                    await playController.updateCode(updateCode);
-                                    // setState(() {
-                                    //   userController.loading = false;
-                                    // });
-                                    exitWindows();
+                                    if (value2Edit == Category.stage) {
+                                      playController.categoryEdit.text =
+                                          playController.categoryToString(
+                                                  value2Edit) ??
+                                              "";
+                                      print(
+                                          "puzzle ${playController.puzzleEdit.text}");
+                                      final updateCode = Stage(
+                                        id: playController.id.text,
+                                        token: playController.tokenEdit.text,
+                                        description:
+                                            playController.descriptionEdit.text,
+                                        puzzle: playController.puzzleEdit.text,
+                                        category: value2Edit,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await playController
+                                          .updateCodeStage(updateCode);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      exitWindows();
+                                    } else if (value2Edit != Category.stage) {
+                                      playController.categoryEdit.text =
+                                          playController.categoryToString(
+                                                  value2Edit) ??
+                                              "";
+                                      print(
+                                          "puzzle ${playController.puzzleEdit.text}");
+                                      final updateCode = Code(
+                                        id: playController.id.text,
+                                        token: playController.tokenEdit.text,
+                                        description:
+                                            playController.descriptionEdit.text,
+                                        // puzzle: playController.puzzleEdit.text,
+                                        category: value2Edit,
+                                        value: playController
+                                                .valueEdit.text.isEmpty
+                                            ? 0
+                                            : double.parse(
+                                                playController.valueEdit.text),
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await playController
+                                          .updateCode(updateCode);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      exitWindows();
+                                    }
                                   }
                                 } else if (update == false) {
                                   if (playController.formKeyPlay.currentState!
                                       .validate()) {
-                                    //add code
-                                    final newCode = Code(
-                                      token: playController.token.text,
-                                      description:
-                                          playController.description.text,
-                                      puzzle: playController.puzzle.text,
-                                      category: value2,
-                                      value: playController.value.text.isEmpty
-                                          ? 0
-                                          : double.parse(
-                                              playController.value.text),
-                                    );
-                                    // setState(() {
-                                    //   userController.loading = true;
-                                    // });
-                                    await playController.addCode(newCode);
-                                    // setState(() {
-                                    //   userController.loading = false;
-                                    // });
-                                    playController.token.clear();
+                                    //add stage
+                                    if (value2 == Category.stage) {
+                                      final newCode = Stage(
+                                        token: playController.token.text,
+                                        description:
+                                            playController.description.text,
+                                        puzzle: playController.puzzle.text,
+                                        category: value2,
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await playController
+                                          .addCodeStage(newCode);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      playController.token.clear();
+                                    } else if (value2 != Category.stage) {
+                                      //add code
+                                      final newCode = Code(
+                                        token: playController.token.text,
+                                        description:
+                                            playController.description.text,
+                                        //puzzle: playController.puzzle.text,
+                                        category: value2,
+                                        value: playController.value.text.isEmpty
+                                            ? 0
+                                            : double.parse(
+                                                playController.value.text),
+                                      );
+                                      setState(() {
+                                        userController.loading = true;
+                                      });
+                                      await playController.addCode(newCode);
+                                      setState(() {
+                                        userController.loading = false;
+                                      });
+                                      playController.token.clear();
+                                    }
                                   }
                                 }
                               },

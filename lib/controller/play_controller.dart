@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/stage.dart';
 
 class PlayController extends ChangeNotifier {
   final GlobalKey<FormState> formKeyPlay = GlobalKey<FormState>();
@@ -35,10 +36,32 @@ class PlayController extends ChangeNotifier {
     return code;
   }
 
+  Future<Stage> addCodeStage(Stage stage) async {
+    try {
+      DocumentReference<Stage> stageDoc = userStageRef.doc();
+      stage.id = stageDoc.id;
+      stage.date = DateTime.now();
+      await stageDoc.set(stage);
+      notifyListeners();
+      return Future<Stage>.value(stage);
+    } catch (e) {
+      print(e);
+    }
+    return stage;
+  }
+
   Stream<List<Code>> get codeStream {
     return _firestore.collection('Code').snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         return Code.fromJson(doc.data());
+      }).toList();
+    });
+  }
+
+  Stream<List<Stage>> get codeStreamFilter {
+    return _firestore.collection('Stage').snapshots().map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        return Stage.fromJson(doc.data());
       }).toList();
     });
   }
@@ -48,9 +71,9 @@ class PlayController extends ChangeNotifier {
       case 0:
         await userCodeRef.doc(id).delete();
         break;
-      // case 1:
-      //   await userAdmRef.doc(id).delete();
-      //   break;
+      case 1:
+        await userStageRef.doc(id).delete();
+        break;
       // case 2:
       //   await userStaffRef.doc(id).delete();
       //   break;
@@ -79,9 +102,6 @@ class PlayController extends ChangeNotifier {
         if (code.value != null && valueEdit.text.isNotEmpty) {
           data['value'] = double.parse(valueEdit.text);
         }
-        if (code.value != null && puzzleEdit.text.isNotEmpty) {
-          data['puzzle'] = double.parse(puzzleEdit.text);
-        }
 
         return data;
       }
@@ -100,10 +120,49 @@ class PlayController extends ChangeNotifier {
     }
   }
 
+  Future updateCodeStage(Stage stage) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await userStageRef.where('id', isEqualTo: stage.id).get();
+
+      // Função auxiliar para construir dinamicamente o mapa de atualização
+      Map<String, dynamic> buildUpdateData(Stage stage) {
+        Map<String, dynamic> data = {};
+
+        if (stage.description != null && descriptionEdit.text.isNotEmpty) {
+          data['description'] = descriptionEdit.text;
+        }
+        if (stage.token != null && tokenEdit.text.isNotEmpty) {
+          data['token'] = tokenEdit.text;
+        }
+        if (stage.category != null && categoryEdit.text.isNotEmpty) {
+          data['category'] = categoryEdit.text;
+        }
+        if (stage.puzzle != null && puzzleEdit.text.isNotEmpty) {
+          data['puzzle'] = puzzleEdit.text;
+        }
+
+        return data;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+        DocumentSnapshot document = querySnapshot.docs.first;
+        Map<String, dynamic> updateData = buildUpdateData(stage);
+
+        if (updateData.isNotEmpty) {
+          await document.reference.update(updateData);
+        }
+      }
+    } catch (e) {
+      debugPrint("Erro ao atualizar equipe: $e");
+    }
+  }
+
   String? categoryToString(Category category) {
     switch (category) {
       case Category.freezing:
-        return 'Pausado';
+        return 'Congelar';
       case Category.protect:
         return 'Escudo';
       case Category.pay:
@@ -119,7 +178,7 @@ class PlayController extends ChangeNotifier {
 
   Category? categoryFromString(String? category) {
     switch (category) {
-      case 'Pausado':
+      case 'Congelar':
         return Category.freezing;
       case 'Escudo':
         return Category.protect;
