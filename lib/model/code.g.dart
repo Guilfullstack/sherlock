@@ -1,53 +1,50 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_team.dart';
+part of 'code.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class UserTeamAdapter extends TypeAdapter<UserTeam> {
+class CodeAdapter extends TypeAdapter<Code> {
   @override
-  final int typeId = 0;
+  final int typeId = 2;
 
   @override
-  UserTeam read(BinaryReader reader) {
+  Code read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return UserTeam(
+    return Code(
       id: fields[0] as String?,
-      login: fields[1] as String?,
-      password: fields[2] as String?,
-      name: fields[3] as String?,
-      date: fields[4] as DateTime?,
-      status: fields[5] as Status?,
-      credit: fields[6] as double?,
-      listTokenDesbloqued: (fields[7] as List?)?.cast<String>(),
+      token: fields[1] as String?,
+      category: fields[2] as Category?,
+      description: fields[3] as String?,
+      puzzle: fields[4] as String?,
+      value: fields[5] as double?,
+      date: fields[6] as DateTime?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, UserTeam obj) {
+  void write(BinaryWriter writer, Code obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.login)
+      ..write(obj.token)
       ..writeByte(2)
-      ..write(obj.password)
+      ..write(obj.category)
       ..writeByte(3)
-      ..write(obj.name)
+      ..write(obj.description)
       ..writeByte(4)
-      ..write(obj.date)
+      ..write(obj.puzzle)
       ..writeByte(5)
-      ..write(obj.status)
+      ..write(obj.value)
       ..writeByte(6)
-      ..write(obj.credit)
-      ..writeByte(7)
-      ..write(obj.listTokenDesbloqued);
+      ..write(obj.date);
   }
 
   @override
@@ -56,40 +53,50 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UserTeamAdapter &&
+      other is CodeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
 
-class StatusAdapter extends TypeAdapter<Status> {
+class CategoryAdapter extends TypeAdapter<Category> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
-  Status read(BinaryReader reader) {
+  Category read(BinaryReader reader) {
     switch (reader.readByte()) {
       case 0:
-        return Status.Jogando;
+        return Category.freezing;
       case 1:
-        return Status.Conjelado;
+        return Category.protect;
       case 2:
-        return Status.Protegido;
+        return Category.pay;
+      case 3:
+        return Category.receive;
+      case 4:
+        return Category.stage;
       default:
-        return Status.Jogando;
+        return Category.freezing;
     }
   }
 
   @override
-  void write(BinaryWriter writer, Status obj) {
+  void write(BinaryWriter writer, Category obj) {
     switch (obj) {
-      case Status.Jogando:
+      case Category.freezing:
         writer.writeByte(0);
         break;
-      case Status.Conjelado:
+      case Category.protect:
         writer.writeByte(1);
         break;
-      case Status.Protegido:
+      case Category.pay:
         writer.writeByte(2);
+        break;
+      case Category.receive:
+        writer.writeByte(3);
+        break;
+      case Category.stage:
+        writer.writeByte(4);
         break;
     }
   }
@@ -100,7 +107,7 @@ class StatusAdapter extends TypeAdapter<Status> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is StatusAdapter &&
+      other is CategoryAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
