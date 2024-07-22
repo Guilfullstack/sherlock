@@ -44,12 +44,13 @@ class Code extends HiveObject {
 
   factory Code.fromJson(Map<String, dynamic> json) {
     return Code(
-      id: json["id"],
-      token: json["token"],
-      category: categoryFromString(json["category"]),
-      description: json["description"],
-      puzzle: json['puzzle'],
-      value: json["value"],
+      id: json["id"] as String?,
+      token: json["token"] as String?,
+      category: categoryFromString(json["category"] as String?),
+      description: json["description"] as String?,
+      puzzle: json['puzzle'] as String?,
+      value: (json["value"] as num?)
+          ?.toDouble(), // Converte int para double se necessário
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
   }

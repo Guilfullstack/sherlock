@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
@@ -11,11 +12,40 @@ import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void clearHiveData() async {
   final dir = await path_provider.getApplicationDocumentsDirectory();
   await Hive.deleteFromDisk();
   Hive.init(dir.path);
+}
+
+Future<void> initializeHive() async {
+  if (kIsWeb) {
+    print('Inicialização do Hive ignorada na plataforma Web.');
+    return; // Não inicializa o Hive se for a Web
+  }
+
+  try {
+    print('Inicializando o Hive...');
+    final appDocumentDir =
+        await path_provider.getApplicationDocumentsDirectory();
+    await Hive.initFlutter(appDocumentDir.path);
+    print('Hive inicializado com o caminho: ${appDocumentDir.path}');
+
+    // Registra os adaptadores do Hive
+    Hive.registerAdapter(UserTeamAdapter());
+    Hive.registerAdapter(StatusAdapter());
+    await Hive.openBox<UserTeam>('userTeamBox');
+
+    Hive.registerAdapter(CodeAdapter());
+    Hive.registerAdapter(CategoryAdapter());
+    await Hive.openBox<Code>('codeBox');
+
+    print('Caixa do Hive aberta com sucesso');
+  } catch (e) {
+    print('Erro ao inicializar o Hive: $e');
+  }
 }
 
 Future<void> main() async {
@@ -30,31 +60,9 @@ Future<void> main() async {
   } catch (e) {
     print('Error initializing Firebase: $e');
   }
-
   // Pequeno atraso para garantir que os plugins estão carregados
   await Future.delayed(const Duration(seconds: 1));
-
-  // Inicializa o Hive com o diretório de documentos do aplicativo
-  try {
-    print('Initializing Hive...');
-    final appDocumentDir =
-        await path_provider.getApplicationDocumentsDirectory();
-    await Hive.initFlutter(appDocumentDir.path);
-    print('Hive initialized with path: ${appDocumentDir.path}');
-    // Registra os adaptadores do Hive
-    Hive.registerAdapter(UserTeamAdapter());
-    Hive.registerAdapter(StatusAdapter());
-    await Hive.openBox<UserTeam>('userTeamBox');
-
-    // Registra os adaptadores do Hive
-    Hive.registerAdapter(CodeAdapter());
-    Hive.registerAdapter(CategoryAdapter());
-    await Hive.openBox<Code>('codeBox');
-
-    print('Hive box opened successfully');
-  } catch (e) {
-    print('Error initializing Hive: $e');
-  }
+  initializeHive();
 
   runApp(
     ChangeNotifierProvider(
