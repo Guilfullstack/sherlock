@@ -843,14 +843,13 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   controller: update == false
                       ? userController.passwordComfirm
                       : userController.passwordEditComfirm,
-                  validator: (value) =>
-                      value != userController.passwordEdit.text
-                          ? "Senhas diferentes"
-                          : value.length < 5
-                              ? "Sua senha deve ter mínimo 5 aracteres"
-                              : value!.isEmpty
-                                  ? "Confirme sua senha"
-                                  : null,
+                  validator: (value) => value != userController.password.text
+                      ? "Senhas diferentes"
+                      : value.length < 6
+                          ? "Sua senha deve ter mínimo 6 aracteres"
+                          : value!.isEmpty
+                              ? "Confirme sua senha"
+                              : null,
                 ),
                 Row(
                   mainAxisAlignment:
