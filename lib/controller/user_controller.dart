@@ -13,6 +13,7 @@ import 'package:sherlock/view/page/controller_panel_page.dart';
 import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthException implements Exception {
   String mensage;
@@ -73,7 +74,7 @@ class UserController extends ChangeNotifier {
     notifyListeners();
     return Future<UserStaff>.value(userStaff);
   }
-
+/*
   Future<void> logout(BuildContext context) async {
     // Limpar SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -88,6 +89,35 @@ class UserController extends ChangeNotifier {
       context,
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
+  }
+*/
+
+  Future<void> logout(BuildContext context) async {
+    // Limpar SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (kIsWeb) {
+      // Navegar para a página de login se for Web
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      // Limpar Hive e então navegar para a página de login se não for Web
+      try {
+        var userTeamBox = Hive.box<UserTeam>('userTeamBox');
+        await userTeamBox.clear();
+      } catch (e) {
+        print('Error clearing Hive box: $e');
+      }
+
+      // Navegar para a página de login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
   }
 
   Future<void> _saveLoginState(
@@ -131,55 +161,46 @@ class UserController extends ChangeNotifier {
             .get();
 
         if (snapshotTeam.docs.isNotEmpty) {
-          await _saveLoginState(true, login, 'Team');
+          if (kIsWeb) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Web Platform'),
+                  content:
+                      const Text('Equipes não tem acesso a plataforma Web'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            await _saveLoginState(true, login, 'Team');
+            // Armazena o usuário na caixa do Hive
+            final user = UserTeam(
+                id: snapshotTeam.docs.first.id,
+                login: snapshotTeam.docs.first.data().login,
+                password: snapshotTeam.docs.first.data().password,
+                name: snapshotTeam.docs.first.data().name,
+                date: snapshotTeam.docs.first.data().date,
+                status: snapshotTeam.docs.first.data().status,
+                credit: snapshotTeam.docs.first.data().credit,
+                listTokenDesbloqued:
+                    snapshotTeam.docs.first.data().listTokenDesbloqued);
+            saveUserHive(user);
 
-          //Recebendo lista de codigos
-          try {
-            // Obtém os documentos da coleção Code
-            final querySnapshot = await userCodeRef.get();
+            List<Code> codeList = await playController.getCodeList();
+            playController.saveCodeListToHive(codeList);
 
-            // Mapeia os documentos para uma lista de objetos Code
-            final List<Code> codes = querySnapshot.docs.map((doc) {
-              return doc.data(); // Usa o conversor para obter o objeto Code
-            }).toList();
-
-            // Salva a lista de códigos usando o playController
-            playController.saveCodesHive(codes);
-            var listcode = await playController.getCodesHive();
-
-            for (var code in listcode) {
-              print('Code ID: ${code.id}');
-              print('Token: ${code.token}');
-              print(
-                  'Category: ${code.category != null ? Code.categoryToString(code.category!) : 'Unknown'}');
-              print('Description: ${code.description}');
-              print('Puzzle: ${code.puzzle}');
-              print('Value: ${code.value}');
-              print('Date: ${code.date}');
-              print('----------------------------------');
-            }
-          } catch (e) {
-            // Lida com erros durante a obtenção dos dados
-            print('Error fetching codes: $e');
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const HomePage()));
           }
-
-          // Armazena o usuário na caixa do Hive
-          final user = UserTeam(
-              id: snapshotTeam.docs.first.id,
-              login: snapshotTeam.docs.first.data().login,
-              password: snapshotTeam.docs.first.data().password,
-              name: snapshotTeam.docs.first.data().name,
-              date: snapshotTeam.docs.first.data().date,
-              status: snapshotTeam.docs.first.data().status,
-              credit: snapshotTeam.docs.first.data().credit,
-              listTokenDesbloqued:
-                  snapshotTeam.docs.first.data().listTokenDesbloqued);
-
-          //final userBox = Hive.box<UserTeam>('userTeamBox');
-          //await userBox.put('currentUser', user);
-          saveUserHive(user);
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
         } else {
           final snapshotStaff = await userStaffRef
               .where("login", isEqualTo: login)
