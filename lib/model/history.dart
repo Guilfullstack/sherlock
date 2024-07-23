@@ -9,11 +9,13 @@ final historyRef = FirebaseFirestore.instance
 
 class History {
   String? id;
+  String? idTeam;
   String? description;
   DateTime? date;
 
   History({
     this.id,
+    this.idTeam,
     this.description,
     this.date,
   });
@@ -21,6 +23,7 @@ class History {
   factory History.fromJson(Map<String, dynamic> json) {
     return History(
       id: json["id"],
+      idTeam: json['idTeam'],
       description: json['description'],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
@@ -28,6 +31,7 @@ class History {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "idTeam": idTeam,
         "description": description,
         "date": date?.toIso8601String(),
       };

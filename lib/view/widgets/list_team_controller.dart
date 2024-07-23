@@ -4,8 +4,6 @@ class ListTeamController extends StatefulWidget {
   final String? equipe;
   final Function()? onTapEdit;
   final Function()? onTapRemove;
-  final Function()? onTapHistory;
-  final bool? onDesktop;
   final double? credit;
   final String? status;
   final String? category;
@@ -17,8 +15,6 @@ class ListTeamController extends StatefulWidget {
     this.equipe,
     this.onTapEdit,
     this.onTapRemove,
-    this.onTapHistory,
-    this.onDesktop = false,
     this.credit,
     this.status,
     this.user = false,
@@ -49,10 +45,11 @@ class _ListTeamControllerState extends State<ListTeamController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    "Categoria: ${widget.category ?? ""}",
-                    style: TextStyle(color: ThemeData().primaryColorLight),
-                  ),
+                  if (widget.stage != true)
+                    Text(
+                      "Categoria: ${widget.category ?? ""}",
+                      style: TextStyle(color: ThemeData().primaryColorLight),
+                    ),
                   if (widget.stage != true)
                     Text(
                       "Valor: ${widget.credit == 0 ? "Sem valor" : widget.credit}",
@@ -104,17 +101,17 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
-                enabled: widget.onDesktop == false ? true : false,
-                onTap: widget.onTapHistory,
-                child: const Row(
-                  children: [
-                    Icon(Icons.history),
-                    SizedBox(width: 8),
-                    Text('Historico'),
-                  ],
-                ),
-              ),
+              // PopupMenuItem<String>(
+              //   enabled: widget.onDesktop == false ? true : false,
+              //   onTap: widget.onTapHistory,
+              //   child: const Row(
+              //     children: [
+              //       Icon(Icons.history),
+              //       SizedBox(width: 8),
+              //       Text('Historico'),
+              //     ],
+              //   ),
+              // ),
             ];
           },
           icon: const Icon(Icons.more_vert), // Ícone do botão de ação

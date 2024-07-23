@@ -327,8 +327,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                         },
                       );
                     },
-                    onDesktop: MediaQuery.of(context).size.width > 1329,
-                    onTapHistory: () {},
                   );
                 },
               ),
@@ -396,8 +394,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                         },
                       );
                     },
-                    onDesktop: MediaQuery.of(context).size.width > 1329,
-                    onTapHistory: () {},
                   );
                 },
               ),
@@ -464,8 +460,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                         },
                       );
                     },
-                    onDesktop: MediaQuery.of(context).size.width > 1329,
-                    onTapHistory: () {},
                   );
                 },
               ),
@@ -559,8 +553,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                   );
                                 });
                           },
-                          onDesktop: MediaQuery.of(context).size.width > 1329,
-                          onTapHistory: () {},
                         );
                       },
                     ),
@@ -626,8 +618,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             equipe: code.description,
                             status: code.token,
                             credit: 0,
-                            category: playController
-                                .categoryToString(code.category as Category),
+                            // category: playController
+                            //     .categoryToString(code.category as Category),
                             onTapRemove: () {
                               playController.removePlay(1, code.id.toString());
                             },
@@ -643,7 +635,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                     playController.puzzleEdit.text =
                                         code.puzzle ?? "";
                                     playController.valueEdit.text = "0";
-                                    value2Edit = code.category!;
+                                    value2Edit = Category.stage;
                                     return Form(
                                       key: playController.formKeyPlayEdit,
                                       child: AlertDialog(
@@ -651,15 +643,17 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                         content: SizedBox(
                                           height: 500,
                                           width: 450,
-                                          child: _addTolkien(context,
-                                              playController, true, true),
+                                          child: StatefulBuilder(builder:
+                                              (BuildContext context, setState) {
+                                            return _addTolkien(context,
+                                                playController, true, true);
+                                          }),
                                         ),
                                       ),
                                     );
                                   });
                             },
-                            onDesktop: MediaQuery.of(context).size.width > 1329,
-                            onTapHistory: () {},
+                            //
                           );
                         },
                       ),
@@ -1107,7 +1101,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     ),
                     //botão historico
                     Visibility(
-                      visible: MediaQuery.of(context).size.width > 1329 ||
+                      visible: MediaQuery.of(context).size.width > 1250 ||
                               update == true
                           ? false
                           : true,
@@ -1218,10 +1212,13 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   ),
                 ),
                 Visibility(
-                  visible:
-                      value2 == Category.stage || value2Edit == Category.stage
-                          ? true
-                          : false,
+                  visible: value2 == Category.stage ||
+                          (value2Edit == Category.stage &&
+                              value2 == Category.stage) ||
+                          (value2Edit == Category.stage && update == true) ||
+                          (value2 == Category.stage && update == true)
+                      ? true
+                      : false,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: ImputTextFormField(
@@ -1340,7 +1337,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                         description:
                                             playController.descriptionEdit.text,
                                         puzzle: playController.puzzleEdit.text,
-                                        category: value2Edit,
+                                        //category: value2Edit,
                                       );
                                       setState(() {
                                         userController.loading = true;
@@ -1392,7 +1389,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                         description:
                                             playController.description.text,
                                         puzzle: playController.puzzle.text,
-                                        category: value2,
+                                        // category: value2,
                                       );
                                       setState(() {
                                         userController.loading = true;
@@ -1431,6 +1428,36 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               child: Text(
                                   update == true ? "Atualizar" : "Adicionar"))
                           : const Center(child: CircularProgressIndicator()),
+                    ),
+                    // lsita de prova versão mobile
+                    Visibility(
+                      visible: MediaQuery.of(context).size.width > 1250 ||
+                              update == true
+                          ? false
+                          : true,
+                      child: StatefulBuilder(
+                          builder: (BuildContext context, setState) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              historyVisible = true;
+                              debugPrint("${userController.history}");
+                            });
+
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Form(
+                                      key: userController.formKeyEditTeam,
+                                      child: listCodeStage(
+                                          context, playController, 400));
+                                });
+                            historyVisible = false;
+                          },
+                          child: const Text("Provas"),
+                        );
+                      }),
                     ),
                   ],
                 ),

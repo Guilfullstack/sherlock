@@ -136,9 +136,9 @@ class PlayController extends ChangeNotifier {
         if (stage.token != null && tokenEdit.text.isNotEmpty) {
           data['token'] = tokenEdit.text;
         }
-        if (stage.category != null && categoryEdit.text.isNotEmpty) {
-          data['category'] = categoryEdit.text;
-        }
+        // if (stage.category != null && categoryEdit.text.isNotEmpty) {
+        //   data['category'] = categoryEdit.text;
+        // }
         if (stage.puzzle != null && puzzleEdit.text.isNotEmpty) {
           data['puzzle'] = puzzleEdit.text;
         }
