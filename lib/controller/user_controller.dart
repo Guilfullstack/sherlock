@@ -54,6 +54,7 @@ class UserController extends ChangeNotifier {
     listTeamn.insert(0, userTeam);
     login.clear();
     password.clear();
+    passwordComfirm.clear();
     notifyListeners();
     return Future<UserTeam>.value(userTeam);
   }
@@ -63,6 +64,9 @@ class UserController extends ChangeNotifier {
     userAdm.id = userAdmDoc.id;
     userAdm.date = DateTime.now();
     await userAdmDoc.set(userAdm);
+    login.clear();
+    password.clear();
+    passwordComfirm.clear();
     notifyListeners();
     return Future<UserAdm>.value(userAdm);
   }
@@ -72,6 +76,9 @@ class UserController extends ChangeNotifier {
     userStaff.id = userStaffDoc.id;
     userStaff.date = DateTime.now();
     await userStaffDoc.set(userStaff);
+    login.clear();
+    password.clear();
+    passwordComfirm.clear();
     notifyListeners();
     return Future<UserStaff>.value(userStaff);
   }
