@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -198,6 +199,15 @@ class UserController extends ChangeNotifier {
             List<Code> codeList = await playController.getCodeList();
             playController.saveCodeListToHive(codeList);
 
+            List<Stage> stageList = await playController.getStageList();
+            playController.saveStageListToHive(stageList);
+
+            List<Stage> stageList2 =
+                await playController.getStageListFromHive();
+            for (Stage stage in stageList2) {
+              print(
+                  'ID: ${stage.id}, Descrição: ${stage.description}, Categoria: ${Stage.categoryToString(stage.category)}');
+            }
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));
           }

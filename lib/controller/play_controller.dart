@@ -69,6 +69,24 @@ class PlayController extends ChangeNotifier {
     }
   }
 
+  Future<List<Stage>> getStageList() async {
+    try {
+      // Obtém os documentos da coleção 'Code'
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('Stage').get();
+
+      // Converte os documentos em uma lista de objetos Code
+      List<Stage> codeList = querySnapshot.docs.map((doc) {
+        return Stage.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      return codeList;
+    } catch (e) {
+      print('Erro ao obter a lista de provas: $e');
+      return [];
+    }
+  }
+
   Stream<List<Code>> get codeStream {
     return _firestore.collection('Code').snapshots().map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
@@ -230,6 +248,30 @@ class PlayController extends ChangeNotifier {
   Future<List<Code>> getCodeListFromHive() async {
     // Obtém a caixa onde os códigos estão armazenados
     final codeBox = await Hive.openBox<Code>('codeBox');
+
+    // Recupera todos os códigos da caixa
+    final codeList = codeBox.values.toList();
+
+    return codeList;
+  }
+
+  Future<void> saveStageListToHive(List<Stage> stageList) async {
+    // Obtém a caixa onde os códigos serão armazenados
+    final codeBox = await Hive.openBox<Stage>('stageBox');
+
+    // Salva os códigos na caixa
+    for (var code in stageList) {
+      if (code.id != null) {
+        await codeBox.put(
+            code.id, code); // Usa o ID como chave para cada código
+      }
+    }
+    print('Lista de códigos salva no Hive com sucesso.');
+  }
+
+  Future<List<Stage>> getStageListFromHive() async {
+    // Obtém a caixa onde os códigos estão armazenados
+    final codeBox = await Hive.openBox<Stage>('stageBox');
 
     // Recupera todos os códigos da caixa
     final codeList = codeBox.values.toList();

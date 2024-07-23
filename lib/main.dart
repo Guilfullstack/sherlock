@@ -2,9 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -38,6 +40,10 @@ Future<void> initializeHive() async {
     Hive.registerAdapter(CategoryAdapter());
     await Hive.openBox<Code>('codeBox');
 
+    Hive.registerAdapter(StageAdapter());
+    //Hive.registerAdapter(CategoryAdapter());
+    await Hive.openBox<Stage>('stageBox');
+
     print('Caixa do Hive aberta com sucesso');
   } catch (e) {
     print('Erro ao inicializar o Hive: $e');
@@ -59,7 +65,12 @@ Future<void> main() async {
   // Pequeno atraso para garantir que os plugins estão carregados
   await Future.delayed(const Duration(seconds: 1));
   initializeHive();
-
+  /*
+  PlayController playController = PlayController();
+  List<Stage> stages = await playController.getStageList();
+  for (Stage stage in stages) {
+    print(
+       */
   runApp(
     ChangeNotifierProvider(
       create: (context) => UserController(),
