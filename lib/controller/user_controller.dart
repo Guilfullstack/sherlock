@@ -161,26 +161,46 @@ class UserController extends ChangeNotifier {
             .get();
 
         if (snapshotTeam.docs.isNotEmpty) {
-          await _saveLoginState(true, login, 'Team');
+          if (kIsWeb) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Web Platform'),
+                  content:
+                      const Text('Equipes não tem acesso a plataforma Web'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            await _saveLoginState(true, login, 'Team');
+            // Armazena o usuário na caixa do Hive
+            final user = UserTeam(
+                id: snapshotTeam.docs.first.id,
+                login: snapshotTeam.docs.first.data().login,
+                password: snapshotTeam.docs.first.data().password,
+                name: snapshotTeam.docs.first.data().name,
+                date: snapshotTeam.docs.first.data().date,
+                status: snapshotTeam.docs.first.data().status,
+                credit: snapshotTeam.docs.first.data().credit,
+                listTokenDesbloqued:
+                    snapshotTeam.docs.first.data().listTokenDesbloqued);
+            saveUserHive(user);
 
-          // Armazena o usuário na caixa do Hive
-          final user = UserTeam(
-              id: snapshotTeam.docs.first.id,
-              login: snapshotTeam.docs.first.data().login,
-              password: snapshotTeam.docs.first.data().password,
-              name: snapshotTeam.docs.first.data().name,
-              date: snapshotTeam.docs.first.data().date,
-              status: snapshotTeam.docs.first.data().status,
-              credit: snapshotTeam.docs.first.data().credit,
-              listTokenDesbloqued:
-                  snapshotTeam.docs.first.data().listTokenDesbloqued);
-          saveUserHive(user);
+            List<Code> codeList = await playController.getCodeList();
+            playController.saveCodeListToHive(codeList);
 
-          List<Code> codeList = await playController.getCodeList();
-          playController.saveCodeListToHive(codeList);
-
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const HomePage()));
+          }
         } else {
           final snapshotStaff = await userStaffRef
               .where("login", isEqualTo: login)

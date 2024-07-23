@@ -1,14 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
-import 'package:sherlock/view/page/controller_panel_page.dart';
-import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
