@@ -76,11 +76,11 @@ class PlayController extends ChangeNotifier {
           await FirebaseFirestore.instance.collection('Stage').get();
 
       // Converte os documentos em uma lista de objetos Code
-      List<Stage> codeList = querySnapshot.docs.map((doc) {
+      List<Stage> stageList = querySnapshot.docs.map((doc) {
         return Stage.fromJson(doc.data() as Map<String, dynamic>);
       }).toList();
 
-      return codeList;
+      return stageList;
     } catch (e) {
       print('Erro ao obter a lista de provas: $e');
       return [];
@@ -242,7 +242,6 @@ class PlayController extends ChangeNotifier {
             code.id, code); // Usa o ID como chave para cada código
       }
     }
-    print('Lista de códigos salva no Hive com sucesso.');
   }
 
   Future<List<Code>> getCodeListFromHive() async {
@@ -256,19 +255,43 @@ class PlayController extends ChangeNotifier {
   }
 
   Future<void> saveStageListToHive(List<Stage> stageList) async {
+    try {
+      final stageBox = Hive.box<Stage>('stageBox');
+      await stageBox
+          .clear(); // Opcional: limpa a caixa antes de adicionar novos itens
+
+      for (var stage in stageList) {
+        // Converter a categoria de string para enum, se necessário
+
+        stage.category = Stage.categoryFromString(stage.category.toString());
+
+        if (stage.id != null) {
+          await stageBox.put(
+              stage.id, stage); // Usa o ID como chave para cada stage
+        }
+      }
+      print('Lista de estágios salva com sucesso no Hive.');
+    } catch (e) {
+      print('Erro ao salvar a lista de estágios no Hive: $e');
+    }
+  }
+
+  //Stage
+  /*
+  Future<void> saveStageListToHive(List<Stage> stageList) async {
     // Obtém a caixa onde os códigos serão armazenados
-    final codeBox = await Hive.openBox<Stage>('stageBox');
+    final stagebox = await Hive.openBox<Stage>('stageBox');
 
     // Salva os códigos na caixa
-    for (var code in stageList) {
-      if (code.id != null) {
-        await codeBox.put(
-            code.id, code); // Usa o ID como chave para cada código
+    for (var stage in stageList) {
+      if (stage.id != null) {
+        await stagebox.put(
+            stage.id, stage); // Usa o ID como chave para cada stage
       }
     }
     print('Lista de códigos salva no Hive com sucesso.');
   }
-
+*/
   Future<List<Stage>> getStageListFromHive() async {
     // Obtém a caixa onde os códigos estão armazenados
     final codeBox = await Hive.openBox<Stage>('stageBox');

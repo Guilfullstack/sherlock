@@ -86,24 +86,8 @@ class UserController extends ChangeNotifier {
     notifyListeners();
     return Future<UserStaff>.value(userStaff);
   }
+
 /*
-  Future<void> logout(BuildContext context) async {
-    // Limpar SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    // Limpar Hive
-    var userTeamBox = Hive.box<UserTeam>('userTeamBox');
-    await userTeamBox.clear();
-
-    // Navegar para a página de login
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
-  }
-*/
-
   Future<void> logout(BuildContext context) async {
     // Limpar SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -122,6 +106,43 @@ class UserController extends ChangeNotifier {
         await userTeamBox.clear();
       } catch (e) {
         print('Error clearing Hive box: $e');
+      }
+
+      // Navegar para a página de login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
+  }
+*/
+  Future<void> logout(BuildContext context) async {
+    // Limpar SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (kIsWeb) {
+      // Navegar para a página de login se for Web
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      // Limpar Hive e então navegar para a página de login se não for Web
+      try {
+        var userTeamBox = Hive.box<UserTeam>('userTeamBox');
+        await userTeamBox.clear();
+        print('userTeamBox limpo com sucesso.');
+
+        var codeBox = Hive.box<Code>('codeBox');
+        await codeBox.clear();
+        print('codeBox limpo com sucesso.');
+
+        var stageBox = Hive.box<Stage>('stageBox');
+        await stageBox.clear();
+        print('stageBox limpo com sucesso.');
+      } catch (e) {
+        print('Erro ao limpar a caixa do Hive: $e');
       }
 
       // Navegar para a página de login
@@ -213,12 +234,6 @@ class UserController extends ChangeNotifier {
             List<Stage> stageList = await playController.getStageList();
             playController.saveStageListToHive(stageList);
 
-            List<Stage> stageList2 =
-                await playController.getStageListFromHive();
-            for (Stage stage in stageList2) {
-              print(
-                  'ID: ${stage.id}, Descrição: ${stage.description}, Categoria: ${Stage.categoryToString(stage.category)}');
-            }
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));
           }
@@ -249,71 +264,6 @@ class UserController extends ChangeNotifier {
       debugPrint('Erro: $e');
     }
   }
-
-/*
-  Future<void> loginSystem(
-      BuildContext context, String login, String password) async {
-    try {
-      final snaphotAdm = await userAdmRef
-          .where("login", isEqualTo: login)
-          .where("password", isEqualTo: password)
-          .limit(1)
-          .get();
-      if (snaphotAdm.docs.isNotEmpty) {
-        debugPrint("Vai para página ControlPanel");
-        /*
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => const ControllerPanelPage()),
-        );*/
-        Navigator.pushReplacementNamed(context, '/controll');
-      } else {
-        final snaphotTeam = await userTeamref
-            .where("login", isEqualTo: login)
-            .where("password", isEqualTo: password)
-            .limit(1)
-            .get();
-        if (snaphotTeam.docs.isNotEmpty) {
-          /*
-          Navigator.pushReplacement(
-            // ignore: use_build_context_synchronously
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          );*/
-          Navigator.pushReplacementNamed(context, '/home');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(
-                'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
-          ));
-          /*
-          showDialog(
-            // ignore: use_build_context_synchronously
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Usuário não encontrado'),
-                content:
-                    const Text('Verifique suas credenciais e tente novamente.'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Fecha o AlertDialog
-                    },
-                  ),
-                ],
-              );
-            },
-          );*/
-        }
-      }
-    } catch (e) {
-      debugPrint('Erro: $e.toString()');
-    }
-  }*/
 
   Future loadTeams() async {
     final snapshot = await userTeamref.get();
@@ -467,90 +417,4 @@ class UserController extends ChangeNotifier {
       }).toList();
     });
   }
-
-  // subscribeToTeams() {
-  //   try {
-  //     listTeamSubscription = userAdmRef.snapshots().listen(
-  //       (querySnapshot) {
-  //         List<UserTeam> trufasAtualizados = querySnapshot.docs
-  //             .map((doc) => UserTeam.fromJson(doc.data()))
-  //             .toList();
-
-  //         listTeamn = List.from(trufasAtualizados);
-
-  //         listTeamn.clear();
-  //         notifyListeners();
-  //         print("equipes ${listTeamn.length}");
-  //         for (var user in trufasAtualizados) {
-  //           listTeamn.add(user);
-  //         }
-  //       },
-  //     );
-  //   } catch (e) {
-  //     print("Erro ao assinar a coleção: $e");
-  //   }
-  // }
-
-  /*
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? user;
-  bool isLoading = true;
-  
-  LoginController() {
-    autcheck();
-  }
-
-  autcheck() {
-    _auth.authStateChanges().listen((User? user) {
-      user = (user == null ? null : user);
-      notifyListeners();
-    });
-  }
-
-  getUser() {
-    user = _auth.currentUser;
-    notifyListeners();
-  }
-
-  Future<void> registerUser(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      User? user = _auth.currentUser;
-      await user?.sendEmailVerification();
-      getUser();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "weak-passoword") {
-        throw AuthException('A senha muito fraca');
-      } else if (e.code == "email-already-in-use") {
-        throw AuthException('Email já está cadastrado');
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  logOut() async {
-    await _auth.signOut();
-    getUser();
-  }
-
-  Future<void> login(String email, String password) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      // Login successful
-      print('User logged in: ${userCredential.user?.email}');
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }*/
 }
