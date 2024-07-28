@@ -34,6 +34,9 @@ class UserTeam extends HiveObject {
   @HiveField(7)
   List<String>? listTokenDesbloqued;
 
+  @HiveField(8)
+  List? listMembers;
+
   UserTeam({
     this.id,
     this.login,
@@ -43,6 +46,7 @@ class UserTeam extends HiveObject {
     this.status,
     this.credit,
     this.listTokenDesbloqued,
+    this.listMembers,
   });
 
   factory UserTeam.fromJson(dynamic json) {
@@ -55,6 +59,7 @@ class UserTeam extends HiveObject {
       status: json["status"] != null ? Status.values[json["status"]] : null,
       credit: (json["credit"] as num?)?.toDouble(),
       listTokenDesbloqued: List<String>.from(json["listTokenDesbloqued"] ?? []),
+      listMembers: List.from(json["listMembers"] ?? []),
     );
   }
 
@@ -67,6 +72,7 @@ class UserTeam extends HiveObject {
         "status": status?.index,
         "credit": credit,
         "listTokenDesbloqued": listTokenDesbloqued,
+        "listMembers": listMembers,
       };
 }
 

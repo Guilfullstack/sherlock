@@ -36,7 +36,11 @@ class UserController extends ChangeNotifier {
   TextEditingController loginEdit = TextEditingController();
   TextEditingController passwordEdit = TextEditingController();
   TextEditingController passwordEditComfirm = TextEditingController();
+  TextEditingController addMember = TextEditingController();
+  TextEditingController addMemberEdit = TextEditingController();
 
+  late List membersTeam = [];
+  final List membersTeamEdit = [];
   List<UserTeam> listTeamn = [];
   bool loading = false;
   bool update = false;
