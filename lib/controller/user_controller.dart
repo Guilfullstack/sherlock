@@ -38,9 +38,10 @@ class UserController extends ChangeNotifier {
   TextEditingController passwordEditComfirm = TextEditingController();
   TextEditingController addMember = TextEditingController();
   TextEditingController addMemberEdit = TextEditingController();
+  final TextEditingController memberId = TextEditingController();
 
   late List membersTeam = [];
-  final List membersTeamEdit = [];
+  late List membersTeamEdit = [];
   List<UserTeam> listTeamn = [];
   bool loading = false;
   bool update = false;
@@ -310,6 +311,9 @@ class UserController extends ChangeNotifier {
         if (userTeam.password != null && passwordEdit.text.isNotEmpty) {
           data['password'] = passwordEdit.text;
         }
+        if (userTeam.listMembers != null) {
+          data['listMembers'] = userTeam.listMembers;
+        }
 
         return data;
       }
@@ -416,5 +420,30 @@ class UserController extends ChangeNotifier {
         return UserStaff.fromJson(doc.data());
       }).toList();
     });
+  }
+
+  Future<List<String>> getListMembers(String teamId) async {
+    try {
+      // Obtém o documento da coleção 'Teams' pelo ID
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+          .collection('Teams')
+          .doc(teamId)
+          .get();
+
+      // Verifica se o documento existe e contém o campo 'listMembers'
+      if (docSnapshot.exists) {
+        Map data = docSnapshot.data() as Map<String, dynamic>;
+        List? listMembers = data['listMembers'] ?? [];
+
+        // Converte a lista de membros para uma lista de strings
+        if (listMembers != null) {
+          return List<String>.from(listMembers);
+        }
+      }
+      return [];
+    } catch (e) {
+      print('Erro ao obter a lista de membros: $e');
+      return [];
+    }
   }
 }

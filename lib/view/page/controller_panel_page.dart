@@ -27,9 +27,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   bool historyVisible = false;
   late TabController _tabController;
   ValueNotifier<bool> isHistoryVisible = ValueNotifier<bool>(true);
-  String value = "Historico 1";
   Category value2 = Category.protect;
   Category value2Edit = Category.protect;
+  bool hasLoadedMembers = false;
+  int membersNumeber = 0;
 
   @override
   void initState() {
@@ -318,6 +319,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               isScrollControlled: false,
                               context: context,
                               builder: (BuildContext context) {
+                                userController.memberId.text = team.id ?? "";
                                 userController.id.text = team.id ?? "";
                                 userController.nameEdit.text = team.name ?? "";
                                 userController.loginEdit.text =
@@ -857,6 +859,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               ? "Confirme sua senha"
                               : null,
                 ),
+
                 Visibility(
                   visible: (addAdm == false &&
                               update == true &&
@@ -866,7 +869,11 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       : false,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: addMembers(userController.membersTeam, update),
+                    child: addMembers(
+                        false,
+                        userController.memberId.text,
+                        userController.membersTeam,
+                        update == true ? true : false),
                   ),
                 ),
                 // SizedBox(
@@ -1080,8 +1087,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           //exitWindows;
                                           //add Equipe
                                         } else if (addAdm == false) {
-                                          print(
-                                              "att membrer ${userController.membersTeam}");
+                                          //add team
                                           final newUserTeams = UserTeam(
                                             name: userController.name.text,
                                             login: userController.login.text,
@@ -1099,6 +1105,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           await userController
                                               .addUserTeam(newUserTeams);
                                           setState(() {
+                                            userController.membersTeam.clear();
                                             userController.loading = false;
                                           });
                                         }
@@ -1360,8 +1367,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           playController.categoryToString(
                                                   value2Edit) ??
                                               "";
-                                      print(
-                                          "puzzle ${playController.puzzleEdit.text}");
                                       final updateCode = Stage(
                                         id: playController.id.text,
                                         token: playController.tokenEdit.text,
@@ -1384,8 +1389,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           playController.categoryToString(
                                                   value2Edit) ??
                                               "";
-                                      print(
-                                          "puzzle ${playController.puzzleEdit.text}");
                                       final updateCode = Code(
                                         id: playController.id.text,
                                         token: playController.tokenEdit.text,
@@ -1500,128 +1503,159 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
-  ElevatedButton addMembers(List member, bool update) {
-    return ElevatedButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (builder) {
-            return AlertDialog(
-              backgroundColor: Colors.black87,
-              content: SizedBox(
-                width: 400,
-                height: 400,
-                child:
-                    StatefulBuilder(builder: (BuildContext context, setState) {
-                  return ListView(
-                    children: [
-                      ImputTextFormField(
-                        title: "Nome do Membro",
-                        controller: userController.addMember,
-                        icon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              member.add(userController.addMember.text);
-                              print(member.length);
-                            });
-                          },
-                          icon: const Icon(Icons.add),
+  StatefulBuilder addMembers(
+      bool hasLoadedMembers, String idTeams, List member, bool update) {
+    return StatefulBuilder(builder: (BuildContext context, setState) {
+      if (update == true && hasLoadedMembers == false) {
+        // Carrega os membros apenas uma vez
+        try {
+          userController.getListMembers(idTeams).then((userTeams) {
+            setState(() {
+              member = userTeams;
+              membersNumeber = member.length;
+              hasLoadedMembers = true; // Marca como carregado
+            });
+            // hasLoadedMembers != hasLoadedMembers;
+          }).catchError((error) {
+            // Tratar o erro se necessário
+            debugPrint('Erro ao carregar membros: $error');
+          });
+        } catch (e) {
+          debugPrint("$e");
+        }
+      }
+      return ElevatedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (builder) {
+              return AlertDialog(
+                backgroundColor: Colors.black87,
+                content: SizedBox(
+                  width: 400,
+                  height: 400,
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, setStateDialog) {
+                    return ListView(
+                      children: [
+                        ImputTextFormField(
+                          title: "Nome do Membro",
+                          controller: userController.addMember,
+                          icon: IconButton(
+                            onPressed: () {
+                              setStateDialog(() {
+                                member.add(userController.addMember.text);
+                              });
+                            },
+                            icon: const Icon(Icons.add),
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 300,
-                        width: 400,
-                        child: ListView.builder(
+                        SizedBox(
+                          height: 300,
+                          width: 400,
+                          child: ListView.builder(
                             itemCount: member.length,
                             itemBuilder: (context, index) {
-                              if (update == true) {
-                                fetchMembers(member).then((fetchedMembers) {
-                                  setState(() {
-                                    member.clear();
-                                    member.addAll(fetchedMembers);
-                                  });
-                                });
-                              }
                               final listMember = member[index];
-
-                              print("teset ${listMember}");
                               return ListTeamController(
                                 user: true,
                                 equipe: listMember,
                                 onTapRemove: () {
-                                  setState(() {
+                                  setStateDialog(() {
                                     member.remove(listMember);
                                   });
                                 },
                                 onTapEdit: () {
-                                  if (update == true) {
-                                  } else {}
                                   bool updateLocal = true;
                                   userController.addMemberEdit.text =
                                       listMember;
+
                                   showDialog(
-                                      context: context,
-                                      builder: (builder) {
-                                        return AlertDialog(
-                                          backgroundColor: Colors.black87,
-                                          content: ImputTextFormField(
-                                            title: updateLocal == true
-                                                ? "Atualizar membro"
-                                                : "Nome do Membro",
-                                            controller: updateLocal == true
-                                                ? userController.addMemberEdit
-                                                : userController.addMember,
-                                            icon: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  member[index] =
-                                                      updateLocal == true
-                                                          ? userController
-                                                              .addMemberEdit
-                                                              .text
-                                                          : userController
-                                                              .addMember.text;
-                                                  print(userController
-                                                      .membersTeam.length);
-                                                  exitWindows();
-                                                });
-                                              },
-                                              icon: Icon(updateLocal == true
-                                                  ? Icons.update
-                                                  : Icons.add),
-                                            ),
+                                    context: context,
+                                    builder: (builder) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.black87,
+                                        content: ImputTextFormField(
+                                          title: updateLocal == true
+                                              ? "Atualizar membro"
+                                              : "Nome do Membro",
+                                          controller: updateLocal == true
+                                              ? userController.addMemberEdit
+                                              : userController.addMember,
+                                          icon: IconButton(
+                                            onPressed: () {
+                                              setStateDialog(() {
+                                                member[index] = userController
+                                                    .addMemberEdit.text;
+                                                exitWindows();
+                                              });
+                                            },
+                                            icon: Icon(updateLocal == true
+                                                ? Icons.update
+                                                : Icons.add),
                                           ),
-                                        );
-                                      });
+                                        ),
+                                      );
+                                    },
+                                  );
                                 },
                               );
-                            }),
-                      )
-                    ],
-                  );
-                }),
-              ),
-            );
-          },
-        ).then((_) {
-          setState(() {});
-        });
-      },
-      child: Text("Membros ${member.length}"),
-    );
+                            },
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (update == true) {
+                              final newMembers = UserTeam(
+                                id: idTeams,
+                                listMembers: member,
+                              );
+                              userController.updateTeams(newMembers);
+                              setStateDialog(() {
+                                hasLoadedMembers = false;
+                              });
+
+                              exitWindows(); // Fechar o diálogo
+                            } else {
+                              exitWindows(); // Fechar o diálogo
+                            }
+                          },
+                          child: Text(update == true ? "Atualizar" : "Salvar"),
+                        )
+                      ],
+                    );
+                  }),
+                ),
+              );
+            },
+          ).then((_) {
+            setState(() {
+              hasLoadedMembers = false;
+            });
+          });
+        },
+        child: Text("Membros ${member.length}"),
+      );
+    });
   }
 
-  Future<List> fetchMembers(List member) async {
-    final userTeams = await userController.teamStream.first;
-    final members = userTeams
-        .expand((team) => team.listMembers != null
-            ? List<String>.from(team.listMembers!)
-            : [])
-        .toList();
-    return members;
-  }
+  // Future<void> fetchMembers(List members) async {
+  //   try {
+  //     final userTeams = await userController.getListMembers();
+  //     setState(() {
+  //       members = userTeams
+  //           .expand((team) => team.listMembers != null
+  //               ? List<String>.from(team.listMembers!)
+  //               : [])
+  //           .toList();
+  //     });
+  //   } catch (e) {
+  //     print('Erro ao obter a lista de membros: $e');
+  //   }
+  // }
 
   exitWindows() {
+    // hasLoadedMembers = false;
     Navigator.pop(context);
   }
 
