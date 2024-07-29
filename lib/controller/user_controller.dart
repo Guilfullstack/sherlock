@@ -266,15 +266,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  Future loadTeams() async {
-    final snapshot = await userTeamref.get();
-    listTeamn.clear();
-    for (var doc in snapshot.docs) {
-      listTeamn.add(UserTeam.fromJson(doc));
-    }
-    notifyListeners();
-  }
-
   Future removeUser(int category, String id) async {
     switch (category) {
       case 0:
@@ -442,7 +433,7 @@ class UserController extends ChangeNotifier {
       }
       return [];
     } catch (e) {
-      print('Erro ao obter a lista de membros: $e');
+      debugPrint('Erro ao obter a lista de membros: $e');
       return [];
     }
   }

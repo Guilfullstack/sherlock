@@ -24,67 +24,47 @@ class PlayController extends ChangeNotifier {
   final TextEditingController valueEdit = TextEditingController();
 
   Future<Code> addCode(Code code) async {
-    try {
-      DocumentReference<Code> codeDoc = userCodeRef.doc();
-      code.id = codeDoc.id;
-      code.date = DateTime.now();
-      await codeDoc.set(code);
-      notifyListeners();
-      return Future<Code>.value(code);
-    } catch (e) {
-      print(e);
-    }
-    return code;
+    DocumentReference<Code> codeDoc = userCodeRef.doc();
+    code.id = codeDoc.id;
+    code.date = DateTime.now();
+    await codeDoc.set(code);
+    notifyListeners();
+    return Future<Code>.value(code);
   }
 
   Future<Stage> addCodeStage(Stage stage) async {
-    try {
-      DocumentReference<Stage> stageDoc = userStageRef.doc();
-      stage.id = stageDoc.id;
-      stage.date = DateTime.now();
-      await stageDoc.set(stage);
-      notifyListeners();
-      return Future<Stage>.value(stage);
-    } catch (e) {
-      print(e);
-    }
-    return stage;
+    DocumentReference<Stage> stageDoc = userStageRef.doc();
+    stage.id = stageDoc.id;
+    stage.date = DateTime.now();
+    await stageDoc.set(stage);
+    notifyListeners();
+    return Future<Stage>.value(stage);
   }
 
   Future<List<Code>> getCodeList() async {
-    try {
-      // Obtém os documentos da coleção 'Code'
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('Code').get();
+    // Obtém os documentos da coleção 'Code'
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('Code').get();
 
-      // Converte os documentos em uma lista de objetos Code
-      List<Code> codeList = querySnapshot.docs.map((doc) {
-        return Code.fromJson(doc.data() as Map<String, dynamic>);
-      }).toList();
+    // Converte os documentos em uma lista de objetos Code
+    List<Code> codeList = querySnapshot.docs.map((doc) {
+      return Code.fromJson(doc.data() as Map<String, dynamic>);
+    }).toList();
 
-      return codeList;
-    } catch (e) {
-      print('Erro ao obter a lista de códigos: $e');
-      return [];
-    }
+    return codeList;
   }
 
   Future<List<Stage>> getStageList() async {
-    try {
-      // Obtém os documentos da coleção 'Code'
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('Stage').get();
+    // Obtém os documentos da coleção 'Code'
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('Stage').get();
 
-      // Converte os documentos em uma lista de objetos Code
-      List<Stage> stageList = querySnapshot.docs.map((doc) {
-        return Stage.fromJson(doc.data() as Map<String, dynamic>);
-      }).toList();
+    // Converte os documentos em uma lista de objetos Code
+    List<Stage> stageList = querySnapshot.docs.map((doc) {
+      return Stage.fromJson(doc.data() as Map<String, dynamic>);
+    }).toList();
 
-      return stageList;
-    } catch (e) {
-      print('Erro ao obter a lista de provas: $e');
-      return [];
-    }
+    return stageList;
   }
 
   Stream<List<Code>> get codeStream {
@@ -119,80 +99,72 @@ class PlayController extends ChangeNotifier {
   }
 
   Future updateCode(Code code) async {
-    try {
-      QuerySnapshot querySnapshot =
-          await userCodeRef.where('id', isEqualTo: code.id).get();
+    QuerySnapshot querySnapshot =
+        await userCodeRef.where('id', isEqualTo: code.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
-      Map<String, dynamic> buildUpdateData(Code code) {
-        Map<String, dynamic> data = {};
+    // Função auxiliar para construir dinamicamente o mapa de atualização
+    Map<String, dynamic> buildUpdateData(Code code) {
+      Map<String, dynamic> data = {};
 
-        if (code.description != null && descriptionEdit.text.isNotEmpty) {
-          data['description'] = descriptionEdit.text;
-        }
-        if (code.token != null && tokenEdit.text.isNotEmpty) {
-          data['token'] = tokenEdit.text;
-        }
-        if (code.category != null && categoryEdit.text.isNotEmpty) {
-          data['category'] = categoryEdit.text;
-        }
-        if (code.value != null && valueEdit.text.isNotEmpty) {
-          data['value'] = double.parse(valueEdit.text);
-        }
-
-        return data;
+      if (code.description != null && descriptionEdit.text.isNotEmpty) {
+        data['description'] = descriptionEdit.text;
+      }
+      if (code.token != null && tokenEdit.text.isNotEmpty) {
+        data['token'] = tokenEdit.text;
+      }
+      if (code.category != null && categoryEdit.text.isNotEmpty) {
+        data['category'] = categoryEdit.text;
+      }
+      if (code.value != null && valueEdit.text.isNotEmpty) {
+        data['value'] = double.parse(valueEdit.text);
       }
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
-        DocumentSnapshot document = querySnapshot.docs.first;
-        Map<String, dynamic> updateData = buildUpdateData(code);
+      return data;
+    }
 
-        if (updateData.isNotEmpty) {
-          await document.reference.update(updateData);
-        }
+    if (querySnapshot.docs.isNotEmpty) {
+      // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+      DocumentSnapshot document = querySnapshot.docs.first;
+      Map<String, dynamic> updateData = buildUpdateData(code);
+
+      if (updateData.isNotEmpty) {
+        await document.reference.update(updateData);
       }
-    } catch (e) {
-      debugPrint("Erro ao atualizar equipe: $e");
     }
   }
 
   Future updateCodeStage(Stage stage) async {
-    try {
-      QuerySnapshot querySnapshot =
-          await userStageRef.where('id', isEqualTo: stage.id).get();
+    QuerySnapshot querySnapshot =
+        await userStageRef.where('id', isEqualTo: stage.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
-      Map<String, dynamic> buildUpdateData(Stage stage) {
-        Map<String, dynamic> data = {};
+    // Função auxiliar para construir dinamicamente o mapa de atualização
+    Map<String, dynamic> buildUpdateData(Stage stage) {
+      Map<String, dynamic> data = {};
 
-        if (stage.description != null && descriptionEdit.text.isNotEmpty) {
-          data['description'] = descriptionEdit.text;
-        }
-        if (stage.token != null && tokenEdit.text.isNotEmpty) {
-          data['token'] = tokenEdit.text;
-        }
-        // if (stage.category != null && categoryEdit.text.isNotEmpty) {
-        //   data['category'] = categoryEdit.text;
-        // }
-        if (stage.puzzle != null && puzzleEdit.text.isNotEmpty) {
-          data['puzzle'] = puzzleEdit.text;
-        }
-
-        return data;
+      if (stage.description != null && descriptionEdit.text.isNotEmpty) {
+        data['description'] = descriptionEdit.text;
+      }
+      if (stage.token != null && tokenEdit.text.isNotEmpty) {
+        data['token'] = tokenEdit.text;
+      }
+      // if (stage.category != null && categoryEdit.text.isNotEmpty) {
+      //   data['category'] = categoryEdit.text;
+      // }
+      if (stage.puzzle != null && puzzleEdit.text.isNotEmpty) {
+        data['puzzle'] = puzzleEdit.text;
       }
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
-        DocumentSnapshot document = querySnapshot.docs.first;
-        Map<String, dynamic> updateData = buildUpdateData(stage);
+      return data;
+    }
 
-        if (updateData.isNotEmpty) {
-          await document.reference.update(updateData);
-        }
+    if (querySnapshot.docs.isNotEmpty) {
+      // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+      DocumentSnapshot document = querySnapshot.docs.first;
+      Map<String, dynamic> updateData = buildUpdateData(stage);
+
+      if (updateData.isNotEmpty) {
+        await document.reference.update(updateData);
       }
-    } catch (e) {
-      debugPrint("Erro ao atualizar equipe: $e");
     }
   }
 
