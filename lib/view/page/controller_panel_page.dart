@@ -49,6 +49,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   void dispose() {
     userController.listTeamSubscription?.cancel();
     playController.dispose();
+    userController.dispose();
+    userController.addMemberFocusNode.dispose();
     super.dispose();
   }
 
@@ -766,236 +768,135 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         maxWidth: 400,
       ),
       //width: 500,
-      child: ListView(
-        children: [
-          Center(
-            child: Text(
-              staff == false
-                  ? update == false
-                      ? addAdm == true
-                          ? "Adicionar Administrador"
-                          : 'Adicionar Equipe'
-                      : 'Atualizar'
-                  : update == true
-                      ? 'Atualizar Staff'
-                      : 'Adicionar Staff',
-              style: const TextStyle(fontSize: 18, color: Colors.purple),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Visibility(
-              visible: (addAdm == false && update == true && staff == false) ||
-                      update == false && staff == false && addAdm == false
-                  ? true
-                  : false,
-              child: ImputTextFormField(
-                title: 'Nome da Equipe',
-                controller: update == false
-                    ? userController.name
-                    : userController.nameEdit,
+      child: FocusTraversalGroup(
+        // policy: OrderedTraversalPolicy(),
+        child: ListView(
+          children: [
+            Center(
+              child: Text(
+                staff == false
+                    ? update == false
+                        ? addAdm == true
+                            ? "Adicionar Administrador"
+                            : 'Adicionar Equipe'
+                        : 'Atualizar'
+                    : update == true
+                        ? 'Atualizar Staff'
+                        : 'Adicionar Staff',
+                style: const TextStyle(fontSize: 18, color: Colors.purple),
               ),
             ),
-          ),
-          ImputTextFormField(
-            title: 'Login',
-            controller: update == false //|| staff == false
-                ? userController.login
-                : userController.loginEdit,
-          ),
-          StatefulBuilder(builder: (BuildContext context, setState) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: ImputTextFormField(
-                    obscure: obscureVisible,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Visibility(
+                visible:
+                    (addAdm == false && update == true && staff == false) ||
+                            update == false && staff == false && addAdm == false
+                        ? true
+                        : false,
+                child: ImputTextFormField(
+                  title: 'Nome da Equipe',
+                  controller: update == false
+                      ? userController.name
+                      : userController.nameEdit,
+                ),
+              ),
+            ),
+            ImputTextFormField(
+              title: 'Login',
+              controller: update == false //|| staff == false
+                  ? userController.login
+                  : userController.loginEdit,
+            ),
+            StatefulBuilder(builder: (BuildContext context, setState) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: ImputTextFormField(
+                      obscure: obscureVisible,
+                      icon: IconButton(
+                        focusNode: FocusNode(skipTraversal: true),
+                        onPressed: () {
+                          setState(() {
+                            obscureVisible = !obscureVisible;
+                          });
+                        },
+                        icon: Icon(
+                          obscureVisible == false
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      title: 'Senha',
+                      controller: update == false
+                          ? userController.password
+                          : userController.passwordEdit,
+                      validator: (value) => value.length < 5
+                          ? 'Precisa  ter no minimo 5 caracteres'
+                          : null,
+                    ),
+                  ),
+                  ImputTextFormField(
+                    obscure: obsucreVisibleComfirm,
                     icon: IconButton(
+                      focusNode: FocusNode(skipTraversal: true),
                       onPressed: () {
                         setState(() {
-                          obscureVisible = !obscureVisible;
+                          obsucreVisibleComfirm = !obsucreVisibleComfirm;
                         });
                       },
                       icon: Icon(
-                        obscureVisible == false
+                        obsucreVisibleComfirm == false
                             ? Icons.visibility
                             : Icons.visibility_off,
                         color: Colors.purple,
                       ),
                     ),
-                    title: 'Senha',
+                    title: 'Confirmar Senha',
                     controller: update == false
-                        ? userController.password
-                        : userController.passwordEdit,
-                    validator: (value) => value.length < 5
-                        ? 'Precisa  ter no minimo 5 caracteres'
-                        : null,
+                        ? userController.passwordComfirm
+                        : userController.passwordEditComfirm,
+                    validator: (value) => value != userController.password.text
+                        ? "Senhas diferentes"
+                        : value.length < 6
+                            ? "Sua senha deve ter mínimo 6 aracteres"
+                            : value!.isEmpty
+                                ? "Confirme sua senha"
+                                : null,
                   ),
-                ),
-                ImputTextFormField(
-                  obscure: obsucreVisibleComfirm,
-                  icon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        obsucreVisibleComfirm = !obsucreVisibleComfirm;
-                      });
-                    },
-                    icon: Icon(
-                      obsucreVisibleComfirm == false
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                      color: Colors.purple,
-                    ),
-                  ),
-                  title: 'Confirmar Senha',
-                  controller: update == false
-                      ? userController.passwordComfirm
-                      : userController.passwordEditComfirm,
-                  validator: (value) => value != userController.password.text
-                      ? "Senhas diferentes"
-                      : value.length < 6
-                          ? "Sua senha deve ter mínimo 6 aracteres"
-                          : value!.isEmpty
-                              ? "Confirme sua senha"
-                              : null,
-                ),
 
-                Visibility(
-                  visible: (addAdm == false &&
-                              update == true &&
-                              staff == false) ||
-                          update == false && staff == false && addAdm == false
-                      ? true
-                      : false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: addMembers(
-                        false,
-                        userController.memberId.text,
-                        userController.membersTeam,
-                        update == true ? true : false),
-                  ),
-                ),
-                // SizedBox(
-                //   height: 200,
-                //   child: ListView.builder(
-                //       itemCount: userController.membersTeam.length,
-                //       itemBuilder: (builder, index) {
-                //         setState(() {});
-                //         return Text(userController.membersTeam[index]);
-                //       }),
-                // ),
-                Row(
-                  mainAxisAlignment:
-                      MediaQuery.of(context).size.width > 1329 || update == true
-                          ? MainAxisAlignment.center
-                          : MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: userController.loading == false
-                          ? ElevatedButton(
-                              onPressed: () async {
-                                if (update == true) {
-                                  if (userController
-                                      .formKeyEditTeam.currentState!
-                                      .validate()) {
-                                    if (staff == false &&
-                                        addAdm == true &&
-                                        update == true) {
-                                      //atualizar adm
-                                      final newUserAdmEdit = UserAdm(
-                                        id: userController.id.text,
-                                        login: userController.loginEdit.text,
-                                        password:
-                                            userController.passwordEdit.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .updateAdm(newUserAdmEdit);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      //exitWindows();
-                                    }
-                                    if (staff == true &&
-                                        update == true &&
-                                        addAdm) {
-                                      //atualizar staff
-                                      final newUserStaffEdit = UserStaff(
-                                        id: userController.id.text,
-                                        login: userController.loginEdit.text,
-                                        password:
-                                            userController.passwordEdit.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .updateStaff(newUserStaffEdit);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      //exitWindows();
-                                    }
-                                    if (staff == true && update == false) {
-                                      //add Staff
-                                      final newUserStaff = UserStaff(
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .addUserStaff(newUserStaff);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                    } else {
-                                      if (update == false) {
-                                        //addAdm
-                                        if (addAdm == true) {
-                                          setState(() {
-                                            userController.loading = true;
-                                          });
-                                          final newUserAdm = UserAdm(
-                                            login: userController.login.text,
-                                            password:
-                                                userController.password.text,
-                                          );
-                                          await userController
-                                              .addUserAdm(newUserAdm);
-                                          setState(() {
-                                            userController.loading = false;
-                                          });
-                                          //add Equipe
-                                        } else if (addAdm == false) {
-                                          final newUserTeams = UserTeam(
-                                            name: userController.name.text,
-                                            login: userController.login.text,
-                                            password:
-                                                userController.password.text,
-                                            credit: 0,
-                                          );
-                                          setState(() {
-                                            userController.loading = true;
-                                          });
-
-                                          await userController
-                                              .addUserTeam(newUserTeams);
-                                          setState(() {
-                                            userController.loading = false;
-                                          });
-                                        }
-                                        //Atualizar Equipe
-                                      } else if (update == true) {
-                                        // atualizar equipe
-                                        final newUserTeamsEdit = UserTeam(
+                  // SizedBox(
+                  //   height: 200,
+                  //   child: ListView.builder(
+                  //       itemCount: userController.membersTeam.length,
+                  //       itemBuilder: (builder, index) {
+                  //         setState(() {});
+                  //         return Text(userController.membersTeam[index]);
+                  //       }),
+                  // ),
+                  Wrap(
+                    alignment: MediaQuery.of(context).size.width > 1329 ||
+                            update == true
+                        ? WrapAlignment.center
+                        : WrapAlignment.spaceEvenly,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: userController.loading == false
+                            ? ElevatedButton(
+                                onPressed: () async {
+                                  if (update == true) {
+                                    if (userController
+                                        .formKeyEditTeam.currentState!
+                                        .validate()) {
+                                      if (staff == false &&
+                                          addAdm == true &&
+                                          update == true) {
+                                        //atualizar adm
+                                        final newUserAdmEdit = UserAdm(
                                           id: userController.id.text,
-                                          name: userController.nameEdit.text,
                                           login: userController.loginEdit.text,
                                           password:
                                               userController.passwordEdit.text,
@@ -1004,117 +905,18 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           userController.loading = true;
                                         });
                                         await userController
-                                            .updateTeams(newUserTeamsEdit);
+                                            .updateAdm(newUserAdmEdit);
                                         setState(() {
                                           userController.loading = false;
                                         });
-                                        exitWindows();
+                                        //exitWindows();
                                       }
-                                    }
-                                  }
-                                } else {
-                                  if (userController.formKey.currentState!
-                                      .validate()) {
-                                    if (staff == false &&
-                                        addAdm == true &&
-                                        update == true) {
-                                      //atualizar adm
-                                      final newUserAdmEdit = UserAdm(
-                                        id: userController.id.text,
-                                        login: userController.loginEdit.text,
-                                        password:
-                                            userController.passwordEdit.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .updateAdm(newUserAdmEdit);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      exitWindows();
-                                    }
-                                    if (staff == true && update == true) {
-                                      //atualizar staff
-                                      final newUserStaffEdit = UserStaff(
-                                        id: userController.id.text,
-                                        login: userController.loginEdit.text,
-                                        password:
-                                            userController.passwordEdit.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .updateStaff(newUserStaffEdit);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      exitWindows();
-                                    }
-                                    if (staff == true && update == false) {
-                                      //add Staff
-                                      final newUserStaff = UserStaff(
-                                        login: userController.login.text,
-                                        password: userController.password.text,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await userController
-                                          .addUserStaff(newUserStaff);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                    } else {
-                                      if (update == false) {
-                                        //addAdm
-                                        if (addAdm == true) {
-                                          setState(() {
-                                            userController.loading = true;
-                                          });
-                                          final newUserAdm = UserAdm(
-                                            login: userController.login.text,
-                                            password:
-                                                userController.password.text,
-                                          );
-                                          await userController
-                                              .addUserAdm(newUserAdm);
-                                          setState(() {
-                                            userController.loading = false;
-                                          });
-                                          //exitWindows;
-                                          //add Equipe
-                                        } else if (addAdm == false) {
-                                          //add team
-                                          final newUserTeams = UserTeam(
-                                            name: userController.name.text,
-                                            login: userController.login.text,
-                                            password:
-                                                userController.password.text,
-                                            credit: 0,
-                                            listMembers: userController
-                                                .membersTeam
-                                                .toList(),
-                                          );
-                                          setState(() {
-                                            userController.loading = true;
-                                          });
-
-                                          await userController
-                                              .addUserTeam(newUserTeams);
-                                          setState(() {
-                                            userController.membersTeam.clear();
-                                            userController.loading = false;
-                                          });
-                                        }
-                                        //Atualizar Equipe
-                                      } else if (update == true) {
-                                        // atualizar equipe
-                                        final newUserTeamsEdit = UserTeam(
+                                      if (staff == true &&
+                                          update == true &&
+                                          addAdm) {
+                                        //atualizar staff
+                                        final newUserStaffEdit = UserStaff(
                                           id: userController.id.text,
-                                          name: userController.nameEdit.text,
                                           login: userController.loginEdit.text,
                                           password:
                                               userController.passwordEdit.text,
@@ -1123,59 +925,275 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           userController.loading = true;
                                         });
                                         await userController
-                                            .updateTeams(newUserTeamsEdit);
+                                            .updateStaff(newUserStaffEdit);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        //exitWindows();
+                                      }
+                                      if (staff == true && update == false) {
+                                        //add Staff
+                                        final newUserStaff = UserStaff(
+                                          login: userController.login.text,
+                                          password:
+                                              userController.password.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .addUserStaff(newUserStaff);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                      } else {
+                                        if (update == false) {
+                                          //addAdm
+                                          if (addAdm == true) {
+                                            setState(() {
+                                              userController.loading = true;
+                                            });
+                                            final newUserAdm = UserAdm(
+                                              login: userController.login.text,
+                                              password:
+                                                  userController.password.text,
+                                            );
+                                            await userController
+                                                .addUserAdm(newUserAdm);
+                                            setState(() {
+                                              userController.loading = false;
+                                            });
+                                            //add Equipe
+                                          } else if (addAdm == false) {
+                                            final newUserTeams = UserTeam(
+                                              name: userController.name.text,
+                                              login: userController.login.text,
+                                              password:
+                                                  userController.password.text,
+                                              credit: 0,
+                                            );
+                                            setState(() {
+                                              userController.loading = true;
+                                            });
+
+                                            await userController
+                                                .addUserTeam(newUserTeams);
+                                            setState(() {
+                                              userController.loading = false;
+                                            });
+                                          }
+                                          //Atualizar Equipe
+                                        } else if (update == true) {
+                                          // atualizar equipe
+                                          final newUserTeamsEdit = UserTeam(
+                                            id: userController.id.text,
+                                            name: userController.nameEdit.text,
+                                            login:
+                                                userController.loginEdit.text,
+                                            password: userController
+                                                .passwordEdit.text,
+                                          );
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
+                                          await userController
+                                              .updateTeams(newUserTeamsEdit);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                          exitWindows();
+                                        }
+                                      }
+                                    }
+                                  } else {
+                                    if (userController.formKey.currentState!
+                                        .validate()) {
+                                      if (staff == false &&
+                                          addAdm == true &&
+                                          update == true) {
+                                        //atualizar adm
+                                        final newUserAdmEdit = UserAdm(
+                                          id: userController.id.text,
+                                          login: userController.loginEdit.text,
+                                          password:
+                                              userController.passwordEdit.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .updateAdm(newUserAdmEdit);
                                         setState(() {
                                           userController.loading = false;
                                         });
                                         exitWindows();
                                       }
+                                      if (staff == true && update == true) {
+                                        //atualizar staff
+                                        final newUserStaffEdit = UserStaff(
+                                          id: userController.id.text,
+                                          login: userController.loginEdit.text,
+                                          password:
+                                              userController.passwordEdit.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .updateStaff(newUserStaffEdit);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        exitWindows();
+                                      }
+                                      if (staff == true && update == false) {
+                                        //add Staff
+                                        final newUserStaff = UserStaff(
+                                          login: userController.login.text,
+                                          password:
+                                              userController.password.text,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await userController
+                                            .addUserStaff(newUserStaff);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                      } else {
+                                        if (update == false) {
+                                          //addAdm
+                                          if (addAdm == true) {
+                                            setState(() {
+                                              userController.loading = true;
+                                            });
+                                            final newUserAdm = UserAdm(
+                                              login: userController.login.text,
+                                              password:
+                                                  userController.password.text,
+                                            );
+                                            await userController
+                                                .addUserAdm(newUserAdm);
+                                            setState(() {
+                                              userController.loading = false;
+                                            });
+                                            //exitWindows;
+                                            //add Equipe
+                                          } else if (addAdm == false) {
+                                            //add team
+                                            final newUserTeams = UserTeam(
+                                              name: userController.name.text,
+                                              login: userController.login.text,
+                                              password:
+                                                  userController.password.text,
+                                              credit: 0,
+                                              listMembers: userController
+                                                  .membersTeam
+                                                  .toList(),
+                                            );
+                                            setState(() {
+                                              userController.loading = true;
+                                            });
+
+                                            await userController
+                                                .addUserTeam(newUserTeams);
+                                            setState(() {
+                                              userController.membersTeam
+                                                  .clear();
+                                              userController.loading = false;
+                                            });
+                                          }
+                                          //Atualizar Equipe
+                                        } else if (update == true) {
+                                          // atualizar equipe
+                                          final newUserTeamsEdit = UserTeam(
+                                            id: userController.id.text,
+                                            name: userController.nameEdit.text,
+                                            login:
+                                                userController.loginEdit.text,
+                                            password: userController
+                                                .passwordEdit.text,
+                                          );
+                                          setState(() {
+                                            userController.loading = true;
+                                          });
+                                          await userController
+                                              .updateTeams(newUserTeamsEdit);
+                                          setState(() {
+                                            userController.loading = false;
+                                          });
+                                          exitWindows();
+                                        }
+                                      }
                                     }
                                   }
-                                }
-                              },
-                              child: Text(
-                                  update == false ? "Adicionar" : "Atualizar"))
-                          : const Center(child: CircularProgressIndicator()),
-                    ),
-                    //botão historico
-                    Visibility(
-                      visible: MediaQuery.of(context).size.width > 1250 ||
-                              update == true
-                          ? false
-                          : true,
-                      child: StatefulBuilder(
-                          builder: (BuildContext context, setState) {
-                        return ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              historyVisible = true;
-                              debugPrint("${userController.history}");
-                            });
-
-                            showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Form(
-                                      key: userController.formKeyEditTeam,
-                                      child: history(context, true));
+                                },
+                                child: Text(update == false
+                                    ? "Adicionar"
+                                    : "Atualizar"))
+                            : const Center(child: CircularProgressIndicator()),
+                      ),
+                      //botão historico
+                      Visibility(
+                        visible: MediaQuery.of(context).size.width > 1250 ||
+                                update == true
+                            ? false
+                            : true,
+                        child: StatefulBuilder(
+                            builder: (BuildContext context, setState) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  historyVisible = true;
+                                  debugPrint("${userController.history}");
                                 });
-                            historyVisible = false;
-                          },
-                          child: const Text("Historico"),
-                        );
-                      }),
-                    ),
 
-                    // Botão adicionar equipes
-                    // Botão remover equipes
-                    // Dropdown para acessar o histórico das equipes
-                  ],
-                ),
-              ],
-            );
-          }),
-        ],
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Form(
+                                          key: userController.formKeyEditTeam,
+                                          child: history(context, true));
+                                    });
+                                historyVisible = false;
+                              },
+                              child: const Text("Historico"),
+                            ),
+                          );
+                        }),
+                      ),
+                      Visibility(
+                        visible: (addAdm == false &&
+                                    update == true &&
+                                    staff == false) ||
+                                update == false &&
+                                    staff == false &&
+                                    addAdm == false
+                            ? true
+                            : false,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: addMembers(
+                              false,
+                              userController.memberId.text,
+                              userController.membersTeam,
+                              update == true ? true : false),
+                        ),
+                      ),
+                      // Botão adicionar equipes
+                      // Botão remover equipes
+                      // Dropdown para acessar o histórico das equipes
+                    ],
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -1188,317 +1206,323 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         maxWidth: 400,
       ),
       //width: 500,
-      child: ListView(
-        children: [
-          Center(
-            child: Text(
-              update == true ? 'Atualizar Código' : 'Adicionar Codigo',
-              style: const TextStyle(fontSize: 18, color: Colors.purple),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: ImputTextFormField(
-              title: 'Descrição',
-              controller: update == true
-                  ? playController.descriptionEdit
-                  : playController.description,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: ImputTextFormField(
-              icon: IconButton(
-                onPressed: () {
-                  update == true
-                      ? playController.tokenEdit.text = generateRandomCode(6)
-                      : playController.token.text = generateRandomCode(6);
-                },
-                icon: const Icon(Icons.generating_tokens),
-                color: Colors.purple,
+      child: FocusTraversalGroup(
+        policy: OrderedTraversalPolicy(),
+        child: ListView(
+          children: [
+            Center(
+              child: Text(
+                update == true ? 'Atualizar Código' : 'Adicionar Codigo',
+                style: const TextStyle(fontSize: 18, color: Colors.purple),
               ),
-              title: 'Codigo',
-              controller: update == true
-                  ? playController.tokenEdit
-                  : playController.token,
             ),
-          ),
-
-          //categoria
-          StatefulBuilder(builder: (BuildContext context, setState) {
-            return Column(
-              children: [
-                Visibility(
-                  visible:
-                      editStage == true && update == true || update == false
-                          ? true
-                          : false,
-                  child: categorySelected(
-                    'Prova',
-                    update == true ? value2Edit : value2,
-                    Category.stage,
-                    (value) {
-                      setState(() {
-                        update == true
-                            ? value2Edit = Category.stage
-                            : value2 = Category.stage;
-                        update == true
-                            ? playController.valueEdit.text = "0"
-                            : playController.value.text = "0";
-                      });
-                    },
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ImputTextFormField(
+                title: 'Descrição',
+                controller: update == true
+                    ? playController.descriptionEdit
+                    : playController.description,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ImputTextFormField(
+                icon: IconButton(
+                  focusNode: FocusNode(skipTraversal: true),
+                  onPressed: () {
+                    update == true
+                        ? playController.tokenEdit.text = generateRandomCode(6)
+                        : playController.token.text = generateRandomCode(6);
+                  },
+                  icon: const Icon(Icons.generating_tokens),
+                  color: Colors.purple,
                 ),
-                Visibility(
-                  visible: value2 == Category.stage ||
-                          (value2Edit == Category.stage &&
-                              value2 == Category.stage) ||
-                          (value2Edit == Category.stage && update == true) ||
-                          (value2 == Category.stage && update == true)
-                      ? true
-                      : false,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: ImputTextFormField(
-                      maxLines: 4,
-                      title: 'Enigma',
-                      controller: update == true
-                          ? playController.puzzleEdit
-                          : playController.puzzle,
+                title: 'Codigo',
+                controller: update == true
+                    ? playController.tokenEdit
+                    : playController.token,
+              ),
+            ),
+
+            //categoria
+            StatefulBuilder(builder: (BuildContext context, setState) {
+              return Column(
+                children: [
+                  Visibility(
+                    visible:
+                        editStage == true && update == true || update == false
+                            ? true
+                            : false,
+                    child: categorySelected(
+                      'Prova',
+                      update == true ? value2Edit : value2,
+                      Category.stage,
+                      (value) {
+                        setState(() {
+                          update == true
+                              ? value2Edit = Category.stage
+                              : value2 = Category.stage;
+                          update == true
+                              ? playController.valueEdit.text = "0"
+                              : playController.value.text = "0";
+                        });
+                      },
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: (value2 == Category.stage ||
-                              value2Edit == Category.stage) &&
-                          update == true &&
-                          editStage == true
-                      ? false
-                      : true,
-                  child: Column(
-                    children: [
-                      categorySelected(
-                        'Adicionar',
-                        update == true ? value2Edit : value2,
-                        Category.receive,
-                        (value) {
-                          setState(() {
-                            update == true
-                                ? value2Edit = Category.receive
-                                : value2 = Category.receive;
-                          });
-                        },
+                  Visibility(
+                    visible: value2 == Category.stage ||
+                            (value2Edit == Category.stage &&
+                                value2 == Category.stage) ||
+                            (value2Edit == Category.stage && update == true) ||
+                            (value2 == Category.stage && update == true)
+                        ? true
+                        : false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                      child: ImputTextFormField(
+                        maxLines: 4,
+                        title: 'Enigma',
+                        controller: update == true
+                            ? playController.puzzleEdit
+                            : playController.puzzle,
                       ),
-                      categorySelected(
-                        'Subtrair',
-                        update == true ? value2Edit : value2,
-                        Category.pay,
-                        (value) {
-                          setState(() {
-                            update == true
-                                ? value2Edit = Category.pay
-                                : value2 = Category.pay;
-                          });
-                        },
-                      ),
-                      categorySelected(
-                        'Congelar',
-                        update == true ? value2Edit : value2,
-                        Category.freezing,
-                        (value) {
-                          setState(() {
-                            update == true
-                                ? value2Edit = Category.freezing
-                                : value2 = Category.freezing;
-                            update == true
-                                ? playController.valueEdit.text = "0"
-                                : playController.value.text = "0";
-                          });
-                        },
-                      ),
-                      categorySelected(
-                        'Escudo',
-                        update == true ? value2Edit : value2,
-                        Category.protect,
-                        (value) {
-                          setState(() {
-                            update == true
-                                ? value2Edit = Category.protect
-                                : value2 = Category.protect;
-                            update == true
-                                ? playController.valueEdit.text = "0"
-                                : playController.value.text = "0";
-                          });
-                        },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: ImputTextFormField(
-                          enabled: value2 == Category.pay ||
-                                  value2 == Category.receive ||
-                                  value2Edit == Category.pay ||
-                                  value2Edit == Category.receive
-                              ? true
-                              : false,
-                          title: 'Valor',
-                          controller: update == true
-                              ? playController.valueEdit
-                              : playController.value,
+                    ),
+                  ),
+                  Visibility(
+                    visible: (value2 == Category.stage ||
+                                value2Edit == Category.stage) &&
+                            update == true &&
+                            editStage == true
+                        ? false
+                        : true,
+                    child: Column(
+                      children: [
+                        categorySelected(
+                          'Adicionar',
+                          update == true ? value2Edit : value2,
+                          Category.receive,
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? value2Edit = Category.receive
+                                  : value2 = Category.receive;
+                            });
+                          },
                         ),
+                        categorySelected(
+                          'Subtrair',
+                          update == true ? value2Edit : value2,
+                          Category.pay,
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? value2Edit = Category.pay
+                                  : value2 = Category.pay;
+                            });
+                          },
+                        ),
+                        categorySelected(
+                          'Congelar',
+                          update == true ? value2Edit : value2,
+                          Category.freezing,
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? value2Edit = Category.freezing
+                                  : value2 = Category.freezing;
+                              update == true
+                                  ? playController.valueEdit.text = "0"
+                                  : playController.value.text = "0";
+                            });
+                          },
+                        ),
+                        categorySelected(
+                          'Escudo',
+                          update == true ? value2Edit : value2,
+                          Category.protect,
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? value2Edit = Category.protect
+                                  : value2 = Category.protect;
+                              update == true
+                                  ? playController.valueEdit.text = "0"
+                                  : playController.value.text = "0";
+                            });
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: ImputTextFormField(
+                            enabled: value2 == Category.pay ||
+                                    value2 == Category.receive ||
+                                    value2Edit == Category.pay ||
+                                    value2Edit == Category.receive
+                                ? true
+                                : false,
+                            title: 'Valor',
+                            controller: update == true
+                                ? playController.valueEdit
+                                : playController.value,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: userController.loading == false
+                            ? ElevatedButton(
+                                onPressed: () async {
+                                  if (update == true) {
+                                    //update code
+                                    if (playController
+                                        .formKeyPlayEdit.currentState!
+                                        .validate()) {
+                                      if (value2Edit == Category.stage) {
+                                        playController.categoryEdit.text =
+                                            playController.categoryToString(
+                                                    value2Edit) ??
+                                                "";
+                                        final updateCode = Stage(
+                                          id: playController.id.text,
+                                          token: playController.tokenEdit.text,
+                                          description: playController
+                                              .descriptionEdit.text,
+                                          puzzle:
+                                              playController.puzzleEdit.text,
+                                          //category: value2Edit,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await playController
+                                            .updateCodeStage(updateCode);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        exitWindows();
+                                      } else if (value2Edit != Category.stage) {
+                                        playController.categoryEdit.text =
+                                            playController.categoryToString(
+                                                    value2Edit) ??
+                                                "";
+                                        final updateCode = Code(
+                                          id: playController.id.text,
+                                          token: playController.tokenEdit.text,
+                                          description: playController
+                                              .descriptionEdit.text,
+                                          // puzzle: playController.puzzleEdit.text,
+                                          category: value2Edit,
+                                          value: playController
+                                                  .valueEdit.text.isEmpty
+                                              ? 0
+                                              : double.parse(playController
+                                                  .valueEdit.text),
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await playController
+                                            .updateCode(updateCode);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        exitWindows();
+                                      }
+                                    }
+                                  } else if (update == false) {
+                                    if (playController.formKeyPlay.currentState!
+                                        .validate()) {
+                                      //add stage
+                                      if (value2 == Category.stage) {
+                                        final newCode = Stage(
+                                          token: playController.token.text,
+                                          description:
+                                              playController.description.text,
+                                          puzzle: playController.puzzle.text,
+                                          // category: value2,
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await playController
+                                            .addCodeStage(newCode);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        playController.token.clear();
+                                      } else if (value2 != Category.stage) {
+                                        //add code
+                                        final newCode = Code(
+                                          token: playController.token.text,
+                                          description:
+                                              playController.description.text,
+                                          //puzzle: playController.puzzle.text,
+                                          category: value2,
+                                          value: playController
+                                                  .value.text.isEmpty
+                                              ? 0
+                                              : double.parse(
+                                                  playController.value.text),
+                                        );
+                                        setState(() {
+                                          userController.loading = true;
+                                        });
+                                        await playController.addCode(newCode);
+                                        setState(() {
+                                          userController.loading = false;
+                                        });
+                                        playController.token.clear();
+                                      }
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                    update == true ? "Atualizar" : "Adicionar"))
+                            : const Center(child: CircularProgressIndicator()),
+                      ),
+                      // lsita de prova versão mobile
+                      Visibility(
+                        visible: MediaQuery.of(context).size.width > 1250 ||
+                                update == true
+                            ? false
+                            : true,
+                        child: StatefulBuilder(
+                            builder: (BuildContext context, setState) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                historyVisible = true;
+                                debugPrint("${userController.history}");
+                              });
+
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Form(
+                                        key: userController.formKeyEditTeam,
+                                        child: listCodeStage(
+                                            context, playController, 400));
+                                  });
+                              historyVisible = false;
+                            },
+                            child: const Text("Provas"),
+                          );
+                        }),
                       ),
                     ],
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: userController.loading == false
-                          ? ElevatedButton(
-                              onPressed: () async {
-                                if (update == true) {
-                                  //update code
-                                  if (playController
-                                      .formKeyPlayEdit.currentState!
-                                      .validate()) {
-                                    if (value2Edit == Category.stage) {
-                                      playController.categoryEdit.text =
-                                          playController.categoryToString(
-                                                  value2Edit) ??
-                                              "";
-                                      final updateCode = Stage(
-                                        id: playController.id.text,
-                                        token: playController.tokenEdit.text,
-                                        description:
-                                            playController.descriptionEdit.text,
-                                        puzzle: playController.puzzleEdit.text,
-                                        //category: value2Edit,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await playController
-                                          .updateCodeStage(updateCode);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      exitWindows();
-                                    } else if (value2Edit != Category.stage) {
-                                      playController.categoryEdit.text =
-                                          playController.categoryToString(
-                                                  value2Edit) ??
-                                              "";
-                                      final updateCode = Code(
-                                        id: playController.id.text,
-                                        token: playController.tokenEdit.text,
-                                        description:
-                                            playController.descriptionEdit.text,
-                                        // puzzle: playController.puzzleEdit.text,
-                                        category: value2Edit,
-                                        value: playController
-                                                .valueEdit.text.isEmpty
-                                            ? 0
-                                            : double.parse(
-                                                playController.valueEdit.text),
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await playController
-                                          .updateCode(updateCode);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      exitWindows();
-                                    }
-                                  }
-                                } else if (update == false) {
-                                  if (playController.formKeyPlay.currentState!
-                                      .validate()) {
-                                    //add stage
-                                    if (value2 == Category.stage) {
-                                      final newCode = Stage(
-                                        token: playController.token.text,
-                                        description:
-                                            playController.description.text,
-                                        puzzle: playController.puzzle.text,
-                                        // category: value2,
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await playController
-                                          .addCodeStage(newCode);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      playController.token.clear();
-                                    } else if (value2 != Category.stage) {
-                                      //add code
-                                      final newCode = Code(
-                                        token: playController.token.text,
-                                        description:
-                                            playController.description.text,
-                                        //puzzle: playController.puzzle.text,
-                                        category: value2,
-                                        value: playController.value.text.isEmpty
-                                            ? 0
-                                            : double.parse(
-                                                playController.value.text),
-                                      );
-                                      setState(() {
-                                        userController.loading = true;
-                                      });
-                                      await playController.addCode(newCode);
-                                      setState(() {
-                                        userController.loading = false;
-                                      });
-                                      playController.token.clear();
-                                    }
-                                  }
-                                }
-                              },
-                              child: Text(
-                                  update == true ? "Atualizar" : "Adicionar"))
-                          : const Center(child: CircularProgressIndicator()),
-                    ),
-                    // lsita de prova versão mobile
-                    Visibility(
-                      visible: MediaQuery.of(context).size.width > 1250 ||
-                              update == true
-                          ? false
-                          : true,
-                      child: StatefulBuilder(
-                          builder: (BuildContext context, setState) {
-                        return ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              historyVisible = true;
-                              debugPrint("${userController.history}");
-                            });
-
-                            showModalBottomSheet(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Form(
-                                      key: userController.formKeyEditTeam,
-                                      child: listCodeStage(
-                                          context, playController, 400));
-                                });
-                            historyVisible = false;
-                          },
-                          child: const Text("Provas"),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          }),
-        ],
+                ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
@@ -1541,10 +1565,20 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                         ImputTextFormField(
                           title: "Nome do Membro",
                           controller: userController.addMember,
+                          focusNode: userController.addMemberFocusNode,
+                          onFieldSubmitted: (value) {
+                            setStateDialog(() {
+                              member.add(value);
+                              userController.addMember.clear();
+                              FocusScope.of(context).requestFocus(
+                                  userController.addMemberFocusNode);
+                            });
+                          },
                           icon: IconButton(
                             onPressed: () {
                               setStateDialog(() {
                                 member.add(userController.addMember.text);
+                                userController.addMember.clear();
                               });
                             },
                             icon: const Icon(Icons.add),
@@ -1582,6 +1616,17 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           controller: updateLocal == true
                                               ? userController.addMemberEdit
                                               : userController.addMember,
+                                          onFieldSubmitted: (value) {
+                                            setStateDialog(() {
+                                              member[index] = value;
+                                              updateLocal == true
+                                                  ? userController.addMemberEdit
+                                                      .clear()
+                                                  : userController.addMember
+                                                      .clear();
+                                              exitWindows();
+                                            });
+                                          },
                                           icon: IconButton(
                                             onPressed: () {
                                               setStateDialog(() {
@@ -1638,21 +1683,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       );
     });
   }
-
-  // Future<void> fetchMembers(List members) async {
-  //   try {
-  //     final userTeams = await userController.getListMembers();
-  //     setState(() {
-  //       members = userTeams
-  //           .expand((team) => team.listMembers != null
-  //               ? List<String>.from(team.listMembers!)
-  //               : [])
-  //           .toList();
-  //     });
-  //   } catch (e) {
-  //     print('Erro ao obter a lista de membros: $e');
-  //   }
-  // }
 
   exitWindows() {
     // hasLoadedMembers = false;

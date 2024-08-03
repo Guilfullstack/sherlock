@@ -4,6 +4,8 @@ class ImputTextFormField extends StatelessWidget {
   final String title;
   final TextEditingController controller;
   final FormFieldValidator? validator;
+  final Function(String)? onFieldSubmitted;
+  final FocusNode? focusNode;
   final bool? enabled;
   final bool? obscure;
   final Widget? icon;
@@ -16,7 +18,7 @@ class ImputTextFormField extends StatelessWidget {
       this.enabled,
       this.obscure,
       this.icon,
-      this.maxLines});
+      this.maxLines, this.onFieldSubmitted, this.focusNode,});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,8 @@ class ImputTextFormField extends StatelessWidget {
         minLines: 1,
         maxLines: maxLines ?? 1,
         obscureText: obscure ?? false,
+        onFieldSubmitted: onFieldSubmitted,
+        focusNode: focusNode,
         validator: validator ??
             (value) {
               if (value == null || value.isEmpty) {

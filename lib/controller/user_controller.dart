@@ -39,6 +39,7 @@ class UserController extends ChangeNotifier {
   TextEditingController addMember = TextEditingController();
   TextEditingController addMemberEdit = TextEditingController();
   final TextEditingController memberId = TextEditingController();
+  final FocusNode addMemberFocusNode = FocusNode();
 
   late List membersTeam = [];
   late List membersTeamEdit = [];
