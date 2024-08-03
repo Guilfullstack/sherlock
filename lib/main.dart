@@ -30,10 +30,6 @@ Future<void> initializeHive() async {
       Hive.registerAdapter(UserTeamAdapter());
       print('UserTeamAdapter registrado');
     }
-    if (!Hive.isAdapterRegistered(1)) {
-      Hive.registerAdapter(StageAdapter());
-      print('StageAdapter registrado');
-    }
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(StatusAdapter());
       print('StatusAdapter registrado');
@@ -46,7 +42,10 @@ Future<void> initializeHive() async {
       Hive.registerAdapter(CategoryAdapter());
       print('CategoryAdapter registrado');
     }
-
+    if (!Hive.isAdapterRegistered(5)) {
+      Hive.registerAdapter(StageAdapter());
+      print('StageAdapter registrado');
+    }
     // Abra as caixas do Hive
     await Hive.openBox<UserTeam>('userTeamBox');
     print('userTeamBox aberta');

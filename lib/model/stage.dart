@@ -10,7 +10,7 @@ final userStageRef = FirebaseFirestore.instance
         fromFirestore: (snapshots, _) => Stage.fromJson(snapshots.data()!),
         toFirestore: (userCode, _) => userCode.toJson());
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 5)
 class Stage extends HiveObject {
   @HiveField(0)
   String? id;
