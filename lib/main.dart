@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
@@ -16,8 +17,6 @@ Future<void> initializeHive() async {
     print('Inicialização do Hive ignorada na plataforma Web.');
     return; // Não inicializa o Hive se for a Web
   }
-  await Hive.close(); // Fecha todas as caixas e limpa o estado do Hive
-  await Hive.deleteFromDisk(); // Exclui todos os dados armazenados pelo Hive
 
   try {
     print('Inicializando o Hive...');
@@ -27,7 +26,7 @@ Future<void> initializeHive() async {
     print('Hive inicializado com o caminho: ${appDocumentDir.path}');
 
     // Registra os adaptadores do Hive
-    if (!Hive.isAdapterRegistered(1)) {
+    if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(UserTeamAdapter());
       print('UserTeamAdapter registrado');
     }
@@ -43,12 +42,10 @@ Future<void> initializeHive() async {
       Hive.registerAdapter(CategoryAdapter());
       print('CategoryAdapter registrado');
     }
-    /*
     if (!Hive.isAdapterRegistered(5)) {
       Hive.registerAdapter(StageAdapter());
       print('StageAdapter registrado');
-    }*/
-
+    }
     // Abra as caixas do Hive
     await Hive.openBox<UserTeam>('userTeamBox');
     print('userTeamBox aberta');
@@ -78,6 +75,18 @@ Future<void> main() async {
   // Pequeno atraso para garantir que os plugins estão carregados
   await Future.delayed(const Duration(seconds: 1));
   await initializeHive();
+
+  PlayController playController = PlayController();
+
+  List<Stage> stageList = await playController.getStageList();
+
+  playController.saveStageListToHive(stageList);
+
+  List<Stage> l2 = await playController.getStageListFromHive();
+
+  for (Stage stage in l2) {
+    print("${stage.description}");
+  }
 
   runApp(
     ChangeNotifierProvider(

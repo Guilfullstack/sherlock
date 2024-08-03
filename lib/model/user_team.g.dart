@@ -25,13 +25,14 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       status: fields[5] as Status?,
       credit: fields[6] as double?,
       listTokenDesbloqued: (fields[7] as List?)?.cast<String>(),
+      listMembers: (fields[8] as List?)?.cast<dynamic>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UserTeam obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       ..writeByte(6)
       ..write(obj.credit)
       ..writeByte(7)
-      ..write(obj.listTokenDesbloqued);
+      ..write(obj.listTokenDesbloqued)
+      ..writeByte(8)
+      ..write(obj.listMembers);
   }
 
   @override

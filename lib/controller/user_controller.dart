@@ -237,7 +237,10 @@ class UserController extends ChangeNotifier {
 
             List<Stage> stageList = await playController.getStageList();
             playController.saveStageListToHive(stageList);
-
+            List<Stage> l2 = await playController.getStageListFromHive();
+            for (Stage stage in l2) {
+              print("${stage.description}");
+            }
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const HomePage()));
           }
