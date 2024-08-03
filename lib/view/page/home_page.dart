@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
-import 'package:sherlock/view/widgets/card_panel_challenges.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
-import 'package:sherlock/view/widgets/challanges.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,9 +15,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Box<UserTeam> userTeamBox;
   UserTeam? currentUser;
+  List<Stage>? listStage = [];
+  List<Code>? listCode = [];
   UserController userController = UserController();
+  PlayController playController = PlayController();
   @override
   void initState() {
     super.initState();
@@ -27,9 +28,20 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _retrieveCurrentUser() async {
     try {
-      userTeamBox = Hive.box<UserTeam>('userTeamBox');
+      UserTeam? userTeamFromHive = await userController.getUserHive();
+      List<Stage>? listStageFromHive =
+          await playController.getStageListFromHive();
+
+      for (Stage stage in listStageFromHive) {
+        print("${stage.description}");
+      }
+
+      List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
+
       setState(() {
-        currentUser = userTeamBox.get('currentUser');
+        currentUser = userTeamFromHive;
+        listStage = listStageFromHive;
+        listCode = listCodeFromHive;
       });
     } catch (e) {
       print("erro home: $e");
@@ -101,14 +113,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              const CardPanelChallenges(
-                listchalanges: [
-                  Challenge(name: "Prova", isUnlocked: true),
-                  Challenge(name: "Prova", isUnlocked: true),
-                  Challenge(name: "Prova", isUnlocked: false),
-                  Challenge(name: "Prova", isUnlocked: false),
-                ],
-              )
+              //CardPanelStages(listStages: listStage)
             ],
           ),
         ),

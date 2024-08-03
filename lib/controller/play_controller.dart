@@ -233,10 +233,6 @@ class PlayController extends ChangeNotifier {
           .clear(); // Opcional: limpa a caixa antes de adicionar novos itens
 
       for (var stage in stageList) {
-        // Converter a categoria de string para enum, se necessário
-
-        stage.category = Stage.categoryFromString(stage.category.toString());
-
         if (stage.id != null) {
           await stageBox.put(
               stage.id, stage); // Usa o ID como chave para cada stage
