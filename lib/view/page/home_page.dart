@@ -6,6 +6,7 @@ import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
+import 'package:sherlock/view/widgets/card_panel_stages.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   UserTeam? currentUser;
-  List<Stage>? listStage = [];
+  List<Stage>? listStages = [];
   List<Code>? listCode = [];
   UserController userController = UserController();
   PlayController playController = PlayController();
@@ -29,10 +30,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> _retrieveCurrentUser() async {
     try {
       UserTeam? userTeamFromHive = await userController.getUserHive();
-      List<Stage>? listStageFromHive =
+      List<Stage>? listStagesFromHive =
           await playController.getStageListFromHive();
 
-      for (Stage stage in listStageFromHive) {
+      for (Stage stage in listStagesFromHive) {
         print("${stage.description}");
       }
 
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         currentUser = userTeamFromHive;
-        listStage = listStageFromHive;
+        listStages = listStagesFromHive;
         listCode = listCodeFromHive;
       });
     } catch (e) {
@@ -113,7 +114,9 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              //CardPanelStages(listStages: listStage)
+              CardPanelStages(
+                liststages: listStages ?? [],
+              )
             ],
           ),
         ),

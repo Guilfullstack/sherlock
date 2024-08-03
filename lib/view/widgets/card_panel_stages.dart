@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:sherlock/model/stage.dart';
+import 'package:sherlock/view/widgets/card_stage.dart';
 
-class CardPanelChallenges extends StatelessWidget {
-  final List<Widget> listchalanges;
-  const CardPanelChallenges({Key? key, required this.listchalanges})
-      : super(key: key);
+class CardPanelStages extends StatelessWidget {
+  final List<Stage> liststages;
+  const CardPanelStages({Key? key, required this.liststages}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,16 @@ class CardPanelChallenges extends StatelessWidget {
               width: 1.0,
             ),
           ),
-          child: ListView(children: listchalanges),
+          child: ListView.builder(
+            itemCount: liststages.length,
+            itemBuilder: (context, index) {
+              Stage stage = liststages[index];
+              bool isUnlocked = true; // Adapte conforme necessário
+              int position = index + 1;
+              return CardStage(
+                  stage: stage, isUnlocked: isUnlocked, position: position);
+            },
+          ),
         ),
       ],
     );

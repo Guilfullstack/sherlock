@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:sherlock/model/stage.dart';
 
-class Challenge extends StatelessWidget {
-  final String name;
+class CardStage extends StatelessWidget {
+  final Stage stage;
   final bool isUnlocked;
+  final int position;
 
-  const Challenge({
+  const CardStage({
     Key? key,
-    required this.name,
+    required this.stage,
     required this.isUnlocked,
+    required this.position,
   }) : super(key: key);
 
   @override
@@ -25,7 +28,7 @@ class Challenge extends StatelessWidget {
       ),
       child: ListTile(
         title: Text(
-          name,
+          stage.description ?? '',
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -35,16 +38,16 @@ class Challenge extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Colors.grey,
           child: Text(
-            '1',
+            '${position ?? ''}',
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
         trailing: isUnlocked
-            ? Icon(
+            ? const Icon(
                 Icons.check_circle,
                 color: Colors.green,
               )
-            : Icon(
+            : const Icon(
                 Icons.lock,
                 color: Colors.red,
               ),
