@@ -40,6 +40,8 @@ class UserController extends ChangeNotifier {
   TextEditingController addMemberEdit = TextEditingController();
   final TextEditingController memberId = TextEditingController();
   final FocusNode addMemberFocusNode = FocusNode();
+  late String? selectionStaff;
+  late String? selectionStaffEdit;
 
   late List membersTeam = [];
   late List membersTeamEdit = [];
@@ -358,6 +360,7 @@ class UserController extends ChangeNotifier {
   }
 
   Future updateStaff(UserStaff newUserStaff) async {
+    print("update $selectionStaffEdit");
     try {
       QuerySnapshot querySnapshot =
           await userStaffRef.where('id', isEqualTo: newUserStaff.id).get();
@@ -371,6 +374,10 @@ class UserController extends ChangeNotifier {
         }
         if (userStaff.password != null && passwordEdit.text.isNotEmpty) {
           data['password'] = passwordEdit.text;
+        }
+        if (userStaff.office != null && selectionStaffEdit!.isNotEmpty) {
+          data['office'] = selectionStaffEdit;
+          print("update $selectionStaffEdit");
         }
 
         return data;

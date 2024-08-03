@@ -29,6 +29,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   ValueNotifier<bool> isHistoryVisible = ValueNotifier<bool>(true);
   Category value2 = Category.protect;
   Category value2Edit = Category.protect;
+  late String selectionStaff = "Prova";
+  late String selectionStaffEdit = "Prova";
   bool hasLoadedMembers = false;
   int membersNumeber = 0;
 
@@ -462,6 +464,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           userController.loginEdit.text = staff.login ?? "";
                           userController.passwordEdit.text =
                               staff.password ?? "";
+                          selectionStaffEdit = staff.office ?? "";
                           return Form(
                             key: userController.formKeyEditTeam,
                             child: _addTeams(
@@ -834,7 +837,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           ? userController.password
                           : userController.passwordEdit,
                       validator: (value) => value.length < 5
-                          ? 'Precisa  ter no minimo 5 caracteres'
+                          ? 'Precisa  ter no minimo 6 caracteres'
                           : null,
                     ),
                   ),
@@ -858,15 +861,79 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     controller: update == false
                         ? userController.passwordComfirm
                         : userController.passwordEditComfirm,
-                    validator: (value) => value != userController.password.text
-                        ? "Senhas diferentes"
-                        : value.length < 6
-                            ? "Sua senha deve ter mínimo 6 aracteres"
-                            : value!.isEmpty
-                                ? "Confirme sua senha"
-                                : null,
+                    validator: (value) {
+                      if (value != userController.password.text &&
+                          value != userController.passwordEdit.text) {
+                        return "Senhas diferentes";
+                      }
+                      if (value!.length < 6) {
+                        return "Sua senha deve ter mínimo 6 caracteres";
+                      }
+                      if (value.isEmpty) {
+                        return "Confirme sua senha";
+                      }
+                      return null;
+                    },
                   ),
 
+                  Visibility(
+                    visible: (staff == true && update == false) ||
+                            (staff == true && update == true)
+                        ? true
+                        : false,
+                    child: Column(
+                      children: [
+                        selectStaff(
+                          'Prova',
+                          update == true ? selectionStaffEdit : selectionStaff,
+                          'Prova',
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? selectionStaffEdit = 'Prova'
+                                  : selectionStaff = 'Prova';
+                              if (update == true) {
+                                userController.selectionStaffEdit = 'Prova';
+                              }
+                              print(selectionStaff);
+                            });
+                          },
+                        ),
+                        selectStaff(
+                          'Banco',
+                          update == true ? selectionStaffEdit : selectionStaff,
+                          'Banco',
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? selectionStaffEdit = 'Banco'
+                                  : selectionStaff = 'Banco';
+                              if (update == true) {
+                                userController.selectionStaffEdit = 'Banco';
+                              }
+                              print(selectionStaff);
+                            });
+                          },
+                        ),
+                        selectStaff(
+                          'Todos',
+                          update == true ? selectionStaffEdit : selectionStaff,
+                          'Todos',
+                          (value) {
+                            setState(() {
+                              update == true
+                                  ? selectionStaffEdit = 'Todos'
+                                  : selectionStaff = 'Todos';
+                              if (update == true) {
+                                userController.selectionStaffEdit = 'Todos';
+                              }
+                              print(selectionStaff);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   // SizedBox(
                   //   height: 200,
                   //   child: ListView.builder(
@@ -911,16 +978,16 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                         });
                                         //exitWindows();
                                       }
-                                      if (staff == true &&
-                                          update == true &&
-                                          addAdm) {
+                                      if (staff == true && update == true) {
                                         //atualizar staff
                                         final newUserStaffEdit = UserStaff(
                                           id: userController.id.text,
                                           login: userController.loginEdit.text,
                                           password:
                                               userController.passwordEdit.text,
+                                          office: selectionStaffEdit,
                                         );
+                                        print("up2 $selectionStaffEdit");
                                         setState(() {
                                           userController.loading = true;
                                         });
@@ -937,6 +1004,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           login: userController.login.text,
                                           password:
                                               userController.password.text,
+                                          office: selectionStaff,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1035,7 +1103,9 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           login: userController.loginEdit.text,
                                           password:
                                               userController.passwordEdit.text,
+                                          office: selectionStaffEdit,
                                         );
+                                        print("up3 $selectionStaffEdit");
                                         setState(() {
                                           userController.loading = true;
                                         });
@@ -1052,6 +1122,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           login: userController.login.text,
                                           password:
                                               userController.password.text,
+                                          office: selectionStaff,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1687,6 +1758,31 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   exitWindows() {
     // hasLoadedMembers = false;
     Navigator.pop(context);
+  }
+
+  Padding selectStaff(String titulo, String valor, String groupValue,
+      Function(String?)? onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        right: 8.0,
+      ),
+      child: RadioListTile<String>(
+        tileColor: Colors.black87,
+        activeColor: Colors.purple,
+        title: Text(
+          titulo,
+          style: const TextStyle(
+            color: Colors.white,
+            // fontWeight: FontWeight.bold,
+            // fontSize: 24,
+          ),
+        ),
+        value: valor,
+        groupValue: groupValue,
+        onChanged: onChanged,
+      ),
+    );
   }
 
   Padding categorySelected(String titulo, Category valor, Category groupValue,

@@ -11,13 +11,14 @@ class UserStaff {
   String? id;
   String? login;
   String? password;
-  String? name;
+  String? office;
   DateTime? date;
 
   UserStaff({
     this.id,
     this.login,
     this.password,
+    this.office,
     this.date,
   });
 
@@ -26,6 +27,7 @@ class UserStaff {
       id: json["id"],
       login: json["login"],
       password: json["password"],
+      office: json['office'],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
   }
@@ -34,6 +36,7 @@ class UserStaff {
         "id": id,
         "login": login,
         "password": password,
+        "office": office,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }
