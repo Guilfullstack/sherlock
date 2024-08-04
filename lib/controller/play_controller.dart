@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 
@@ -254,8 +255,18 @@ class PlayController extends ChangeNotifier {
     return codeList;
   }
 
-  void execultCode(Category category, String code) {
+  void execultCode(Category category, String token) async {
+    UserController userController = UserController();
+
     if (category == Category.receive) {
+      List<Code> listCodes = await getCodeListFromHive();
+      for (var code in listCodes) {
+        if (code.token == token) {
+          print("Token correto");
+          await userController.updateUserTeamHive('credit', code.value);
+          return;
+        }
+      }
     } else {}
   }
 }

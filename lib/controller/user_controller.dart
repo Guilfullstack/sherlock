@@ -91,35 +91,6 @@ class UserController extends ChangeNotifier {
     return Future<UserStaff>.value(userStaff);
   }
 
-/*
-  Future<void> logout(BuildContext context) async {
-    // Limpar SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    if (kIsWeb) {
-      // Navegar para a página de login se for Web
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    } else {
-      // Limpar Hive e então navegar para a página de login se não for Web
-      try {
-        var userTeamBox = Hive.box<UserTeam>('userTeamBox');
-        await userTeamBox.clear();
-      } catch (e) {
-        print('Error clearing Hive box: $e');
-      }
-
-      // Navegar para a página de login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    }
-  }
-*/
   Future<void> logout(BuildContext context) async {
     // Limpar SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -163,6 +134,37 @@ class UserController extends ChangeNotifier {
     await prefs.setBool('isLoggedIn', isLoggedIn);
     await prefs.setString('login', login);
     await prefs.setString('category', category);
+  }
+
+  Future<void> updateUserTeamHive(String key, dynamic value) async {
+    var box = Hive.box<UserTeam>('userTeamBox');
+
+    // Obtém o usuário atual salvo no Hive
+    UserTeam? currentUser = box.get('currentUser');
+
+    if (currentUser != null) {
+      // Modifica o dado desejado no objeto do usuário
+      switch (key) {
+        case 'status':
+          currentUser.status = value as Status?;
+          break;
+        case 'credit':
+          currentUser.credit = value as double?;
+          break;
+        case 'listTokenDesbloqued':
+          currentUser.listTokenDesbloqued = value as List<String>?;
+          break;
+        // Adicione outros casos conforme necessário
+        default:
+          print('Chave inválida');
+          return;
+      }
+
+      // Salva o objeto atualizado de volta ao Hive
+      await box.put('currentUser', currentUser);
+    } else {
+      print('Nenhum usuário encontrado');
+    }
   }
 
   Future<void> saveUserHive(UserTeam user) async {
@@ -233,10 +235,10 @@ class UserController extends ChangeNotifier {
             saveUserHive(user);
 
             List<Code> codeList = await playController.getCodeList();
-            playController.saveCodeListToHive(codeList);
+            await playController.saveCodeListToHive(codeList);
 
             List<Stage> stageList = await playController.getStageList();
-            playController.saveStageListToHive(stageList);
+            await playController.saveStageListToHive(stageList);
             List<Stage> l2 = await playController.getStageListFromHive();
             for (Stage stage in l2) {
               print("${stage.description}");

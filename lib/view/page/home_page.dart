@@ -122,7 +122,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCodeEntryDialog(context),
+        onPressed: () =>
+            _showCodeEntryDialog(context, userController, playController),
         backgroundColor: Colors.grey,
         child: const Icon(
           Icons.key,
@@ -142,7 +143,8 @@ const Map<Category, String> categoryLabels = {
   Category.stage: 'Prova',
 };
 
-void _showCodeEntryDialog(BuildContext context) {
+void _showCodeEntryDialog(BuildContext context, UserController userControll,
+    PlayController playerControll) {
   final TextEditingController codeController = TextEditingController();
   Category? selectedCategory;
 
@@ -185,11 +187,8 @@ void _showCodeEntryDialog(BuildContext context) {
             onPressed: () {
               if (selectedCategory != null && codeController.text.isNotEmpty) {
                 final Category category = selectedCategory!;
-                final String code = codeController.text;
-
-                // Execute a função com a categoria e código
-                _handleSave(category, code);
-
+                final String token = codeController.text;
+                playerControll.execultCode(category, token);
                 Navigator.of(context).pop();
               } else {
                 // Exiba uma mensagem de erro se a categoria ou o código não forem preenchidos
@@ -204,10 +203,4 @@ void _showCodeEntryDialog(BuildContext context) {
       );
     },
   );
-}
-
-void _handleSave(Category category, String code) {
-  // Adicione a lógica para tratar o código e a categoria aqui
-  print('Categoria: $category');
-  print('Código: $code');
 }
