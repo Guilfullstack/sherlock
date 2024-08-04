@@ -895,7 +895,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               if (update == true) {
                                 userController.selectionStaffEdit = 'Prova';
                               }
-                              print(selectionStaff);
                             });
                           },
                         ),
@@ -911,7 +910,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               if (update == true) {
                                 userController.selectionStaffEdit = 'Banco';
                               }
-                              print(selectionStaff);
                             });
                           },
                         ),
@@ -927,7 +925,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               if (update == true) {
                                 userController.selectionStaffEdit = 'Todos';
                               }
-                              print(selectionStaff);
                             });
                           },
                         ),
@@ -987,7 +984,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                               userController.passwordEdit.text,
                                           office: selectionStaffEdit,
                                         );
-                                        print("up2 $selectionStaffEdit");
                                         setState(() {
                                           userController.loading = true;
                                         });
@@ -1105,7 +1101,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                               userController.passwordEdit.text,
                                           office: selectionStaffEdit,
                                         );
-                                        print("up3 $selectionStaffEdit");
                                         setState(() {
                                           userController.loading = true;
                                         });
