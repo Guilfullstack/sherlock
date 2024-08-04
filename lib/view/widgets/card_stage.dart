@@ -7,11 +7,11 @@ class CardStage extends StatelessWidget {
   final int position;
 
   const CardStage({
-    Key? key,
+    super.key,
     required this.stage,
     required this.isUnlocked,
     required this.position,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +38,8 @@ class CardStage extends StatelessWidget {
         leading: CircleAvatar(
           backgroundColor: Colors.grey,
           child: Text(
-            '${position ?? ''}',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            '$position',
+            style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
         trailing: isUnlocked

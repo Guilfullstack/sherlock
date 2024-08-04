@@ -244,22 +244,6 @@ class PlayController extends ChangeNotifier {
     }
   }
 
-  //Stage
-  /*
-  Future<void> saveStageListToHive(List<Stage> stageList) async {
-    // Obtém a caixa onde os códigos serão armazenados
-    final stagebox = await Hive.openBox<Stage>('stageBox');
-
-    // Salva os códigos na caixa
-    for (var stage in stageList) {
-      if (stage.id != null) {
-        await stagebox.put(
-            stage.id, stage); // Usa o ID como chave para cada stage
-      }
-    }
-    print('Lista de códigos salva no Hive com sucesso.');
-  }
-*/
   Future<List<Stage>> getStageListFromHive() async {
     // Obtém a caixa onde os códigos estão armazenados
     final codeBox = await Hive.openBox<Stage>('stageBox');
@@ -268,5 +252,10 @@ class PlayController extends ChangeNotifier {
     final codeList = codeBox.values.toList();
 
     return codeList;
+  }
+
+  void execultCode(Category category, String code) {
+    if (category == Category.receive) {
+    } else {}
   }
 }

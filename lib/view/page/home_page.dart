@@ -122,7 +122,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => _showCodeEntryDialog(context),
         backgroundColor: Colors.grey,
         child: const Icon(
           Icons.key,
@@ -131,4 +131,83 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+// Mapeamento das categorias para português
+const Map<Category, String> categoryLabels = {
+  Category.freezing: 'Congelar',
+  Category.protect: 'Proteção',
+  Category.pay: 'Pagar',
+  Category.receive: 'Receber',
+  Category.stage: 'Prova',
+};
+
+void _showCodeEntryDialog(BuildContext context) {
+  final TextEditingController codeController = TextEditingController();
+  Category? selectedCategory;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Inserir Código'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<Category>(
+              value: selectedCategory,
+              hint: const Text('Selecione uma categoria'),
+              items: categoryLabels.entries.map((entry) {
+                return DropdownMenuItem<Category>(
+                  value: entry.key,
+                  child: Text(entry.value),
+                );
+              }).toList(),
+              onChanged: (Category? newCategory) {
+                selectedCategory = newCategory;
+              },
+            ),
+            TextField(
+              controller: codeController,
+              decoration: const InputDecoration(labelText: 'Código'),
+              keyboardType: TextInputType.text,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (selectedCategory != null && codeController.text.isNotEmpty) {
+                final Category category = selectedCategory!;
+                final String code = codeController.text;
+
+                // Execute a função com a categoria e código
+                _handleSave(category, code);
+
+                Navigator.of(context).pop();
+              } else {
+                // Exiba uma mensagem de erro se a categoria ou o código não forem preenchidos
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Preencha todos os campos')),
+                );
+              }
+            },
+            child: const Text('Salvar'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void _handleSave(Category category, String code) {
+  // Adicione a lógica para tratar o código e a categoria aqui
+  print('Categoria: $category');
+  print('Código: $code');
 }

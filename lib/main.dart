@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
@@ -14,49 +13,49 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 Future<void> initializeHive() async {
   if (kIsWeb) {
-    print('Inicialização do Hive ignorada na plataforma Web.');
+    debugPrint('Inicialização do Hive ignorada na plataforma Web.');
     return; // Não inicializa o Hive se for a Web
   }
 
   try {
-    print('Inicializando o Hive...');
+    debugPrint('Inicializando o Hive...');
     final appDocumentDir =
         await path_provider.getApplicationDocumentsDirectory();
     await Hive.initFlutter(appDocumentDir.path);
-    print('Hive inicializado com o caminho: ${appDocumentDir.path}');
+    debugPrint('Hive inicializado com o caminho: ${appDocumentDir.path}');
 
     // Registra os adaptadores do Hive
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(UserTeamAdapter());
-      print('UserTeamAdapter registrado');
+      debugPrint('UserTeamAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(StatusAdapter());
-      print('StatusAdapter registrado');
+      debugPrint('StatusAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(3)) {
       Hive.registerAdapter(CodeAdapter());
-      print('CodeAdapter registrado');
+      debugPrint('CodeAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(4)) {
       Hive.registerAdapter(CategoryAdapter());
-      print('CategoryAdapter registrado');
+      debugPrint('CategoryAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(5)) {
       Hive.registerAdapter(StageAdapter());
-      print('StageAdapter registrado');
+      debugPrint('StageAdapter registrado');
     }
     // Abra as caixas do Hive
     await Hive.openBox<UserTeam>('userTeamBox');
-    print('userTeamBox aberta');
+    debugPrint('userTeamBox aberta');
     await Hive.openBox<Code>('codeBox');
-    print('codeBox aberta');
+    debugPrint('codeBox aberta');
     await Hive.openBox<Stage>('stageBox');
-    print('stageBox aberta');
+    debugPrint('stageBox aberta');
 
-    print('Caixas do Hive abertas com sucesso');
+    debugPrint('Caixas do Hive abertas com sucesso');
   } catch (e) {
-    print('Erro ao inicializar o Hive: $e');
+    debugPrint('Erro ao inicializar o Hive: $e');
   }
 }
 
@@ -65,28 +64,16 @@ Future<void> main() async {
 
   // Inicializa o Firebase
   try {
-    print('Initializing Firebase...');
+    debugPrint('Initializing Firebase...');
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Error initializing Firebase: $e');
+    debugPrint('Error initializing Firebase: $e');
   }
   // Pequeno atraso para garantir que os plugins estão carregados
   await Future.delayed(const Duration(seconds: 1));
   await initializeHive();
-
-  PlayController playController = PlayController();
-
-  List<Stage> stageList = await playController.getStageList();
-
-  playController.saveStageListToHive(stageList);
-
-  List<Stage> l2 = await playController.getStageListFromHive();
-
-  for (Stage stage in l2) {
-    print("${stage.description}");
-  }
 
   runApp(
     ChangeNotifierProvider(
