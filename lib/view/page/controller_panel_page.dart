@@ -1511,7 +1511,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           description:
                                               playController.description.text,
                                           puzzle: playController.puzzle.text,
-                                          // category: value2,
+                                          category: value2,
                                         );
                                         setState(() {
                                           userController.loading = true;
