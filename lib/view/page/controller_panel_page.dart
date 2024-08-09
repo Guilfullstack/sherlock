@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
@@ -92,34 +93,36 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             ),
           ],
         ),
-        body: Wrap(
-          children: [
-            SizedBox(
-              width: 850,
-              height: MediaQuery.of(context).size.height - 135,
-              // height: MediaQuery.of(context).size.width > 830
-              //     ? MediaQuery.of(context).size.height - 100
-              //     : MediaQuery.of(context).size.height / 2 - 20,
-              //height: 500,
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  pageTeams(),
-                  pageAdm(),
-                  pageStaff(),
-                  pageTolken(),
-                ],
+        body: Center(
+          child: Wrap(
+            children: [
+              SizedBox(
+                width: 824,
+                height: MediaQuery.of(context).size.height - 135,
+                // height: MediaQuery.of(context).size.width > 830
+                //     ? MediaQuery.of(context).size.height - 100
+                //     : MediaQuery.of(context).size.height / 2 - 20,
+                //height: 500,
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    pageTeams(),
+                    pageAdm(),
+                    pageStaff(),
+                    pageTolken(),
+                  ],
+                ),
               ),
-            ),
-            ValueListenableBuilder<bool>(
-              valueListenable: isHistoryVisible,
-              builder: (context, value, child) {
-                return value
-                    ? history(context, true)
-                    : listCodeStage(context, playController, 400);
-              },
-            ),
-          ],
+              ValueListenableBuilder<bool>(
+                valueListenable: isHistoryVisible,
+                builder: (context, value, child) {
+                  return value
+                      ? history(context, true)
+                      : listCodeStage(context, playController, 400);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -692,7 +695,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         child: SizedBox(
           width: 400,
           height: MediaQuery.of(context).size.width > 830
-              ? MediaQuery.of(context).size.height - 135
+              ? MediaQuery.of(context).size.height - 140
               : MediaQuery.of(context).size.height / 2 - 20,
           child: Card(
             elevation: 3,
@@ -1431,6 +1434,12 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             controller: update == true
                                 ? playController.valueEdit
                                 : playController.value,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d*\.?\d*')),
+                            ],
                           ),
                         ),
                       ],

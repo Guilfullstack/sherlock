@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ImputTextFormField extends StatelessWidget {
   final String title;
   final TextEditingController controller;
   final FormFieldValidator? validator;
   final Function(String)? onFieldSubmitted;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool? enabled;
   final bool? obscure;
   final Widget? icon;
   final int? maxLines;
-  const ImputTextFormField(
-      {super.key,
-      required this.title,
-      required this.controller,
-      this.validator,
-      this.enabled,
-      this.obscure,
-      this.icon,
-      this.maxLines, this.onFieldSubmitted, this.focusNode,});
+  const ImputTextFormField({
+    super.key,
+    required this.title,
+    required this.controller,
+    this.validator,
+    this.enabled,
+    this.obscure,
+    this.icon,
+    this.maxLines,
+    this.onFieldSubmitted,
+    this.focusNode,
+    this.keyboardType, this.inputFormatters,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,8 @@ class ImputTextFormField extends StatelessWidget {
             },
         controller: controller,
         style: const TextStyle(color: Colors.white),
+        keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           suffixIcon: icon,
           enabled: enabled ?? true,
