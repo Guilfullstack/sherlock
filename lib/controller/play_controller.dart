@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
+import 'package:sherlock/model/user_team.dart';
 
 class PlayController extends ChangeNotifier {
   final GlobalKey<FormState> formKeyPlay = GlobalKey<FormState>();
@@ -257,16 +258,27 @@ class PlayController extends ChangeNotifier {
 
   void execultCode(Category category, String token) async {
     UserController userController = UserController();
+    UserTeam? userTeam = await userController.getUserHive();
+    List<Code> listCodes = await getCodeListFromHive();
 
     if (category == Category.receive) {
-      List<Code> listCodes = await getCodeListFromHive();
       for (var code in listCodes) {
         if (code.token == token) {
-          print("Token correto");
-          await userController.updateUserTeamHive('credit', code.value);
+          double valueCredit = userTeam!.credit ?? 0;
+          double valueAll = valueCredit + code.value!;
+          await userController.updateUserTeamHive('credit', valueAll);
           return;
         }
       }
-    } else {}
+    } else if (category == Category.pay) {
+      for (var code in listCodes) {
+        if (code.token == token) {
+          double valueCredit = userTeam!.credit ?? 0;
+          double valueAll = valueCredit - code.value!;
+          await userController.updateUserTeamHive('credit', valueAll);
+          return;
+        }
+      }
+    }
   }
 }
