@@ -21,6 +21,8 @@ class _HomePageState extends State<HomePage> {
   List<Code>? listCode = [];
   UserController userController = UserController();
   PlayController playController = PlayController();
+  TextEditingController codeController = TextEditingController();
+  Category? selectedCategory;
   @override
   void initState() {
     super.initState();
@@ -32,10 +34,6 @@ class _HomePageState extends State<HomePage> {
       UserTeam? userTeamFromHive = await userController.getUserHive();
       List<Stage>? listStagesFromHive =
           await playController.getStageListFromHive();
-
-      for (Stage stage in listStagesFromHive) {
-        print("${stage.description}");
-      }
 
       List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
 
@@ -122,8 +120,68 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            _showCodeEntryDialog(context, userController, playController),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Inserir Código'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<Category>(
+                      value: selectedCategory,
+                      hint: const Text('Selecione uma categoria'),
+                      items: categoryLabels.entries.map((entry) {
+                        return DropdownMenuItem<Category>(
+                          value: entry.key,
+                          child: Text(entry.value),
+                        );
+                      }).toList(),
+                      onChanged: (Category? newCategory) {
+                        selectedCategory = newCategory;
+                      },
+                    ),
+                    TextField(
+                      controller: codeController,
+                      decoration: const InputDecoration(labelText: 'Código'),
+                      keyboardType: TextInputType.text,
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancelar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (selectedCategory != null &&
+                          codeController.text.isNotEmpty) {
+                        setState(() {
+                          final Category category = selectedCategory!;
+                          final String token = codeController.text;
+
+                          playController.execultCode(category, token);
+                        });
+                        Navigator.of(context).pop();
+                      } else {
+                        // Exiba uma mensagem de erro se a categoria ou o código não forem preenchidos
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Preencha todos os campos')),
+                        );
+                      }
+                    },
+                    child: const Text('Salvar'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
         backgroundColor: Colors.grey,
         child: const Icon(
           Icons.key,
@@ -134,73 +192,12 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+//TB86Cd
 // Mapeamento das categorias para português
 const Map<Category, String> categoryLabels = {
   Category.freezing: 'Congelar',
   Category.protect: 'Proteção',
-  Category.pay: 'Pagar',
-  Category.receive: 'Receber',
+  Category.pay: 'Subtrair',
+  Category.receive: 'Adicionar',
   Category.stage: 'Prova',
 };
-
-void _showCodeEntryDialog(BuildContext context, UserController userControll,
-    PlayController playerControll) {
-  final TextEditingController codeController = TextEditingController();
-  Category? selectedCategory;
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Inserir Código'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<Category>(
-              value: selectedCategory,
-              hint: const Text('Selecione uma categoria'),
-              items: categoryLabels.entries.map((entry) {
-                return DropdownMenuItem<Category>(
-                  value: entry.key,
-                  child: Text(entry.value),
-                );
-              }).toList(),
-              onChanged: (Category? newCategory) {
-                selectedCategory = newCategory;
-              },
-            ),
-            TextField(
-              controller: codeController,
-              decoration: const InputDecoration(labelText: 'Código'),
-              keyboardType: TextInputType.text,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (selectedCategory != null && codeController.text.isNotEmpty) {
-                final Category category = selectedCategory!;
-                final String token = codeController.text;
-                playerControll.execultCode(category, token);
-                Navigator.of(context).pop();
-              } else {
-                // Exiba uma mensagem de erro se a categoria ou o código não forem preenchidos
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Preencha todos os campos')),
-                );
-              }
-            },
-            child: const Text('Salvar'),
-          ),
-        ],
-      );
-    },
-  );
-}

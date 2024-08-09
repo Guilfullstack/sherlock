@@ -141,30 +141,27 @@ class UserController extends ChangeNotifier {
 
     // Obtém o usuário atual salvo no Hive
     UserTeam? currentUser = box.get('currentUser');
+    print('Usuário: ${currentUser!.login}');
 
-    if (currentUser != null) {
-      // Modifica o dado desejado no objeto do usuário
-      switch (key) {
-        case 'status':
-          currentUser.status = value as Status?;
-          break;
-        case 'credit':
-          currentUser.credit = value as double?;
-          break;
-        case 'listTokenDesbloqued':
-          currentUser.listTokenDesbloqued = value as List<String>?;
-          break;
-        // Adicione outros casos conforme necessário
-        default:
-          print('Chave inválida');
-          return;
-      }
+    print('Value: ${value}');
 
-      // Salva o objeto atualizado de volta ao Hive
-      await box.put('currentUser', currentUser);
-    } else {
-      print('Nenhum usuário encontrado');
+    switch (key) {
+      case 'status':
+        currentUser.status = value as Status?;
+        break;
+      case 'credit':
+        double valueParametre = double.parse(value.toString());
+        currentUser.credit = valueParametre;
+        print('Creditos: ${currentUser.credit}');
+        break;
+      case 'listTokenDesbloqued':
+        currentUser.listTokenDesbloqued = value as List<String>?;
+        break;
+      // Adicione outros casos conforme necessário
+      default:
+        print('Chave inválida');
     }
+    await box.put('currentUser', currentUser);
   }
 
   Future<void> saveUserHive(UserTeam user) async {
