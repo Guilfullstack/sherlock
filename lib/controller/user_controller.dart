@@ -155,7 +155,7 @@ class UserController extends ChangeNotifier {
         print('Creditos: ${currentUser.credit}');
         break;
       case 'listTokenDesbloqued':
-        currentUser.listTokenDesbloqued = value as List<String>?;
+        currentUser.listTokenDesbloqued!.add(value.toString());
         break;
       // Adicione outros casos conforme necessário
       default:

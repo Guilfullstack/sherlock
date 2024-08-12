@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
@@ -24,6 +25,7 @@ class PlayController extends ChangeNotifier {
   final TextEditingController descriptionEdit = TextEditingController();
   final TextEditingController puzzleEdit = TextEditingController();
   final TextEditingController valueEdit = TextEditingController();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   Future<Code> addCode(Code code) async {
     DocumentReference<Code> codeDoc = userCodeRef.doc();
@@ -256,29 +258,85 @@ class PlayController extends ChangeNotifier {
     return codeList;
   }
 
-  void execultCode(Category category, String token) async {
+  void execultCode(
+      BuildContext context, Category category, String token) async {
     UserController userController = UserController();
     UserTeam? userTeam = await userController.getUserHive();
     List<Code> listCodes = await getCodeListFromHive();
+    List<Stage> listStage = await getStageListFromHive();
 
     if (category == Category.receive) {
       for (var code in listCodes) {
-        if (code.token == token) {
+        if (code.token == token && code.category == category) {
           double valueCredit = userTeam!.credit ?? 0;
           double valueAll = valueCredit + code.value!;
           await userController.updateUserTeamHive('credit', valueAll);
+          //TODO: atualizar no banco
+          ToolsController.scafoldMensage(
+              context, Colors.green, 'Foram adicionados ${code.value} pontos!');
           return;
         }
       }
     } else if (category == Category.pay) {
       for (var code in listCodes) {
-        if (code.token == token) {
+        if (code.token == token && code.category == category) {
           double valueCredit = userTeam!.credit ?? 0;
-          double valueAll = valueCredit - code.value!;
-          await userController.updateUserTeamHive('credit', valueAll);
+          if (valueCredit >= code.value!) {
+            double valueAll = valueCredit - code.value!;
+            await userController.updateUserTeamHive('credit', valueAll);
+            //TODO: atualizar no banco
+            ToolsController.scafoldMensage(
+                context, Colors.red, 'Você gastou ${code.value} pontos!');
+          } else {
+            ToolsController.dialogMensage(
+                context, 'Erro!', 'Pontos insuficientes');
+            return;
+          }
+        } else {
+          ToolsController.dialogMensage(context, 'Erro!', 'Código inválido!');
+          return;
+        }
+      }
+    } else if (category == Category.protect) {
+    } else if (category == Category.freezing) {
+      freezeApp(context);
+    } else if (category == Category.stage) {
+      for (var stage in listStage) {
+        if (stage.token == token) {
+          // Verifica se o token já está na lista
+          if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
+            print('Token já está na lista.');
+            ToolsController.dialogMensage(
+                context, 'Info', 'Essa atividade já foi desbloqueada!');
+          } else {
+            await userController.updateUserTeamHive(
+                'listTokenDesbloqued', stage.token);
+            print('Adicionado à lista');
+          }
+
+          // Exibe todos os tokens na lista
+          for (var element in userTeam!.listTokenDesbloqued!) {
+            print('Token: $element');
+          }
           return;
         }
       }
     }
   }
+}
+
+void freezeApp(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Evita que o usuário feche o diálogo
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Icon(Icons.lock, size: 50, color: Colors.red),
+        content: Text('Você está bloqueado!'),
+      );
+    },
+  );
+  Future.delayed(Duration(minutes: 1), () {
+    Navigator.of(context).pop(); // Fecha o diálogo após 10 minutos
+  });
 }

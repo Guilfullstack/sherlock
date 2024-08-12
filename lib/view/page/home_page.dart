@@ -164,7 +164,8 @@ class _HomePageState extends State<HomePage> {
                           final Category category = selectedCategory!;
                           final String token = codeController.text;
 
-                          playController.execultCode(category, token);
+                          playController.execultCode(context, category, token);
+                          //codeController.clear();
                         });
                         Navigator.of(context).pop();
                       } else {
