@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                     ImputTextFormField(
                       title: "Senha",
                       controller: userController.password,
-                      obscure: true,
+                      obscure: _obscureText == true ? true : false,
                       icon: IconButton(
                         icon: Icon(
                           _obscureText

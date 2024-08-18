@@ -142,7 +142,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   SizedBox(
                     height: MediaQuery.of(context).size.width > 830
                         ? MediaQuery.of(context).size.height - 140
-                        : MediaQuery.of(context).size.height / 2 - 50,
+                        : MediaQuery.of(context).size.height / 2 - 100,
                     child: Card(
                       elevation: 3,
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
@@ -180,7 +180,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   SizedBox(
                     height: MediaQuery.of(context).size.width > 830
                         ? MediaQuery.of(context).size.height - 140
-                        : MediaQuery.of(context).size.height / 2 - 50,
+                        : MediaQuery.of(context).size.height / 2 - 100,
                     child: Card(
                       elevation: 3,
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
@@ -218,7 +218,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   SizedBox(
                     height: MediaQuery.of(context).size.width > 830
                         ? MediaQuery.of(context).size.height - 140
-                        : MediaQuery.of(context).size.height / 2 - 50,
+                        : MediaQuery.of(context).size.height / 2 - 100,
                     child: Card(
                       elevation: 3,
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
@@ -256,7 +256,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   SizedBox(
                     height: MediaQuery.of(context).size.width > 830
                         ? MediaQuery.of(context).size.height - 140
-                        : MediaQuery.of(context).size.height / 2 - 50,
+                        : MediaQuery.of(context).size.height / 2 - 100,
                     child: Card(
                       elevation: 3,
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
@@ -285,7 +285,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       width: width,
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
-          : MediaQuery.of(context).size.height / 2 - 50,
+          : MediaQuery.of(context).size.height / 2 - 100,
       child: FutureBuilder(
           future: Future.delayed(const Duration(microseconds: 200)),
           builder: (context, snapshot) {
@@ -322,7 +322,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           },
                           onTapEdit: () {
                             showModalBottomSheet(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Colors.grey,
                               isScrollControlled: false,
                               context: context,
                               builder: (BuildContext context) {
@@ -358,7 +358,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       width: width,
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
-          : MediaQuery.of(context).size.height / 2 - 50,
+          : MediaQuery.of(context).size.height / 2 - 100,
       child: Card(
         color: const Color.fromRGBO(189, 189, 189, 189),
         child: StreamBuilder<List<UserAdm>>(
@@ -392,7 +392,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     },
                     onTapEdit: () {
                       showModalBottomSheet(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.grey,
                         isScrollControlled: false,
                         context: context,
                         builder: (BuildContext context) {
@@ -425,7 +425,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       width: width,
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
-          : MediaQuery.of(context).size.height / 2 - 50,
+          : MediaQuery.of(context).size.height / 2 - 100,
       child: Card(
         color: const Color.fromRGBO(189, 189, 189, 189),
         child: StreamBuilder<List<UserStaff>>(
@@ -459,7 +459,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     },
                     onTapEdit: () {
                       showModalBottomSheet(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Colors.grey,
                         isScrollControlled: false,
                         context: context,
                         builder: (BuildContext context) {
@@ -496,7 +496,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       width: width,
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
-          : MediaQuery.of(context).size.height / 2 - 50,
+          : MediaQuery.of(context).size.height / 2 - 100,
       child: Card(
         color: const Color.fromRGBO(189, 189, 189, 189),
         child: StreamBuilder<List<Code>>(
@@ -558,7 +558,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                   return Form(
                                     key: playController.formKeyPlayEdit,
                                     child: AlertDialog(
-                                      backgroundColor: Colors.black87,
+                                      backgroundColor: Colors.grey,
                                       content: SizedBox(
                                         height: 500,
                                         width: 450,
@@ -593,7 +593,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         width: width,
         height: MediaQuery.of(context).size.width > 830
             ? MediaQuery.of(context).size.height - 140
-            : MediaQuery.of(context).size.height / 2 - 50,
+            : MediaQuery.of(context).size.height / 2 - 100,
         child: Card(
           color: const Color.fromRGBO(189, 189, 189, 189),
           child: StreamBuilder<List<Stage>>(
@@ -655,7 +655,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                     return Form(
                                       key: playController.formKeyPlayEdit,
                                       child: AlertDialog(
-                                        backgroundColor: Colors.black87,
+                                        backgroundColor: Colors.grey,
                                         content: SizedBox(
                                           height: 500,
                                           width: 450,
@@ -1629,10 +1629,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             context: context,
             builder: (builder) {
               return AlertDialog(
-                backgroundColor: Colors.black87,
+                backgroundColor: Colors.grey,
                 content: SizedBox(
                   width: 400,
-                  height: 400,
+                  height: 408,
                   child: StatefulBuilder(
                       builder: (BuildContext context, setStateDialog) {
                     return ListView(
@@ -1659,68 +1659,72 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             icon: const Icon(Icons.add),
                           ),
                         ),
-                        SizedBox(
-                          height: 300,
-                          width: 400,
-                          child: ListView.builder(
-                            itemCount: member.length,
-                            itemBuilder: (context, index) {
-                              final listMember = member[index];
-                              return ListTeamController(
-                                user: true,
-                                equipe: listMember,
-                                onTapRemove: () {
-                                  setStateDialog(() {
-                                    member.remove(listMember);
-                                  });
-                                },
-                                onTapEdit: () {
-                                  bool updateLocal = true;
-                                  userController.addMemberEdit.text =
-                                      listMember;
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: SizedBox(
+                            height: 300,
+                            width: 400,
+                            child: ListView.builder(
+                              itemCount: member.length,
+                              itemBuilder: (context, index) {
+                                final listMember = member[index];
+                                return ListTeamController(
+                                  user: true,
+                                  equipe: listMember,
+                                  onTapRemove: () {
+                                    setStateDialog(() {
+                                      member.remove(listMember);
+                                    });
+                                  },
+                                  onTapEdit: () {
+                                    bool updateLocal = true;
+                                    userController.addMemberEdit.text =
+                                        listMember;
 
-                                  showDialog(
-                                    context: context,
-                                    builder: (builder) {
-                                      return AlertDialog(
-                                        backgroundColor: Colors.black87,
-                                        content: ImputTextFormField(
-                                          title: updateLocal == true
-                                              ? "Atualizar membro"
-                                              : "Nome do Membro",
-                                          controller: updateLocal == true
-                                              ? userController.addMemberEdit
-                                              : userController.addMember,
-                                          onFieldSubmitted: (value) {
-                                            setStateDialog(() {
-                                              member[index] = value;
-                                              updateLocal == true
-                                                  ? userController.addMemberEdit
-                                                      .clear()
-                                                  : userController.addMember
-                                                      .clear();
-                                              exitWindows();
-                                            });
-                                          },
-                                          icon: IconButton(
-                                            onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (builder) {
+                                        return AlertDialog(
+                                          backgroundColor: Colors.black87,
+                                          content: ImputTextFormField(
+                                            title: updateLocal == true
+                                                ? "Atualizar membro"
+                                                : "Nome do Membro",
+                                            controller: updateLocal == true
+                                                ? userController.addMemberEdit
+                                                : userController.addMember,
+                                            onFieldSubmitted: (value) {
                                               setStateDialog(() {
-                                                member[index] = userController
-                                                    .addMemberEdit.text;
+                                                member[index] = value;
+                                                updateLocal == true
+                                                    ? userController
+                                                        .addMemberEdit
+                                                        .clear()
+                                                    : userController.addMember
+                                                        .clear();
                                                 exitWindows();
                                               });
                                             },
-                                            icon: Icon(updateLocal == true
-                                                ? Icons.update
-                                                : Icons.add),
+                                            icon: IconButton(
+                                              onPressed: () {
+                                                setStateDialog(() {
+                                                  member[index] = userController
+                                                      .addMemberEdit.text;
+                                                  exitWindows();
+                                                });
+                                              },
+                                              icon: Icon(updateLocal == true
+                                                  ? Icons.update
+                                                  : Icons.add),
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
                         ElevatedButton(
