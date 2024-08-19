@@ -4,12 +4,14 @@ class ListTeamController extends StatefulWidget {
   final String? equipe;
   final Function()? onTapEdit;
   final Function()? onTapRemove;
+  final Function()? onTapAddValue;
   final double? credit;
   final String? status;
   final String? category;
   final bool? user;
   final bool? code;
   final bool? stage;
+  final bool? addValue;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -21,6 +23,8 @@ class ListTeamController extends StatefulWidget {
     this.code = false,
     this.category,
     this.stage,
+    this.addValue,
+    this.onTapAddValue,
   });
 
   @override
@@ -101,6 +105,17 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   ],
                 ),
               ),
+              if (widget.addValue == true)
+                PopupMenuItem<String>(
+                  onTap: widget.onTapAddValue,
+                  child: const Row(
+                    children: [
+                      Icon(Icons.task),
+                      SizedBox(width: 8),
+                      Text('Estatus'),
+                    ],
+                  ),
+                ),
               // PopupMenuItem<String>(
               //   enabled: widget.onDesktop == false ? true : false,
               //   onTap: widget.onTapHistory,

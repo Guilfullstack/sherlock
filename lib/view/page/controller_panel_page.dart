@@ -32,6 +32,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   Category value2Edit = Category.protect;
   late String selectionStaff = "Prova";
   late String selectionStaffEdit = "Prova";
+  String valueDropDown = "Adicionar";
   bool hasLoadedMembers = false;
   int membersNumeber = 0;
 
@@ -315,6 +316,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       itemBuilder: (context, index) {
                         final team = listTeamn[index];
                         return ListTeamController(
+                          addValue: true,
                           equipe: team.name,
                           credit: team.credit,
                           onTapRemove: () {
@@ -340,6 +342,11 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                 );
                               },
                             );
+                          },
+                          onTapAddValue: () {
+                            userController.addValueStatus.clear();
+                            addValue(
+                                context, userController, team, valueDropDown);
                           },
                         );
                       },
@@ -1817,4 +1824,102 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       ),
     );
   }
+}
+
+addValue(
+  BuildContext context,
+  UserController user,
+  UserTeam teams,
+  String dropDonw,
+) {
+  exit() {
+    Navigator.of(context).pop();
+  }
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            backgroundColor: Colors.grey,
+            title: Text(teams.name ?? ""),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomDropdown(
+                  items: const [
+                    "Adicionar",
+                    "Subtrair",
+                    "Congelar",
+                    "Proteção"
+                  ],
+                  title: "Selecione",
+                  value: dropDonw,
+                  onChanged: (value) {
+                    setState(() {
+                      dropDonw = value!;
+                      print(dropDonw);
+                    });
+                  },
+                ),
+                if (dropDonw == "Adicionar" || dropDonw == "Subtrair")
+                  ImputTextFormField(
+                    title: "Valor",
+                    controller: user.addValueStatus,
+                  ),
+              ],
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () async {
+                  switch (dropDonw) {
+                    case "Adicionar":
+                      final credit = double.parse(user.addValueStatus.text) +
+                          teams.credit!;
+                      user.addValueStatus.text = credit.toString();
+                      final userTeam = UserTeam(
+                        id: teams.id,
+                        credit: double.parse(user.addValueStatus.text),
+                      );
+                      await user.updateTeams(userTeam);
+                      exit();
+                      break;
+                    case "Subtrair":
+                      final double enteredValue =
+                          double.parse(user.addValueStatus.text);
+                      final double currentCredit = teams.credit!;
+                      // Calcula o novo valor do crédito após a subtração
+                      final double newCredit = currentCredit - enteredValue;
+                      // Garante que o crédito não seja menor que zero
+                      final double credit =
+                          newCredit < 0 ? teams.credit! : newCredit;
+                      user.addValueStatus.text = credit.toString();
+                      final userTeam = UserTeam(
+                        id: teams.id,
+                        credit: double.parse(user.addValueStatus.text),
+                      );
+                      await user.updateTeams(userTeam);
+                      exit();
+                      break;
+                    case "Congelar":
+                      break;
+                    case "Proteção":
+                      break;
+                    default:
+                  }
+                },
+                child: const Text("Aplicar"),
+              ),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Cancelar"))
+            ],
+          );
+        },
+      );
+    },
+  );
 }
