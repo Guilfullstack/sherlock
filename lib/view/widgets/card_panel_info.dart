@@ -36,7 +36,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Text(
-                  'Saldo:',
+                  'Pontos:',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 const SizedBox(
@@ -60,10 +60,6 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text(
-                  'Status:',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
                 const SizedBox(width: 8),
                 Text(
                   '${widget.status}',

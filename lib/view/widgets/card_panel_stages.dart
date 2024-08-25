@@ -3,11 +3,26 @@ import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/view/widgets/card_stage.dart';
 
 class CardPanelStages extends StatelessWidget {
-  final List<Stage> liststages;
-  const CardPanelStages({Key? key, required this.liststages}) : super(key: key);
+  final List<Stage>? liststages;
+  final List<String>? listTokenStageDesbloqued;
+
+  const CardPanelStages({
+    Key? key,
+    required this.liststages,
+    required this.listTokenStageDesbloqued,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (liststages == null || liststages!.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nenhuma prova disponível.',
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -22,7 +37,7 @@ class CardPanelStages extends StatelessWidget {
           ),
         ),
         Container(
-          height: 300, // Altura do Container
+          height: 300,
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -34,13 +49,17 @@ class CardPanelStages extends StatelessWidget {
             ),
           ),
           child: ListView.builder(
-            itemCount: liststages.length,
+            itemCount: liststages!.length,
             itemBuilder: (context, index) {
-              Stage stage = liststages[index];
-              bool isUnlocked = true; // Adapte conforme necessário
-              int position = index + 1;
+              final stage = liststages![index];
+              final isUnlocked =
+                  listTokenStageDesbloqued?.contains(stage.token) ?? false;
+
               return CardStage(
-                  stage: stage, isUnlocked: isUnlocked, position: position);
+                stage: stage,
+                isUnlocked: isUnlocked,
+                position: index + 1,
+              );
             },
           ),
         ),

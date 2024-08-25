@@ -258,68 +258,27 @@ class PlayController extends ChangeNotifier {
     return codeList;
   }
 
-  void execultCode(
-      BuildContext context, Category category, String token) async {
+  void execultCode(BuildContext context, String token) async {
     UserController userController = UserController();
     UserTeam? userTeam = await userController.getUserHive();
-    List<Code> listCodes = await getCodeListFromHive();
     List<Stage> listStage = await getStageListFromHive();
 
-    if (category == Category.receive) {
-      for (var code in listCodes) {
-        if (code.token == token && code.category == category) {
-          double valueCredit = userTeam!.credit ?? 0;
-          double valueAll = valueCredit + code.value!;
-          await userController.updateUserTeamHive('credit', valueAll);
-          //TODO: atualizar no banco
-          ToolsController.scafoldMensage(
-              context, Colors.green, 'Foram adicionados ${code.value} pontos!');
-          return;
-        }
-      }
-    } else if (category == Category.pay) {
-      for (var code in listCodes) {
-        if (code.token == token && code.category == category) {
-          double valueCredit = userTeam!.credit ?? 0;
-          if (valueCredit >= code.value!) {
-            double valueAll = valueCredit - code.value!;
-            await userController.updateUserTeamHive('credit', valueAll);
-            //TODO: atualizar no banco
-            ToolsController.scafoldMensage(
-                context, Colors.red, 'Você gastou ${code.value} pontos!');
-          } else {
-            ToolsController.dialogMensage(
-                context, 'Erro!', 'Pontos insuficientes');
-            return;
-          }
+    for (var stage in listStage) {
+      if (stage.token == token) {
+        // Verifica se o token já está na lista
+        if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
+          ToolsController.dialogMensage(
+              context, 'Info', 'Essa prova já está desbloqueada!');
         } else {
-          ToolsController.dialogMensage(context, 'Erro!', 'Código inválido!');
-          return;
+          userController.updateUserTeamHive('listTokenDesbloqued', token);
+          ToolsController.scafoldMensage(
+              context, Colors.green, 'Prova desbloqueada com sucesso!');
         }
-      }
-    } else if (category == Category.protect) {
-    } else if (category == Category.freezing) {
-      freezeApp(context);
-    } else if (category == Category.stage) {
-      for (var stage in listStage) {
-        if (stage.token == token) {
-          // Verifica se o token já está na lista
-          if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
-            print('Token já está na lista.');
-            ToolsController.dialogMensage(
-                context, 'Info', 'Essa atividade já foi desbloqueada!');
-          } else {
-            await userController.updateUserTeamHive(
-                'listTokenDesbloqued', stage.token);
-            print('Adicionado à lista');
-          }
-
-          // Exibe todos os tokens na lista
-          for (var element in userTeam!.listTokenDesbloqued!) {
-            print('Token: $element');
-          }
-          return;
+        // Exibe todos os tokens na lista
+        for (var element in userTeam.listTokenDesbloqued!) {
+          print('Token: $element');
         }
+        return;
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sherlock/controller/play_controller.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
@@ -22,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   UserController userController = UserController();
   PlayController playController = PlayController();
   TextEditingController codeController = TextEditingController();
-  Category? selectedCategory;
   @override
   void initState() {
     super.initState();
@@ -44,6 +44,29 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       print("erro home: $e");
+    }
+  }
+
+  void execultCode(String token) async {
+    UserTeam? userTeam = await userController.getUserHive();
+    List<Stage> listStage = await playController.getStageListFromHive();
+
+    for (var stage in listStage) {
+      if (stage.token == token) {
+        // Verifica se o token já está na lista
+        if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
+          ToolsController.dialogMensage(
+              context, 'Info', 'Essa prova já está desbloqueada!');
+        } else {
+          userController.updateUserTeamHive('listTokenDesbloqued', token);
+          setState(() {});
+          ToolsController.scafoldMensage(
+              context, Colors.green, 'Prova desbloqueada com sucesso!');
+        }
+        return;
+      } else {
+        ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
+      }
     }
   }
 
@@ -113,7 +136,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               CardPanelStages(
-                liststages: listStages ?? [],
+                liststages: listStages,
+                listTokenStageDesbloqued: currentUser!.listTokenDesbloqued,
               )
             ],
           ),
@@ -124,30 +148,30 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
+              final _formKey = GlobalKey<FormState>();
+              final codeController = TextEditingController();
+
               return AlertDialog(
-                title: const Text('Inserir Código'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownButtonFormField<Category>(
-                      value: selectedCategory,
-                      hint: const Text('Selecione uma categoria'),
-                      items: categoryLabels.entries.map((entry) {
-                        return DropdownMenuItem<Category>(
-                          value: entry.key,
-                          child: Text(entry.value),
-                        );
-                      }).toList(),
-                      onChanged: (Category? newCategory) {
-                        selectedCategory = newCategory;
-                      },
-                    ),
-                    TextField(
-                      controller: codeController,
-                      decoration: const InputDecoration(labelText: 'Código'),
-                      keyboardType: TextInputType.text,
-                    ),
-                  ],
+                title: const Text('Desbloquear Prova'),
+                content: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: codeController,
+                        decoration:
+                            const InputDecoration(labelText: 'Inserir código'),
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'O código não pode ser vazio';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 actions: [
                   TextButton(
@@ -158,25 +182,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (selectedCategory != null &&
-                          codeController.text.isNotEmpty) {
-                        setState(() {
-                          final Category category = selectedCategory!;
-                          final String token = codeController.text;
-
-                          playController.execultCode(context, category, token);
-                          //codeController.clear();
-                        });
+                      if (_formKey.currentState!.validate()) {
+                        final String token = codeController.text;
+                        execultCode(token);
                         Navigator.of(context).pop();
-                      } else {
-                        // Exiba uma mensagem de erro se a categoria ou o código não forem preenchidos
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Preencha todos os campos')),
-                        );
                       }
                     },
-                    child: const Text('Salvar'),
+                    child: const Text('Desbloquear'),
                   ),
                 ],
               );
@@ -192,13 +204,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-//TB86Cd
-// Mapeamento das categorias para português
-const Map<Category, String> categoryLabels = {
-  Category.freezing: 'Congelar',
-  Category.protect: 'Proteção',
-  Category.pay: 'Subtrair',
-  Category.receive: 'Adicionar',
-  Category.stage: 'Prova',
-};
