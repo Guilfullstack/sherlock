@@ -38,6 +38,7 @@ class UserController extends ChangeNotifier {
   TextEditingController passwordEditComfirm = TextEditingController();
   TextEditingController addMember = TextEditingController();
   TextEditingController addMemberEdit = TextEditingController();
+  TextEditingController addValueStatus = TextEditingController();
   final TextEditingController memberId = TextEditingController();
   final FocusNode addMemberFocusNode = FocusNode();
   late String? selectionStaff;
@@ -303,6 +304,9 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.login != null && loginEdit.text.isNotEmpty) {
           data['login'] = loginEdit.text;
+        }
+        if (userTeam.credit != null && addValueStatus.text.isNotEmpty) {
+          data['credit'] = double.parse(addValueStatus.text);
         }
         if (userTeam.password != null && passwordEdit.text.isNotEmpty) {
           data['password'] = passwordEdit.text;
