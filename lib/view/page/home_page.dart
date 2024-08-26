@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
@@ -24,10 +27,20 @@ class _HomePageState extends State<HomePage> {
   UserController userController = UserController();
   PlayController playController = PlayController();
   TextEditingController codeController = TextEditingController();
+  StreamSubscription<DocumentSnapshot>? userSubscription;
+
   @override
   void initState() {
     super.initState();
     _retrieveCurrentUser();
+    _listenToDatabaseChanges();
+  }
+
+  @override
+  void dispose() {
+    userSubscription
+        ?.cancel(); // Cancela a assinatura quando o widget é destruído
+    super.dispose();
   }
 
   Future<void> _retrieveCurrentUser() async {
@@ -35,7 +48,6 @@ class _HomePageState extends State<HomePage> {
       UserTeam? userTeamFromHive = await userController.getUserHive();
       List<Stage>? listStagesFromHive =
           await playController.getStageListFromHive();
-
       List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
 
       setState(() {
@@ -43,11 +55,59 @@ class _HomePageState extends State<HomePage> {
         listStages = listStagesFromHive;
         listCode = listCodeFromHive;
         listTokenDesbloked = currentUser!.listTokenDesbloqued;
+        _listenToDatabaseChanges();
       });
     } catch (e) {
       print("erro home: $e");
     }
   }
+
+  void _listenToDatabaseChanges() {
+    userSubscription = FirebaseFirestore.instance
+        .collection('Teams') // Nome da coleção no Firestore
+        .doc(currentUser
+            ?.id) // Substitua 'user_id' pelo ID do usuário específico
+        .snapshots() // Obtém as mudanças em tempo real
+        .listen((DocumentSnapshot snapshot) async {
+      if (snapshot.exists) {
+        UserTeam updatedUser = UserTeam.fromJson(snapshot.data()
+            as Map<String, dynamic>); // Converte o documento para um UserTeam
+
+        // Salva as atualizações no Hive
+        await userController.saveUserHive(updatedUser);
+
+        // Atualiza a interface do usuário
+        setState(() {
+          currentUser = updatedUser;
+          listTokenDesbloked = updatedUser.listTokenDesbloqued;
+        });
+      }
+    });
+  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _retrieveCurrentUser();
+  // }
+
+  // Future<void> _retrieveCurrentUser() async {
+  //   try {
+  //     UserTeam? userTeamFromHive = await userController.getUserHive();
+  //     List<Stage>? listStagesFromHive =
+  //         await playController.getStageListFromHive();
+
+  //     List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
+
+  //     setState(() {
+  //       currentUser = userTeamFromHive;
+  //       listStages = listStagesFromHive;
+  //       listCode = listCodeFromHive;
+  //       listTokenDesbloked = currentUser!.listTokenDesbloqued;
+  //     });
+  //   } catch (e) {
+  //     print("erro home: $e");
+  //   }
+  // }
 
   void execultCode(String token) async {
     UserTeam? userTeam = await userController.getUserHive();
@@ -117,7 +177,7 @@ class _HomePageState extends State<HomePage> {
               currentUser != null
                   ? CardPanelInfo(
                       credit: currentUser!.credit ?? 0,
-                      status: currentUser!.status ?? Status.Jogando,
+                      status: currentUser?.status ?? Status.Jogando,
                     )
                   : const CircularProgressIndicator(),
               //const SizedBox(height: 10),

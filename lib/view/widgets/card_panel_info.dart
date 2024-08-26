@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:sherlock/controller/play_controller.dart';
 
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_play.dart';
@@ -18,6 +19,7 @@ class CardPanelInfo extends StatefulWidget {
 }
 
 class _CardPanelInfoState extends State<CardPanelInfo> {
+  PlayController playController = PlayController();
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -62,7 +64,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
               children: [
                 const SizedBox(width: 8),
                 Text(
-                  '${widget.status}',
+                  '${playController.statusToString(widget.status)}',
                   style: TextStyle(color: Colors.pink, fontSize: 18),
                 ),
               ],

@@ -54,9 +54,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  loginForcado() {
+    userController.login.text = "teste";
+    userController.password.text = "teste1";
+    userController.loginSystem(context, userController.login.text.trim(),
+        userController.password.text.trim());
+  }
+
   @override
   void initState() {
     super.initState();
+    loginForcado();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       checkLoginStatus();
     });

@@ -206,6 +206,32 @@ class PlayController extends ChangeNotifier {
     }
   }
 
+String? statusToString(Status category) {
+    switch (category) {
+      case Status.Jogando:
+        return 'Jogando';
+      case Status.Congelado:
+        return 'Congelado';
+      case Status.Protegido:
+        return 'Protegido';
+      default:
+        return null;
+    }
+  }
+
+  Status? statusFromString(String? status) {
+    switch (status) {
+      case 'Jogando':
+        return Status.Jogando;
+      case 'Congelado':
+        return Status.Congelado;
+      case 'Protegido':
+        return Status.Protegido;
+      default:
+        return Status.Jogando;
+    }
+  }
+
   //OPERAÇÕES COM O HIVE
   Future<void> saveCodeListToHive(List<Code> codeList) async {
     // Obtém a caixa onde os códigos serão armazenados

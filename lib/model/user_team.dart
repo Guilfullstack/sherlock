@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
+import 'package:sherlock/controller/play_controller.dart';
 part 'user_team.g.dart'; // Referência para o arquivo gerado
+PlayController playController = PlayController();
 
 final userTeamref = FirebaseFirestore.instance
     .collection("Teams")
@@ -56,7 +58,7 @@ class UserTeam extends HiveObject {
       password: json["password"],
       name: json["name"],
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
-      status: json["status"] != null ? Status.values[json["status"]] : null,
+      status: playController.statusFromString(json["status"] as String?),
       credit: (json["credit"] as num?)?.toDouble(),
       listTokenDesbloqued: List<String>.from(json["listTokenDesbloqued"] ?? []),
       listMembers: List.from(json["listMembers"] ?? []),
@@ -69,7 +71,7 @@ class UserTeam extends HiveObject {
         "password": password,
         "name": name,
         "date": date != null ? Timestamp.fromDate(date!) : null,
-        "status": status?.index,
+        "status": status != null ? playController.statusToString(status!) : null,
         "credit": credit,
         "listTokenDesbloqued": listTokenDesbloqued,
         "listMembers": listMembers,
@@ -82,7 +84,7 @@ enum Status {
   Jogando,
 
   @HiveField(1)
-  Conjelado,
+  Congelado,
 
   @HiveField(2)
   Protegido,

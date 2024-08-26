@@ -74,7 +74,7 @@ class StatusAdapter extends TypeAdapter<Status> {
       case 0:
         return Status.Jogando;
       case 1:
-        return Status.Conjelado;
+        return Status.Congelado;
       case 2:
         return Status.Protegido;
       default:
@@ -88,7 +88,7 @@ class StatusAdapter extends TypeAdapter<Status> {
       case Status.Jogando:
         writer.writeByte(0);
         break;
-      case Status.Conjelado:
+      case Status.Congelado:
         writer.writeByte(1);
         break;
       case Status.Protegido:
