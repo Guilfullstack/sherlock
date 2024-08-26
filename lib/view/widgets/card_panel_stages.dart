@@ -8,8 +8,8 @@ class CardPanelStages extends StatelessWidget {
 
   const CardPanelStages({
     Key? key,
-    required this.liststages,
-    required this.listTokenStageDesbloqued,
+    this.liststages,
+    this.listTokenStageDesbloqued,
   }) : super(key: key);
 
   @override

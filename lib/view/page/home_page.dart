@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   UserTeam? currentUser;
   List<Stage>? listStages = [];
   List<Code>? listCode = [];
+  List<String>? listTokenDesbloked = [];
   UserController userController = UserController();
   PlayController playController = PlayController();
   TextEditingController codeController = TextEditingController();
@@ -41,6 +42,7 @@ class _HomePageState extends State<HomePage> {
         currentUser = userTeamFromHive;
         listStages = listStagesFromHive;
         listCode = listCodeFromHive;
+        listTokenDesbloked = currentUser!.listTokenDesbloqued;
       });
     } catch (e) {
       print("erro home: $e");
@@ -137,7 +139,7 @@ class _HomePageState extends State<HomePage> {
               ),
               CardPanelStages(
                 liststages: listStages,
-                listTokenStageDesbloqued: currentUser!.listTokenDesbloqued,
+                listTokenStageDesbloqued: listTokenDesbloked,
               )
             ],
           ),
