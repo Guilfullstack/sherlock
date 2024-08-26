@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/model/stage.dart';
 
 class CardStage extends StatelessWidget {
@@ -66,7 +67,8 @@ class CardStage extends StatelessWidget {
                 },
               );
             }
-          : null,
+          : () => ToolsController.scafoldMensage(
+              context, Colors.red, 'Prova bloqueada'),
       child: Container(
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(12),
