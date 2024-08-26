@@ -126,10 +126,9 @@ class _HomePageState extends State<HomePage> {
               context, Colors.green, 'Prova desbloqueada com sucesso!');
         }
         return;
-      } else {
-        ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
       }
     }
+    ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
   }
 
   @override
