@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    loginForcado();
+    //loginForcado();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       checkLoginStatus();
     });
