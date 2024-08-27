@@ -36,8 +36,6 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   bool hasLoadedMembers = false;
   int membersNumeber = 0;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -1834,10 +1832,6 @@ addValue(
   UserTeam teams,
   String dropDonw,
 ) {
-  exit() {
-    Navigator.of(context).pop();
-  }
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -1854,7 +1848,8 @@ addValue(
                     "Adicionar",
                     "Subtrair",
                     "Congelar",
-                    "Proteção"
+                    "Proteção",
+                    "Jogando"
                   ],
                   title: "Selecione",
                   value: dropDonw,
@@ -1885,7 +1880,7 @@ addValue(
                         credit: double.parse(user.addValueStatus.text),
                       );
                       await user.updateTeams(userTeam);
-                      exit();
+                      user.addValueStatus.clear();
                       break;
                     case "Subtrair":
                       final double enteredValue =
@@ -1901,13 +1896,33 @@ addValue(
                         id: teams.id,
                         credit: double.parse(user.addValueStatus.text),
                       );
+
                       await user.updateTeams(userTeam);
-                      exit();
+                      user.addValueStatus.clear();
                       break;
                     case "Congelar":
+                      user.statusTeams = Status.Congelado;
+                      final userTeam = UserTeam(
+                        id: teams.id,
+                        status: user.statusTeams,
+                      );
+                      await user.updateTeams(userTeam);
                       break;
                     case "Proteção":
+                      user.statusTeams = Status.Protegido;
+                      final userTeam = UserTeam(
+                        id: teams.id,
+                        status: user.statusTeams,
+                      );
+                      await user.updateTeams(userTeam);
                       break;
+                    case "Jogando":
+                      user.statusTeams = Status.Jogando;
+                      final userTeam = UserTeam(
+                        id: teams.id,
+                        status: user.statusTeams,
+                      );
+                      await user.updateTeams(userTeam);
                     default:
                   }
                 },

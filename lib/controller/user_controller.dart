@@ -27,6 +27,7 @@ class AuthException implements Exception {
 class UserController extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> formKeyEditTeam = GlobalKey<FormState>();
+  PlayController play = PlayController();
   TextEditingController id = TextEditingController();
   TextEditingController name = TextEditingController();
   TextEditingController login = TextEditingController();
@@ -39,6 +40,7 @@ class UserController extends ChangeNotifier {
   TextEditingController addMember = TextEditingController();
   TextEditingController addMemberEdit = TextEditingController();
   TextEditingController addValueStatus = TextEditingController();
+  Status statusTeams = Status.Jogando;
   final TextEditingController memberId = TextEditingController();
   final FocusNode addMemberFocusNode = FocusNode();
   late String? selectionStaff;
@@ -313,6 +315,9 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.listMembers != null) {
           data['listMembers'] = userTeam.listMembers;
+        }
+        if (userTeam.status != null) {
+          data['status'] = play.statusToString(statusTeams);
         }
 
         return data;

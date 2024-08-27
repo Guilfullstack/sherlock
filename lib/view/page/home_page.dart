@@ -48,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       UserTeam? userTeamFromHive = await userController.getUserHive();
       List<Stage>? listStagesFromHive =
           await playController.getStageListFromHive();
+
       List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
 
       setState(() {
