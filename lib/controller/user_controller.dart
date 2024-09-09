@@ -118,6 +118,8 @@ class UserController extends ChangeNotifier {
 
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
+        var listTokenDesbloquedBox = Hive.box<List<String>>('ListTokenDesbloquedBox');
+        await listTokenDesbloquedBox.clear();
         print('stageBox limpo com sucesso.');
       } catch (e) {
         print('Erro ao limpar a caixa do Hive: $e');
@@ -137,35 +139,22 @@ class UserController extends ChangeNotifier {
     await prefs.setBool('isLoggedIn', isLoggedIn);
     await prefs.setString('login', login);
     await prefs.setString('category', category);
+    
+  }
+  Future<void> addItemListTokenStageDesbloqued(String newItem) async {
+    var box = Hive.box<List<String>>('ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+
+    List<String> currentList = box.get('TokenList', defaultValue: [])!;
+
+    currentList.add(newItem);
+    await box.put('TokenList', currentList);
+  }
+  Future<List<String>> getListTokenStageDesbloqued() async {
+    var box = Hive.box<List<String>>('ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+
+    return box.get('TokenList', defaultValue: [])!;
   }
 
-  Future<void> updateUserTeamHive(String key, dynamic value) async {
-    var box = Hive.box<UserTeam>('userTeamBox');
-
-    // Obtém o usuário atual salvo no Hive
-    UserTeam? currentUser = box.get('currentUser');
-    print('Usuário: ${currentUser!.login}');
-
-    print('Value: ${value}');
-
-    switch (key) {
-      case 'status':
-        currentUser.status = value as Status?;
-        break;
-      case 'credit':
-        double valueParametre = double.parse(value.toString());
-        currentUser.credit = valueParametre;
-        print('Creditos: ${currentUser.credit}');
-        break;
-      case 'listTokenDesbloqued':
-        currentUser.listTokenDesbloqued!.add(value.toString());
-        break;
-      // Adicione outros casos conforme necessário
-      default:
-        print('Chave inválida');
-    }
-    await box.put('currentUser', currentUser);
-  }
 
   Future<void> saveUserHive(UserTeam user) async {
     var box = Hive.box<UserTeam>('userTeamBox');
@@ -319,7 +308,9 @@ class UserController extends ChangeNotifier {
         if (userTeam.status != null) {
           data['status'] = play.statusToString(statusTeams);
         }
-
+        if (userTeam.listTokenDesbloqued != null) {
+          data['listTokenDesbloqued'] = newUserTeam.listTokenDesbloqued;
+        }
         return data;
       }
 

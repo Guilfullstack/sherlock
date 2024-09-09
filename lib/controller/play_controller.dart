@@ -284,30 +284,6 @@ String? statusToString(Status category) {
     return codeList;
   }
 
-  void execultCode(BuildContext context, String token) async {
-    UserController userController = UserController();
-    UserTeam? userTeam = await userController.getUserHive();
-    List<Stage> listStage = await getStageListFromHive();
-
-    for (var stage in listStage) {
-      if (stage.token == token) {
-        // Verifica se o token já está na lista
-        if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
-          ToolsController.dialogMensage(
-              context, 'Info', 'Essa prova já está desbloqueada!');
-        } else {
-          userController.updateUserTeamHive('listTokenDesbloqued', token);
-          ToolsController.scafoldMensage(
-              context, Colors.green, 'Prova desbloqueada com sucesso!');
-        }
-        // Exibe todos os tokens na lista
-        for (var element in userTeam.listTokenDesbloqued!) {
-          print('Token: $element');
-        }
-        return;
-      }
-    }
-  }
 }
 
 void freezeApp(BuildContext context) {
