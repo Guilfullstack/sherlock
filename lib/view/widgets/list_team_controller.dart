@@ -12,6 +12,7 @@ class ListTeamController extends StatefulWidget {
   final bool? code;
   final bool? stage;
   final bool? addValue;
+  final bool? history;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -25,6 +26,7 @@ class ListTeamController extends StatefulWidget {
     this.stage,
     this.addValue,
     this.onTapAddValue,
+    this.history = true,
   });
 
   @override
@@ -69,32 +71,35 @@ class _ListTeamControllerState extends State<ListTeamController> {
                 ? Text(
                     "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}")
                 : null,
-        leading: CircleAvatar(
-          backgroundColor: const Color.fromARGB(255, 95, 95, 95),
-          child: widget.code == true
-              ? const Icon(
-                  Icons.token,
-                  color: Colors.black,
-                )
-              : const Icon(
-                  Icons.people,
-                  color: Colors.black,
-                ),
-        ),
+        leading: widget.history == false
+            ? null
+            : CircleAvatar(
+                backgroundColor: const Color.fromARGB(255, 95, 95, 95),
+                child: widget.code == true
+                    ? const Icon(
+                        Icons.token,
+                        color: Colors.black,
+                      )
+                    : const Icon(
+                        Icons.people,
+                        color: Colors.black,
+                      ),
+              ),
         trailing: PopupMenuButton<String>(
           tooltip: "Menu",
           itemBuilder: (BuildContext context) {
             return [
-              PopupMenuItem<String>(
-                onTap: widget.onTapEdit,
-                child: const Row(
-                  children: [
-                    Icon(Icons.edit),
-                    SizedBox(width: 8),
-                    Text('Editar'),
-                  ],
+              if (widget.history == true)
+                PopupMenuItem<String>(
+                  onTap: widget.onTapEdit,
+                  child: const Row(
+                    children: [
+                      Icon(Icons.edit),
+                      SizedBox(width: 8),
+                      Text('Editar'),
+                    ],
+                  ),
                 ),
-              ),
               PopupMenuItem<String>(
                 onTap: widget.onTapRemove,
                 child: const Row(
