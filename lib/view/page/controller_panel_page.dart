@@ -1924,7 +1924,7 @@ addValue(
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                     ],
                   ),
-                if (dropDonw == "Congelar" || dropDonw == "Proteção")
+                if (dropDonw == "Congelar")
                   StreamBuilder<List<UserTeam>>(
                     stream: user.teamStream, // Sua stream de equipes
                     builder: (context, snapshot) {
