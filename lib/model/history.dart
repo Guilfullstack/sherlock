@@ -33,6 +33,6 @@ class History {
         "id": id,
         "idTeam": idTeam,
         "description": description,
-        "date": date?.toIso8601String(),
+        "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }

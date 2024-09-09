@@ -2,10 +2,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
@@ -40,11 +42,14 @@ class UserController extends ChangeNotifier {
   TextEditingController addMember = TextEditingController();
   TextEditingController addMemberEdit = TextEditingController();
   TextEditingController addValueStatus = TextEditingController();
+  TextEditingController addValueHistoty = TextEditingController();
   Status statusTeams = Status.Jogando;
   final TextEditingController memberId = TextEditingController();
   final FocusNode addMemberFocusNode = FocusNode();
   late String? selectionStaff;
   late String? selectionStaffEdit;
+  late String? teamIdHistory;
+  String teamDropDownHistory = 'Todos';
 
   late List membersTeam = [];
   late List membersTeamEdit = [];
@@ -92,6 +97,15 @@ class UserController extends ChangeNotifier {
     passwordComfirm.clear();
     notifyListeners();
     return Future<UserStaff>.value(userStaff);
+  }
+
+  Future<History> addHistory(History history) async {
+    DocumentReference<History> hystoryDoc = historyRef.doc();
+    history.id = hystoryDoc.id;
+    history.date = DateTime.now();
+    await hystoryDoc.set(history);
+    notifyListeners();
+    return Future<History>.value(history);
   }
 
   Future<void> logout(BuildContext context) async {
@@ -274,6 +288,8 @@ class UserController extends ChangeNotifier {
       case 2:
         await userStaffRef.doc(id).delete();
         break;
+      case 3:
+        await historyRef.doc(id).delete();
       default:
     }
 
@@ -361,6 +377,36 @@ class UserController extends ChangeNotifier {
     }
   }
 
+  Future updateHystory(History newHystory) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await historyRef.where('id', isEqualTo: newHystory.id).get();
+
+      // Função auxiliar para construir dinamicamente o mapa de atualização
+      Map<String, dynamic> buildUpdateData(History history) {
+        Map<String, dynamic> data = {};
+
+        if (history.description != null && loginEdit.text.isNotEmpty) {
+          data['description'] = loginEdit.text;
+        }
+
+        return data;
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
+        DocumentSnapshot document = querySnapshot.docs.first;
+        Map<String, dynamic> updateData = buildUpdateData(newHystory);
+
+        if (updateData.isNotEmpty) {
+          await document.reference.update(updateData);
+        }
+      }
+    } catch (e) {
+      debugPrint("Erro ao atualizar historico: $e");
+    }
+  }
+
   Future updateStaff(UserStaff newUserStaff) async {
     print("update $selectionStaffEdit");
     try {
@@ -421,6 +467,34 @@ class UserController extends ChangeNotifier {
         return UserStaff.fromJson(doc.data());
       }).toList();
     });
+  }
+
+  Stream<List<History>> get historyStream {
+    // Verifique se "Todos" está selecionado ou se o ID da equipe está definido
+    if (teamDropDownHistory == 'Todos' || teamIdHistory == null) {
+      return _firestore.collection('History').snapshots().map((querySnapshot) {
+        return querySnapshot.docs.map((doc) {
+          return History.fromJson(doc.data());
+        }).toList();
+      });
+    } else {
+      // Certifique-se de que o ID da equipe está sendo passado corretamente
+      debugPrint('Filtrando pelo ID da equipe: $teamIdHistory');
+      return _firestore
+          .collection('History')
+          .where('idTeam', isEqualTo: teamIdHistory)
+          .snapshots()
+          .map((querySnapshot) {
+        debugPrint('Documentos retornados: ${querySnapshot.docs.length}');
+        return querySnapshot.docs.map((doc) {
+          return History.fromJson(doc.data());
+        }).toList();
+      });
+    }
+  }
+
+  void updateTeamIdHistory(String? newTeamId) {
+    teamIdHistory = newTeamId;
   }
 
   Future<List<String>> getListMembers(String teamId) async {

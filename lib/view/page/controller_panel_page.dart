@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
@@ -117,6 +119,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
               ValueListenableBuilder<bool>(
                 valueListenable: isHistoryVisible,
                 builder: (context, value, child) {
+                  print(
+                      "Histórico Visível: $value"); // Impressão para depuração
                   return value
                       ? history(context, true)
                       : listCodeStage(context, playController, 400);
@@ -280,6 +284,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+// lista equipes
   SizedBox listUsers(
       BuildContext context, UserController userController, double width) {
     return SizedBox(
@@ -319,6 +324,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           addValue: true,
                           equipe: team.name,
                           credit: team.credit,
+                          status: playController.statusToString(team.status!),
                           onTapRemove: () {
                             userController.removeUser(0, team.id.toString());
                           },
@@ -359,6 +365,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+// lista usuario adm
   SizedBox listUsersAdm(
       BuildContext context, UserController userController, double width) {
     return SizedBox(
@@ -426,6 +433,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+// lista usuario staff
   SizedBox listUsersStaff(
       BuildContext context, UserController userController, double width) {
     return SizedBox(
@@ -589,6 +597,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+// lista de condigos das provas
   Padding listCodeStage(
     BuildContext context,
     PlayController playController,
@@ -691,14 +700,12 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+// historico
   Padding history(BuildContext context, bool historyVisible) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Visibility(
-        visible:
-            MediaQuery.of(context).size.width > 1329 || historyVisible == true
-                ? true
-                : false,
+        visible: MediaQuery.of(context).size.width > 1329 || historyVisible,
         child: SizedBox(
           width: 400,
           height: MediaQuery.of(context).size.width > 830
@@ -708,65 +715,106 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             elevation: 3,
             shadowColor: const Color.fromRGBO(189, 189, 189, 189),
             color: const Color.fromRGBO(189, 189, 189, 189),
-            child: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: StreamBuilder<List<UserTeam>>(
-                    stream: userController.teamStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Text('No data available');
-                      } else {
-                        List<String> teamNames = ['Todos'];
-                        teamNames.addAll(snapshot.data!
-                            .map((team) => team.name ?? 'Não há equipes')
-                            .toList());
-                        String? dropdownValue =
-                            teamNames.isNotEmpty ? teamNames.first : null;
+            child: StatefulBuilder(builder: (BuildContext context, setState) {
+              return ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: StreamBuilder<List<UserTeam>>(
+                      stream: userController.teamStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return const Text('Nenhuma equipe encontrada.');
+                        } else {
+                          List<UserTeam> teams = snapshot.data!;
+                          List<String> teamNames = ['Todos'];
+                          Map<String, String> teamIdMap = {};
 
-                        return StatefulBuilder(
-                          builder: (BuildContext context, setState) {
-                            return CustomDropdown(
-                              value: dropdownValue,
-                              title: "Historico",
-                              items: teamNames,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  dropdownValue = newValue!;
-                                });
+                          for (var team in teams) {
+                            String name = team.name ?? 'Não há equipes';
+                            String id = team.id!;
+                            teamNames.add(name);
+                            teamIdMap[name] = id;
+                          }
+
+                          return CustomDropdown(
+                            value: userController.teamDropDownHistory,
+                            title: "Histórico",
+                            items: teamNames,
+                            onChanged: (newValue) {
+                              setState(() {
+                                userController.teamDropDownHistory = newValue!;
+                                userController
+                                    .updateTeamIdHistory(teamIdMap[newValue]);
+                              });
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  Card(
+                    color: const Color.fromARGB(0, 255, 255, 255),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height - 220,
+                      child: StreamBuilder<List<History>>(
+                        stream: userController.historyStream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasError) {
+                            debugPrint("${snapshot.error}");
+                            return const Center(
+                                child: Text('Erro ao carregar histórico'));
+                          }
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(
+                                child: Text('Não há nenhum histórico'));
+                          }
+
+                          final listHistoryc = snapshot.data!;
+
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: ListView.builder(
+                              itemCount: listHistoryc.length,
+                              itemBuilder: (context, index) {
+                                final history = listHistoryc[index];
+                                if (userController.teamDropDownHistory ==
+                                        'Todos' ||
+                                    history.idTeam ==
+                                        userController.teamIdHistory) {
+                                  return ListTeamController(
+                                    user: true,
+                                    history: false,
+                                    equipe: history.description,
+                                    onTapRemove: () {
+                                      userController.removeUser(
+                                          3, history.id.toString());
+                                    },
+                                  );
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
                               },
-                            );
-                          },
-                        );
-                      }
-                    },
-                  ),
-                ),
-                Card(
-                    child: ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  title: Text(
-                    "Equipe",
-                    style: TextStyle(
-                      color: ThemeData().primaryColorLight,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                  subtitle: Text(
-                    "Fez =>",
-                    style: TextStyle(
-                      color: ThemeData().primaryColorLight,
-                    ),
-                  ),
-                ))
-              ],
-            ),
+                ],
+              );
+            }),
           ),
         ),
       ),
@@ -1835,6 +1883,10 @@ addValue(
   showDialog(
     context: context,
     builder: (BuildContext context) {
+      exit() {
+        Navigator.of(context).pop();
+      }
+
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
@@ -1863,7 +1915,12 @@ addValue(
                 if (dropDonw == "Adicionar" || dropDonw == "Subtrair")
                   ImputTextFormField(
                     title: "Valor",
-                    controller: user.addValueStatus,
+                    controller: user.addValueHistoty,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                    ],
                   ),
               ],
             ),
@@ -1872,6 +1929,7 @@ addValue(
                 onPressed: () async {
                   switch (dropDonw) {
                     case "Adicionar":
+                      user.addValueStatus.text = user.addValueHistoty.text;
                       final credit = double.parse(user.addValueStatus.text) +
                           teams.credit!;
                       user.addValueStatus.text = credit.toString();
@@ -1879,8 +1937,19 @@ addValue(
                         id: teams.id,
                         credit: double.parse(user.addValueStatus.text),
                       );
+                      String formattedDateMonthy =
+                          DateFormat('dd/MM').format(DateTime.now());
+                      String formattedDateHour =
+                          DateFormat('HH:mm:ss').format(DateTime.now());
+                      final history = History(
+                          idTeam: teams.id,
+                          description:
+                              "Adicionado ${user.addValueHistoty.text} a equipe ${teams.name}"
+                              "\nHorario: $formattedDateMonthy as $formattedDateHour");
+                      await user.addHistory(history);
                       await user.updateTeams(userTeam);
                       user.addValueStatus.clear();
+                      user.addValueHistoty.clear();
                       break;
                     case "Subtrair":
                       final double enteredValue =
@@ -1907,6 +1976,7 @@ addValue(
                         status: user.statusTeams,
                       );
                       await user.updateTeams(userTeam);
+
                       break;
                     case "Proteção":
                       user.statusTeams = Status.Protegido;
@@ -1925,6 +1995,7 @@ addValue(
                       await user.updateTeams(userTeam);
                     default:
                   }
+                  exit();
                 },
                 child: const Text("Aplicar"),
               ),
