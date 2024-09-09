@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -351,8 +350,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           },
                           onTapAddValue: () {
                             userController.addValueStatus.clear();
-                            addValue(
-                                context, userController, team, valueDropDown);
+                            addValue(teamsDropDown, context, userController,
+                                team, valueDropDown);
                           },
                         );
                       },
@@ -718,47 +717,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             child: StatefulBuilder(builder: (BuildContext context, setState) {
               return ListView(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: StreamBuilder<List<UserTeam>>(
-                      stream: userController.teamStream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return const Text('Nenhuma equipe encontrada.');
-                        } else {
-                          List<UserTeam> teams = snapshot.data!;
-                          List<String> teamNames = ['Todos'];
-                          Map<String, String> teamIdMap = {};
-
-                          for (var team in teams) {
-                            String name = team.name ?? 'Não há equipes';
-                            String id = team.id!;
-                            teamNames.add(name);
-                            teamIdMap[name] = id;
-                          }
-
-                          return CustomDropdown(
-                            value: userController.teamDropDownHistory,
-                            title: "Histórico",
-                            items: teamNames,
-                            onChanged: (newValue) {
-                              setState(() {
-                                userController.teamDropDownHistory = newValue!;
-                                userController
-                                    .updateTeamIdHistory(teamIdMap[newValue]);
-                              });
-                            },
-                          );
-                        }
-                      },
-                    ),
-                  ),
+                  teamsDropDown(setState),
                   Card(
                     color: const Color.fromARGB(0, 255, 255, 255),
                     child: SizedBox(
@@ -794,6 +753,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                     history.idTeam ==
                                         userController.teamIdHistory) {
                                   return ListTeamController(
+                                    dateHistory: history.date,
                                     user: true,
                                     history: false,
                                     equipe: history.description,
@@ -817,6 +777,47 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
             }),
           ),
         ),
+      ),
+    );
+  }
+
+  Padding teamsDropDown(StateSetter setState) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: StreamBuilder<List<UserTeam>>(
+        stream: userController.teamStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Text('Nenhuma equipe encontrada.');
+          } else {
+            List<UserTeam> teams = snapshot.data!;
+            List<String> teamNames = ['Todos'];
+            Map<String, String> teamIdMap = {};
+
+            for (var team in teams) {
+              String name = team.name ?? 'Não há equipes';
+              String id = team.id!;
+              teamNames.add(name);
+              teamIdMap[name] = id;
+            }
+
+            return CustomDropdown(
+              value: userController.teamDropDownHistory,
+              title: "Histórico",
+              items: teamNames,
+              onChanged: (newValue) {
+                setState(() {
+                  userController.teamDropDownHistory = newValue!;
+                  userController.updateTeamIdHistory(teamIdMap[newValue]);
+                });
+              },
+            );
+          }
+        },
       ),
     );
   }
@@ -1875,6 +1876,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
 }
 
 addValue(
+  Padding Function(StateSetter setState) teamsDropDown,
   BuildContext context,
   UserController user,
   UserTeam teams,
@@ -1922,6 +1924,55 @@ addValue(
                       FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                     ],
                   ),
+                if (dropDonw == "Congelar" || dropDonw == "Proteção")
+                  StreamBuilder<List<UserTeam>>(
+                    stream: user.teamStream, // Sua stream de equipes
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text(
+                            'Erro ao carregar equipes: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Text('Nenhuma equipe disponível');
+                      } else {
+                        List<UserTeam> availableTeams = snapshot.data!;
+                        List<String> teamNames = availableTeams
+                            .map((team) => team.name ?? "Sem nome")
+                            .toList();
+
+                        // Ajusta a lista de equipes conforme a ação selecionada
+                        if (dropDonw == "Congelar") {
+                          // Remove a equipe atual da lista para congelar
+                          teamNames.remove(teams.name);
+                        } else if (dropDonw == "Proteção") {
+                          // Adiciona a equipe selecionada na lista e usa como valor
+                          teamNames = [teams.name ?? "Sem nome"];
+                        }
+
+                        // Garantir que o valor inicial do dropdown seja um dos itens da lista
+                        String? selectedTeam = user.teamDropDownHistory;
+                        if (dropDonw == "Proteção" && teamNames.isNotEmpty) {
+                          selectedTeam = teamNames.first;
+                        } else if (!teamNames.contains(selectedTeam)) {
+                          selectedTeam =
+                              teamNames.isNotEmpty ? teamNames.first : null;
+                        }
+
+                        return CustomDropdown(
+                          value:
+                              selectedTeam, // Certifique-se de que value não é nulo
+                          title: "Selecione a equipe",
+                          items: teamNames,
+                          onChanged: (newValue) {
+                            setState(() {
+                              user.teamDropDownHistory = newValue!;
+                            });
+                          },
+                        );
+                      }
+                    },
+                  ),
               ],
             ),
             actions: [
@@ -1937,15 +1988,11 @@ addValue(
                         id: teams.id,
                         credit: double.parse(user.addValueStatus.text),
                       );
-                      String formattedDateMonthy =
-                          DateFormat('dd/MM').format(DateTime.now());
-                      String formattedDateHour =
-                          DateFormat('HH:mm:ss').format(DateTime.now());
+
                       final history = History(
                           idTeam: teams.id,
                           description:
-                              "Adicionado ${user.addValueHistoty.text} a equipe ${teams.name}"
-                              "\nHorario: $formattedDateMonthy as $formattedDateHour");
+                              "Adicionado ${user.addValueHistoty.text} a Equipe ${teams.name}");
                       await user.addHistory(history);
                       await user.updateTeams(userTeam);
                       user.addValueStatus.clear();
@@ -1953,7 +2000,7 @@ addValue(
                       break;
                     case "Subtrair":
                       final double enteredValue =
-                          double.parse(user.addValueStatus.text);
+                          double.parse(user.addValueHistoty.text);
                       final double currentCredit = teams.credit!;
                       // Calcula o novo valor do crédito após a subtração
                       final double newCredit = currentCredit - enteredValue;
@@ -1965,9 +2012,14 @@ addValue(
                         id: teams.id,
                         credit: double.parse(user.addValueStatus.text),
                       );
-
+                      final history = History(
+                          idTeam: teams.id,
+                          description:
+                              "Subtraido ${user.addValueHistoty.text} a equipe ${teams.name}");
+                      await user.addHistory(history);
                       await user.updateTeams(userTeam);
                       user.addValueStatus.clear();
+                      user.addValueHistoty.clear();
                       break;
                     case "Congelar":
                       user.statusTeams = Status.Congelado;
@@ -1975,6 +2027,11 @@ addValue(
                         id: teams.id,
                         status: user.statusTeams,
                       );
+                      final history = History(
+                          idTeam: teams.id,
+                          description:
+                              "Equipe ${teams.name} congela equipe ${user.teamDropDownHistory}");
+                      await user.addHistory(history);
                       await user.updateTeams(userTeam);
 
                       break;
@@ -1984,6 +2041,10 @@ addValue(
                         id: teams.id,
                         status: user.statusTeams,
                       );
+                      final history = History(
+                          idTeam: teams.id,
+                          description: "Equipe ${teams.name} usa proteção");
+                      await user.addHistory(history);
                       await user.updateTeams(userTeam);
                       break;
                     case "Jogando":

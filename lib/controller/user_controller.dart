@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/model/code.dart';
@@ -481,7 +482,11 @@ class UserController extends ChangeNotifier {
   Stream<List<History>> get historyStream {
     // Verifique se "Todos" está selecionado ou se o ID da equipe está definido
     if (teamDropDownHistory == 'Todos' || teamIdHistory == null) {
-      return _firestore.collection('History').snapshots().map((querySnapshot) {
+      return _firestore
+          .collection('History')
+          .orderBy('date', descending: true)
+          .snapshots()
+          .map((querySnapshot) {
         return querySnapshot.docs.map((doc) {
           return History.fromJson(doc.data());
         }).toList();
@@ -492,6 +497,7 @@ class UserController extends ChangeNotifier {
       return _firestore
           .collection('History')
           .where('idTeam', isEqualTo: teamIdHistory)
+          .orderBy('date', descending: true)
           .snapshots()
           .map((querySnapshot) {
         debugPrint('Documentos retornados: ${querySnapshot.docs.length}');
@@ -505,6 +511,9 @@ class UserController extends ChangeNotifier {
   void updateTeamIdHistory(String? newTeamId) {
     teamIdHistory = newTeamId;
   }
+  String formatDate(DateTime date) {
+  return DateFormat('dd/MM').add_Hms().format(date);
+}
 
   Future<List<String>> getListMembers(String teamId) async {
     try {

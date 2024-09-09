@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sherlock/controller/user_controller.dart';
 
 class ListTeamController extends StatefulWidget {
   final String? equipe;
@@ -13,6 +14,7 @@ class ListTeamController extends StatefulWidget {
   final bool? stage;
   final bool? addValue;
   final bool? history;
+  final DateTime? dateHistory;
   const ListTeamController({
     super.key,
     this.equipe,
@@ -27,6 +29,7 @@ class ListTeamController extends StatefulWidget {
     this.addValue,
     this.onTapAddValue,
     this.history = true,
+    this.dateHistory,
   });
 
   @override
@@ -34,18 +37,93 @@ class ListTeamController extends StatefulWidget {
 }
 
 class _ListTeamControllerState extends State<ListTeamController> {
+  UserController user = UserController();
+
+  TextSpan _buildHighlightedText(String text) {
+    // Definir palavras a serem destacadas
+    const highlightKeywords = [
+      'Equipe',
+      'equipe',
+      'Adicionado',
+      'Subtraido',
+      'congela equipe',
+    ];
+
+    // Separar o texto por espaços para análise
+    final words = text.split(' ');
+
+    // Lista de TextSpan para construir o texto formatado
+    final children = <TextSpan>[];
+
+    // Variável para rastrear a palavra anterior
+    String? previousWord;
+
+    for (var word in words) {
+      if (highlightKeywords.contains(previousWord)) {
+        // Adicionar a palavra destacada
+        children.add(TextSpan(
+          text: '$word ',
+          style: const TextStyle(
+            color: Colors.red, // Cor do destaque
+            fontWeight: FontWeight.bold, // Peso do destaque
+          ),
+        ));
+      } else {
+        // Adicionar a palavra normal
+        children.add(TextSpan(
+          text: '$word ',
+          style: const TextStyle(
+            color: Colors.white, // Cor normal
+          ),
+        ));
+      }
+
+      // Atualizar a palavra anterior
+      previousWord = word;
+    }
+
+    return TextSpan(children: children);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          widget.equipe ?? "Sem nome",
-          style: TextStyle(
-            color: ThemeData().primaryColorLight,
-          ),
-        ),
+        title: widget.history == true
+            ? Text(
+                widget.equipe ?? "Sem nome",
+                style: TextStyle(
+                  color: ThemeData().primaryColorLight,
+                ),
+              )
+            : RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    color: ThemeData().primaryColorLight,
+                  ),
+                  children: [
+                    _buildHighlightedText(widget.equipe ?? ""),
+                    const TextSpan(
+                      text: "\nData: ",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                    TextSpan(
+                      text:
+                          user.formatDate(widget.dateHistory ?? DateTime.now()),
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
         subtitle: widget.code == true
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
