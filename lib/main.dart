@@ -52,7 +52,7 @@ Future<void> initializeHive() async {
     debugPrint('codeBox aberta');
     await Hive.openBox<Stage>('stageBox');
     debugPrint('stageBox aberta');
-
+    await Hive.openBox<List<String>>('ListTokenDesbloquedBox');
     debugPrint('Caixas do Hive abertas com sucesso');
   } catch (e) {
     debugPrint('Erro ao inicializar o Hive: $e');

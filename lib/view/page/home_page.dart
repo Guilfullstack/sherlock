@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   UserTeam? currentUser;
   List<Stage>? listStages = [];
   List<Code>? listCode = [];
-  List<String>? listTokenDesbloked = [];
+  List<String>? listTokenDesbloqued = [];
   UserController userController = UserController();
   PlayController playController = PlayController();
   TextEditingController codeController = TextEditingController();
@@ -46,16 +46,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _retrieveCurrentUser() async {
     try {
       UserTeam? userTeamFromHive = await userController.getUserHive();
-      List<Stage>? listStagesFromHive =
-          await playController.getStageListFromHive();
-
+      List<Stage>? listStagesFromHive = await playController.getStageListFromHive();
       List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
-
+      List<String> listTokenD= await userController.getListTokenStageDesbloqued();
       setState(() {
         currentUser = userTeamFromHive;
         listStages = listStagesFromHive;
         listCode = listCodeFromHive;
-        listTokenDesbloked = currentUser!.listTokenDesbloqued;
+        listTokenDesbloqued = listTokenD;
         _listenToDatabaseChanges();
       });
     } catch (e) {
@@ -80,55 +78,36 @@ class _HomePageState extends State<HomePage> {
         // Atualiza a interface do usuário
         setState(() {
           currentUser = updatedUser;
-          listTokenDesbloked = updatedUser.listTokenDesbloqued;
         });
       }
     });
   }
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _retrieveCurrentUser();
-  // }
-
-  // Future<void> _retrieveCurrentUser() async {
-  //   try {
-  //     UserTeam? userTeamFromHive = await userController.getUserHive();
-  //     List<Stage>? listStagesFromHive =
-  //         await playController.getStageListFromHive();
-
-  //     List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
-
-  //     setState(() {
-  //       currentUser = userTeamFromHive;
-  //       listStages = listStagesFromHive;
-  //       listCode = listCodeFromHive;
-  //       listTokenDesbloked = currentUser!.listTokenDesbloqued;
-  //     });
-  //   } catch (e) {
-  //     print("erro home: $e");
-  //   }
-  // }
 
   void execultCode(String token) async {
-    UserTeam? userTeam = await userController.getUserHive();
     List<Stage> listStage = await playController.getStageListFromHive();
 
     for (var stage in listStage) {
       if (stage.token == token) {
         // Verifica se o token já está na lista
-        if (userTeam!.listTokenDesbloqued!.contains(stage.token)) {
+        if (listTokenDesbloqued!.contains(stage.token)) {
           ToolsController.dialogMensage(
               context, 'Info', 'Essa prova já está desbloqueada!');
         } else {
-          userController.updateUserTeamHive('listTokenDesbloqued', token);
-          setState(() {});
+         await userController.addItemListTokenStageDesbloqued(token);
+         List<String> listTokenD= await userController.getListTokenStageDesbloqued();
+         currentUser!.listTokenDesbloqued=listTokenD;
+         userController.updateTeams(currentUser!);
+          setState(() {
+            listTokenDesbloqued=listTokenD;
+          });
+          
           ToolsController.scafoldMensage(
               context, Colors.green, 'Prova desbloqueada com sucesso!');
         }
         return;
       }
     }
+
     ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
   }
 
@@ -199,7 +178,7 @@ class _HomePageState extends State<HomePage> {
               ),
               CardPanelStages(
                 liststages: listStages,
-                listTokenStageDesbloqued: listTokenDesbloked,
+                listTokenStageDesbloqued: listTokenDesbloqued,
               )
             ],
           ),
@@ -247,6 +226,7 @@ class _HomePageState extends State<HomePage> {
                       if (_formKey.currentState!.validate()) {
                         final String token = codeController.text;
                         execultCode(token);
+
                         Navigator.of(context).pop();
                       }
                     },
