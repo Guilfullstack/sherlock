@@ -34,6 +34,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   late String selectionStaff = "Prova";
   late String selectionStaffEdit = "Prova";
   String valueDropDown = "Adicionar";
+  String? codeStaff;
   bool hasLoadedMembers = false;
   int membersNumeber = 0;
 
@@ -99,7 +100,9 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
           child: Wrap(
             children: [
               SizedBox(
-                width: 824,
+                width: MediaQuery.of(context).size.width > 824
+                    ? 824
+                    : MediaQuery.of(context).size.width / 1.69,
                 height: MediaQuery.of(context).size.height - 135,
                 // height: MediaQuery.of(context).size.width > 830
                 //     ? MediaQuery.of(context).size.height - 100
@@ -146,7 +149,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                   SizedBox(
                     height: MediaQuery.of(context).size.width > 830
                         ? MediaQuery.of(context).size.height - 140
-                        : MediaQuery.of(context).size.height / 2 - 100,
+                        : MediaQuery.of(context).size.height / 2 - 75,
                     child: Card(
                       elevation: 3,
                       shadowColor: const Color.fromARGB(67, 41, 41, 41),
@@ -290,7 +293,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       width: width,
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
-          : MediaQuery.of(context).size.height / 2 - 100,
+          : MediaQuery.of(context).size.height / 2 - 75,
       child: FutureBuilder(
           future: Future.delayed(const Duration(microseconds: 200)),
           builder: (context, snapshot) {
@@ -328,25 +331,39 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             userController.removeUser(0, team.id.toString());
                           },
                           onTapEdit: () {
-                            showModalBottomSheet(
-                              backgroundColor: Colors.grey,
-                              isScrollControlled: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                userController.memberId.text = team.id ?? "";
-                                userController.id.text = team.id ?? "";
-                                userController.nameEdit.text = team.name ?? "";
-                                userController.loginEdit.text =
-                                    team.login ?? "";
-                                userController.passwordEdit.text =
-                                    team.password ?? "";
-                                return Form(
-                                  key: userController.formKeyEditTeam,
-                                  child: _addTeams(context, false, true, false,
-                                      userController),
-                                );
-                              },
-                            );
+                            showDialog(
+                                context: context,
+                                builder: (build) {
+                                  userController.memberId.text = team.id ?? "";
+                                  userController.id.text = team.id ?? "";
+                                  userController.nameEdit.text =
+                                      team.name ?? "";
+                                  userController.loginEdit.text =
+                                      team.login ?? "";
+                                  userController.passwordEdit.text =
+                                      team.password ?? "";
+                                  return AlertDialog(
+                                    backgroundColor: Colors.grey,
+                                    content: Form(
+                                      key: userController.formKeyEditTeam,
+                                      child: SizedBox(
+                                        width: 300,
+                                        height: 450,
+                                        child: _addTeams(context, false, true,
+                                            false, userController),
+                                      ),
+                                    ),
+                                  );
+                                });
+                            // showModalBottomSheet(
+                            //   backgroundColor: Colors.grey,
+                            //   isScrollControlled: false,
+                            //   context: context,
+                            //   builder: (BuildContext context) {
+
+                            //     return
+                            //   },
+                            // );
                           },
                           onTapAddValue: () {
                             userController.addValueStatus.clear();
@@ -404,23 +421,37 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       userController.removeUser(1, team.id.toString());
                     },
                     onTapEdit: () {
-                      showModalBottomSheet(
-                        backgroundColor: Colors.grey,
-                        isScrollControlled: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          userController.id.text = team.id ?? "";
-                          userController.nameEdit.text = team.name ?? "";
-                          userController.loginEdit.text = team.login ?? "";
-                          userController.passwordEdit.text =
-                              team.password ?? "";
-                          return Form(
-                            key: userController.formKeyEditTeam,
-                            child: _addTeams(
-                                context, true, true, false, userController),
-                          );
-                        },
-                      );
+                      showDialog(
+                          context: context,
+                          builder: (build) {
+                            userController.id.text = team.id ?? "";
+                            userController.nameEdit.text = team.name ?? "";
+                            userController.loginEdit.text = team.login ?? "";
+                            userController.passwordEdit.text =
+                                team.password ?? "";
+                            return AlertDialog(
+                              backgroundColor: Colors.grey,
+                              content: Form(
+                                key: userController.formKeyEditTeam,
+                                child: SizedBox(
+                                  width: 300,
+                                  height: 450,
+                                  child: _addTeams(context, true, true, false,
+                                      userController),
+                                ),
+                              ),
+                            );
+                          });
+
+                      // showModalBottomSheet(
+                      //   backgroundColor: Colors.grey,
+                      //   isScrollControlled: false,
+                      //   context: context,
+                      //   builder: (BuildContext context) {
+
+                      //     return
+                      //   },
+                      // );
                     },
                   );
                 },
@@ -440,63 +471,86 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
       height: MediaQuery.of(context).size.width > 830
           ? MediaQuery.of(context).size.height - 140
           : MediaQuery.of(context).size.height / 2 - 100,
-      child: Card(
-        color: const Color.fromRGBO(189, 189, 189, 189),
-        child: StreamBuilder<List<UserStaff>>(
-          stream: userController.staffStream,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              debugPrint("${snapshot.error}");
-              return const Center(child: Text('Erro ao carrega Adms'));
-            }
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('Não há nenhum Adm'));
-            }
+      child: StatefulBuilder(builder: (BuildContext context, setState) {
+        return Card(
+          color: const Color.fromRGBO(189, 189, 189, 189),
+          child: StreamBuilder<List<UserStaff>>(
+            stream: userController.staffStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                debugPrint("${snapshot.error}");
+                return const Center(child: Text('Erro ao carrega Adms'));
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('Não há nenhum Adm'));
+              }
 
-            final listStaff = snapshot.data!;
+              final listStaff = snapshot.data!;
 
-            return Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: ListView.builder(
-                itemCount: listStaff.length,
-                itemBuilder: (context, index) {
-                  final staff = listStaff[index];
-                  return ListTeamController(
-                    user: true,
-                    equipe: staff.login,
-                    //credit: staff.credit,
-                    onTapRemove: () {
-                      userController.removeUser(2, staff.id.toString());
-                    },
-                    onTapEdit: () {
-                      showModalBottomSheet(
-                        backgroundColor: Colors.grey,
-                        isScrollControlled: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          userController.id.text = staff.id ?? "";
-                          userController.loginEdit.text = staff.login ?? "";
-                          userController.passwordEdit.text =
-                              staff.password ?? "";
-                          selectionStaffEdit = staff.office ?? "";
-                          return Form(
-                            key: userController.formKeyEditTeam,
-                            child: _addTeams(
-                                context, false, true, true, userController),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
-            );
-          },
-        ),
-      ),
+              return Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: ListView.builder(
+                  itemCount: listStaff.length,
+                  itemBuilder: (context, index) {
+                    final staff = listStaff[index];
+                    return ListTeamController(
+                      user: true,
+                      equipe: staff.login,
+                      //credit: staff.credit,
+                      onTapRemove: () {
+                        userController.removeUser(2, staff.id.toString());
+                      },
+                      onTapEdit: () {
+                        showDialog(
+                          context: context,
+                          builder: (build) {
+                            userController.id.text = staff.id ?? "";
+                            userController.loginEdit.text = staff.login ?? "";
+                            userController.passwordEdit.text =
+                                staff.password ?? "";
+                            selectionStaffEdit = staff.office ?? "";
+                            userController.selectedStageEdit =
+                                staff.listCode ?? [];
+                            return AlertDialog(
+                              backgroundColor: Colors.grey,
+                              content: Form(
+                                key: userController.formKeyEditTeam,
+                                child: SizedBox(
+                                  width: 300,
+                                  height: 450,
+                                  child: _addTeams(context, false, true, true,
+                                      userController),
+                                ),
+                              ),
+                            );
+                          },
+                        ).then((_) {
+                          setState(() {});
+
+                          // userController.selectedStageEdit =
+                          //     userController.selectedStage;
+                        });
+
+                        // showModalBottomSheet(
+                        //   backgroundColor: Colors.grey,
+                        //   isScrollControlled: false,
+                        //   context: context,
+                        //   builder: (BuildContext context) {
+
+                        //   },
+                        // );
+                      },
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -1042,6 +1096,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           password:
                                               userController.passwordEdit.text,
                                           office: selectionStaffEdit,
+                                          listCode:
+                                              userController.selectedStage,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1159,6 +1215,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           password:
                                               userController.passwordEdit.text,
                                           office: selectionStaffEdit,
+                                          listCode:
+                                              userController.selectedStageEdit,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1177,6 +1235,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           password:
                                               userController.password.text,
                                           office: selectionStaff,
+                                          listCode:
+                                              userController.selectedStage,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1309,6 +1369,34 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                               update == true ? true : false),
                         ),
                       ),
+                      Visibility(
+                        visible: staff == true
+                            // selectionStaff == 'Prova' ||
+                            //         (selectionStaffEdit == 'Prova' &&
+                            //             selectionStaff == 'Prova') ||
+                            //         (selectionStaffEdit == 'Prova' &&
+                            //             staff == true) ||
+                            //         (selectionStaff == 'Prova' && staff == true)
+                            ? true
+                            : false,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                addCodeStaff(
+                                    setState,
+                                    userController.selectedStage,
+                                    userController.selectedStageEdit,
+                                    update,
+                                    staff);
+                              },
+                              child: staff == true && update == false
+                                  ? Text(
+                                      'Adiconar Visualização ${userController.selectedStage.length}')
+                                  : Text(
+                                      ' Visualizar provas ${userController.selectedStageEdit.length}')),
+                        ),
+                      ),
                       // Botão adicionar equipes
                       // Botão remover equipes
                       // Dropdown para acessar o histórico das equipes
@@ -1321,6 +1409,161 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
         ),
       ),
     );
+  }
+
+  addCodeStaff(StateSetter setState, List<String> selectedList,
+      List<String> selectedListEdit, bool update, bool staff) {
+    return showDialog(
+        context: context,
+        builder: (build) {
+          return AlertDialog(
+            backgroundColor: Colors.grey,
+            content: SizedBox(
+              width: 300,
+              height: 450,
+              child: StreamBuilder<List<Stage>>(
+                stream: playController.codeStreamFilter,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    debugPrint("${snapshot.error}");
+                    return const Center(
+                        child: Text('Erro ao carregar Códigos'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Não há nenhum Código'));
+                  }
+
+                  final listCode = snapshot.data!;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      children: [
+                        StatefulBuilder(
+                            builder: (BuildContext context, setState) {
+                          return SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            child: Card(
+                              color: Colors.grey,
+                              child: ListView.builder(
+                                itemCount: listCode.length,
+                                itemBuilder: (context, index) {
+                                  final code = listCode[index];
+
+                                  bool valueCheck =
+                                      selectedList.contains(code.id);
+                                  bool valueCheckEdit =
+                                      selectedListEdit.contains(code.id);
+                                  return ListTeamController(
+                                    check: true,
+                                    remove: false,
+                                    addValue: false,
+                                    user: true,
+                                    equipe: code.description,
+                                    status: code.token,
+                                    credit: 0,
+                                    // category: playController
+                                    //     .categoryToString(code.category as Category),
+                                    onTapRemove: () {
+                                      playController.removePlay(
+                                          1, code.id.toString());
+                                    },
+                                    onTapEdit: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (builder) {
+                                            playController.id.text =
+                                                code.id ?? "";
+                                            playController.tokenEdit.text =
+                                                code.token ?? "";
+                                            playController.descriptionEdit
+                                                .text = code.description ?? "";
+                                            playController.puzzleEdit.text =
+                                                code.puzzle ?? "";
+                                            playController.valueEdit.text = "0";
+                                            value2Edit = Category.stage;
+                                            return Form(
+                                              key: playController
+                                                  .formKeyPlayEdit,
+                                              child: AlertDialog(
+                                                backgroundColor: Colors.grey,
+                                                content: SizedBox(
+                                                  height: 500,
+                                                  width: 450,
+                                                  child: StatefulBuilder(
+                                                      builder:
+                                                          (BuildContext context,
+                                                              setState) {
+                                                    return _addTolkien(
+                                                        context,
+                                                        playController,
+                                                        true,
+                                                        true);
+                                                  }),
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    },
+                                    valueChack: staff == true && update == false
+                                        ? valueCheck
+                                        : valueCheckEdit,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          if (staff == true &&
+                                              update == false) {
+                                            selectedList.add(code.id!);
+                                            print('add normal');
+                                          } else {
+                                            selectedListEdit.add(code.id!);
+                                            print('add edit');
+                                          }
+                                        } else if (value == false) {
+                                          if (staff == true &&
+                                              update == false) {
+                                            selectedList.remove(code.id!);
+                                          } else {
+                                            selectedListEdit.remove(code.id!);
+                                            print("remover");
+                                          }
+                                        }
+                                        print("${selectedListEdit}");
+                                      });
+                                    },
+                                    //
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }),
+                        Visibility(
+                          child: ElevatedButton(
+                              onPressed: () {
+                                exitWindows();
+                              },
+                              child: const Text('Adicionar')),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        }).then((_) {
+      setState(() {
+        // if (staff == true && update == true) {
+        //   selectedListEdit = selectedList;
+        // } else {}
+        //hasLoadedMembers = false;
+        //selectedList.clear();
+      });
+    });
   }
 
 // add codigo

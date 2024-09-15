@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +47,7 @@ class UserController extends ChangeNotifier {
   final TextEditingController memberId = TextEditingController();
   final FocusNode addMemberFocusNode = FocusNode();
   late String? selectionStaff;
-  late String? selectionStaffEdit;
+  String selectionStaffEdit = 'Prova';
   late String? teamIdHistory;
   String teamDropDownHistory = 'Todos';
 
@@ -58,6 +57,9 @@ class UserController extends ChangeNotifier {
   bool loading = false;
   bool update = false;
   bool history = false;
+  // lista provas
+  List<String> selectedStage = [];
+  List<String> selectedStageEdit = [];
 
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -96,6 +98,7 @@ class UserController extends ChangeNotifier {
     login.clear();
     password.clear();
     passwordComfirm.clear();
+    selectedStage.clear();
     notifyListeners();
     return Future<UserStaff>.value(userStaff);
   }
@@ -133,7 +136,8 @@ class UserController extends ChangeNotifier {
 
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
-        var listTokenDesbloquedBox = Hive.box<List<String>>('ListTokenDesbloquedBox');
+        var listTokenDesbloquedBox =
+            Hive.box<List<String>>('ListTokenDesbloquedBox');
         await listTokenDesbloquedBox.clear();
         print('stageBox limpo com sucesso.');
       } catch (e) {
@@ -154,22 +158,24 @@ class UserController extends ChangeNotifier {
     await prefs.setBool('isLoggedIn', isLoggedIn);
     await prefs.setString('login', login);
     await prefs.setString('category', category);
-    
   }
+
   Future<void> addItemListTokenStageDesbloqued(String newItem) async {
-    var box = Hive.box<List<String>>('ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+    var box = Hive.box<List<String>>(
+        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
     List<String> currentList = box.get('TokenList', defaultValue: [])!;
 
     currentList.add(newItem);
     await box.put('TokenList', currentList);
   }
+
   Future<List<String>> getListTokenStageDesbloqued() async {
-    var box = Hive.box<List<String>>('ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+    var box = Hive.box<List<String>>(
+        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
     return box.get('TokenList', defaultValue: [])!;
   }
-
 
   Future<void> saveUserHive(UserTeam user) async {
     var box = Hive.box<UserTeam>('userTeamBox');
@@ -409,7 +415,6 @@ class UserController extends ChangeNotifier {
   }
 
   Future updateStaff(UserStaff newUserStaff) async {
-    print("update $selectionStaffEdit");
     try {
       QuerySnapshot querySnapshot =
           await userStaffRef.where('id', isEqualTo: newUserStaff.id).get();
@@ -424,9 +429,11 @@ class UserController extends ChangeNotifier {
         if (userStaff.password != null && passwordEdit.text.isNotEmpty) {
           data['password'] = passwordEdit.text;
         }
-        if (userStaff.office != null && selectionStaffEdit!.isNotEmpty) {
+        if (userStaff.office != null && selectionStaffEdit.isNotEmpty) {
           data['office'] = selectionStaffEdit;
-          print("update $selectionStaffEdit");
+        }
+        if (userStaff.listCode != null) {
+          data['listCode'] = selectedStageEdit;
         }
 
         return data;
@@ -502,9 +509,10 @@ class UserController extends ChangeNotifier {
   void updateTeamIdHistory(String? newTeamId) {
     teamIdHistory = newTeamId;
   }
+
   String formatDate(DateTime date) {
-  return DateFormat('dd/MM').add_Hms().format(date);
-}
+    return DateFormat('dd/MM').add_Hms().format(date);
+  }
 
   Future<List<String>> getListMembers(String teamId) async {
     try {

@@ -26,6 +26,7 @@ class PlayController extends ChangeNotifier {
   final TextEditingController puzzleEdit = TextEditingController();
   final TextEditingController valueEdit = TextEditingController();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  
 
   Future<Code> addCode(Code code) async {
     DocumentReference<Code> codeDoc = userCodeRef.doc();

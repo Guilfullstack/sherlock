@@ -6,6 +6,7 @@ class ListTeamController extends StatefulWidget {
   final Function()? onTapEdit;
   final Function()? onTapRemove;
   final Function()? onTapAddValue;
+  final Function(bool?)? onChanged;
   final double? credit;
   final String? status;
   final String? category;
@@ -14,6 +15,9 @@ class ListTeamController extends StatefulWidget {
   final bool? stage;
   final bool? addValue;
   final bool? history;
+  final bool? remove;
+  final bool? check;
+  final bool? valueChack;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -30,6 +34,10 @@ class ListTeamController extends StatefulWidget {
     this.onTapAddValue,
     this.history = true,
     this.dateHistory,
+    this.remove = true,
+    this.check = false,
+    this.onChanged,
+    this.valueChack,
   });
 
   @override
@@ -151,18 +159,21 @@ class _ListTeamControllerState extends State<ListTeamController> {
                 : null,
         leading: widget.history == false
             ? null
-            : CircleAvatar(
-                backgroundColor: const Color.fromARGB(255, 95, 95, 95),
-                child: widget.code == true
-                    ? const Icon(
-                        Icons.token,
-                        color: Colors.black,
-                      )
-                    : const Icon(
-                        Icons.people,
-                        color: Colors.black,
-                      ),
-              ),
+            : widget.check == true
+                ? Checkbox(
+                    value: widget.valueChack, onChanged: widget.onChanged)
+                : CircleAvatar(
+                    backgroundColor: const Color.fromARGB(255, 95, 95, 95),
+                    child: widget.code == true
+                        ? const Icon(
+                            Icons.token,
+                            color: Colors.black,
+                          )
+                        : const Icon(
+                            Icons.people,
+                            color: Colors.black,
+                          ),
+                  ),
         trailing: PopupMenuButton<String>(
           tooltip: "Menu",
           itemBuilder: (BuildContext context) {
@@ -178,16 +189,17 @@ class _ListTeamControllerState extends State<ListTeamController> {
                     ],
                   ),
                 ),
-              PopupMenuItem<String>(
-                onTap: widget.onTapRemove,
-                child: const Row(
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 8),
-                    Text('Remover'),
-                  ],
+              if (widget.remove == true)
+                PopupMenuItem<String>(
+                  onTap: widget.onTapRemove,
+                  child: const Row(
+                    children: [
+                      Icon(Icons.delete),
+                      SizedBox(width: 8),
+                      Text('Remover'),
+                    ],
+                  ),
                 ),
-              ),
               if (widget.addValue == true)
                 PopupMenuItem<String>(
                   onTap: widget.onTapAddValue,

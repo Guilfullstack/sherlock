@@ -12,6 +12,7 @@ class UserStaff {
   String? login;
   String? password;
   String? office;
+  List<String>? listCode;
   DateTime? date;
 
   UserStaff({
@@ -19,6 +20,7 @@ class UserStaff {
     this.login,
     this.password,
     this.office,
+    this.listCode,
     this.date,
   });
 
@@ -28,6 +30,7 @@ class UserStaff {
       login: json["login"],
       password: json["password"],
       office: json['office'],
+      listCode: List<String>.from(json["listCode"] ?? []),
       date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
     );
   }
@@ -37,6 +40,7 @@ class UserStaff {
         "login": login,
         "password": password,
         "office": office,
+        "listCode": listCode,
         "date": date != null ? Timestamp.fromDate(date!) : null,
       };
 }
