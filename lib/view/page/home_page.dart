@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
-import 'package:sherlock/model/code.dart';
+import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
@@ -22,18 +21,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   UserTeam? currentUser;
   List<Stage>? listStages = [];
-  List<Code>? listCode = [];
   List<String>? listTokenDesbloqued = [];
   UserController userController = UserController();
   PlayController playController = PlayController();
-  TextEditingController codeController = TextEditingController();
   StreamSubscription<DocumentSnapshot>? userSubscription;
+  bool _isPopupVisible = false; // Flag de controle para o pop-up
 
   @override
   void initState() {
     super.initState();
     _retrieveCurrentUser();
-    _listenToDatabaseChanges();
   }
 
   @override
@@ -46,46 +43,74 @@ class _HomePageState extends State<HomePage> {
   Future<void> _retrieveCurrentUser() async {
     try {
       UserTeam? userTeamFromHive = await userController.getUserHive();
-      List<Stage>? listStagesFromHive = await playController.getStageListFromHive();
-      List<Code>? listCodeFromHive = await playController.getCodeListFromHive();
-      List<String> listTokenD= await userController.getListTokenStageDesbloqued();
+      List<Stage>? listStagesFromHive =
+          await playController.getStageListFromHive();
       setState(() {
         currentUser = userTeamFromHive;
         listStages = listStagesFromHive;
-        listCode = listCodeFromHive;
-        listTokenDesbloqued = listTokenD;
-        _listenToDatabaseChanges();
+        listTokenDesbloqued = userTeamFromHive!.listTokenDesbloqued;
+        _listenToDatabaseChanges(userTeamFromHive.id!);
       });
     } catch (e) {
-      print("erro home: $e");
+      debugPrint("erro home: $e");
     }
   }
 
-  void _listenToDatabaseChanges() {
+  void _listenToDatabaseChanges(String id) {
     userSubscription = FirebaseFirestore.instance
         .collection('Teams') // Nome da coleção no Firestore
-        .doc(currentUser
-            ?.id) // Substitua 'user_id' pelo ID do usuário específico
+        .doc(id) // Substitua 'user_id' pelo ID do usuário específico
         .snapshots() // Obtém as mudanças em tempo real
         .listen((DocumentSnapshot snapshot) async {
       if (snapshot.exists) {
         UserTeam updatedUser = UserTeam.fromJson(snapshot.data()
             as Map<String, dynamic>); // Converte o documento para um UserTeam
-
         // Salva as atualizações no Hive
         await userController.saveUserHive(updatedUser);
-
         // Atualiza a interface do usuário
         setState(() {
           currentUser = updatedUser;
         });
+        await _checkIfUserIsFrozen();
       }
     });
   }
 
+  Future<void> _checkIfUserIsFrozen() async {
+    if (currentUser != null) {
+      if (currentUser!.status == Status.Congelado && !_isPopupVisible) {
+        _isPopupVisible = true; // Marca o pop-up como visível
+        showDialog(
+          context: context,
+          barrierDismissible: false, // Não permite fechar clicando fora
+          builder: (BuildContext context) {
+            return const PopScope(
+              canPop: false, // Impede o fechamento com o botão de voltar
+              child: AlertDialog(
+                title: Icon(Icons.lock, size: 50, color: Colors.red),
+                content: Text('Você está bloqueado!'),
+              ),
+            );
+          },
+        ).then((_) {
+          // Após o pop-up ser fechado, defina a flag como falsa
+          setState(() {
+            _isPopupVisible = false;
+          });
+        });
+      } else if (currentUser!.status != Status.Congelado && _isPopupVisible) {
+        // Fecha o pop-up automaticamente quando o status mudar de "congelado"
+        Navigator.of(context, rootNavigator: true).pop(); // Fecha o pop-up
+        setState(() {
+          _isPopupVisible = false;
+        });
+      }
+    } 
+  }
+
   void execultCode(String token) async {
     List<Stage> listStage = await playController.getStageListFromHive();
-
+    UserTeam? userTeam=UserTeam();
     for (var stage in listStage) {
       if (stage.token == token) {
         // Verifica se o token já está na lista
@@ -93,14 +118,22 @@ class _HomePageState extends State<HomePage> {
           ToolsController.dialogMensage(
               context, 'Info', 'Essa prova já está desbloqueada!');
         } else {
-         await userController.addItemListTokenStageDesbloqued(token);
-         List<String> listTokenD= await userController.getListTokenStageDesbloqued();
-         currentUser!.listTokenDesbloqued=listTokenD;
-         userController.updateTeams(currentUser!);
-          setState(() {
-            listTokenDesbloqued=listTokenD;
-          });
+          // //salvar no hive
+          userTeam = await userController.getUserHive();
+          userTeam!.listTokenDesbloqued!.add(token);
+          // await userController.saveUserHive(userTeam);
+          // //mandar para banco de dados
+          userController.updateTeams(userTeam);
+          //historico
+          userController.addHistory(History(
+              idTeam: currentUser!.id,
+              description:
+                  "Prova ${stage.description} de token $token foi desbloqueada, pela equipe ${currentUser!.name}"));
           
+          setState(() {
+            listTokenDesbloqued=userTeam!.listTokenDesbloqued;
+          });
+
           ToolsController.scafoldMensage(
               context, Colors.green, 'Prova desbloqueada com sucesso!');
         }
@@ -189,13 +222,13 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              final _formKey = GlobalKey<FormState>();
+              final formKey = GlobalKey<FormState>();
               final codeController = TextEditingController();
 
               return AlertDialog(
                 title: const Text('Desbloquear Prova'),
                 content: Form(
-                  key: _formKey,
+                  key: formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -223,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
+                      if (formKey.currentState!.validate()) {
                         final String token = codeController.text;
                         execultCode(token);
 

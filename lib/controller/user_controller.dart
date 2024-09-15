@@ -160,22 +160,22 @@ class UserController extends ChangeNotifier {
     await prefs.setString('category', category);
   }
 
-  Future<void> addItemListTokenStageDesbloqued(String newItem) async {
-    var box = Hive.box<List<String>>(
-        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+  // Future<void> addItemListTokenStageDesbloqued(String newItem) async {
+  //   var box = Hive.box<List<String>>(
+  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
-    List<String> currentList = box.get('TokenList', defaultValue: [])!;
+  //   List<String> currentList = box.get('TokenList', defaultValue: [])!;
 
-    currentList.add(newItem);
-    await box.put('TokenList', currentList);
-  }
+  //   currentList.add(newItem);
+  //   await box.put('TokenList', currentList);
+  // }
 
-  Future<List<String>> getListTokenStageDesbloqued() async {
-    var box = Hive.box<List<String>>(
-        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+  // Future<List<String>> getListTokenStageDesbloqued() async {
+  //   var box = Hive.box<List<String>>(
+  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
-    return box.get('TokenList', defaultValue: [])!;
-  }
+  //   return box.get('TokenList', defaultValue: [])!;
+  // }
 
   Future<void> saveUserHive(UserTeam user) async {
     var box = Hive.box<UserTeam>('userTeamBox');

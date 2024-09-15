@@ -284,21 +284,6 @@ String? statusToString(Status category) {
 
     return codeList;
   }
-
+  
 }
 
-void freezeApp(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Evita que o usuário feche o diálogo
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Icon(Icons.lock, size: 50, color: Colors.red),
-        content: Text('Você está bloqueado!'),
-      );
-    },
-  );
-  Future.delayed(Duration(minutes: 1), () {
-    Navigator.of(context).pop(); // Fecha o diálogo após 10 minutos
-  });
-}
