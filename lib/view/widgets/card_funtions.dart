@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-
 class CardFuntions extends StatelessWidget {
   final IconData icon;
   final String nome;
   final VoidCallback onTap;
 
   const CardFuntions({
-    Key? key,
+    super.key,
     required this.icon,
     required this.nome,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,7 @@ class CardFuntions extends StatelessWidget {
       splashColor: Colors.white.withOpacity(0.5), // Cor do splash
       borderRadius: BorderRadius.circular(10.0),
       child: Card(
-        color: Colors.grey[800],
+        color: Colors.black12,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
           side: const BorderSide(
@@ -28,17 +27,18 @@ class CardFuntions extends StatelessWidget {
           ),
         ),
         child: SizedBox(
-          height: 130,
-          width: 150,
+          height: 100,
+          width: 120,
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: 50,
-                  color: Colors.white,
-                ),
+               Icon(
+                icon,
+              size: 50,
+              color: Colors.red,
+            ),
+           
                 const SizedBox(height: 8),
                 Text(
                   nome,

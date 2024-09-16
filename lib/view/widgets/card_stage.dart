@@ -73,7 +73,7 @@ class CardStage extends StatelessWidget {
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: Colors.black38,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Colors.white,

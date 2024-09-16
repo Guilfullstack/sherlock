@@ -1,19 +1,23 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:sherlock/controller/play_controller.dart';
 
+import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_play.dart';
 
 class CardPanelInfo extends StatefulWidget {
   final double credit;
   final Status status;
+  final bool useCardFrezee;
+  final bool useCardProtect;
 
   CardPanelInfo({
-    Key? key,
+    super.key,
     required this.credit,
     required this.status,
-  }) : super(key: key);
+    required this.useCardFrezee,
+    required this.useCardProtect,
+  });
   @override
   State<CardPanelInfo> createState() => _CardPanelInfoState();
 }
@@ -23,14 +27,14 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.grey[800],
+      color: Colors.black12,
       shape: RoundedRectangleBorder(
         side: const BorderSide(color: Colors.white),
         borderRadius: BorderRadius.circular(10),
       ),
       margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -62,11 +66,28 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(width: 8),
-                Text(
-                  '${playController.statusToString(widget.status)}',
-                  style: TextStyle(color: Colors.pink, fontSize: 18),
-                ),
+                Text.rich(
+                  TextSpan(
+                    text: 'Status: ', // Texto comum, sem cor específica
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18), // Estilo do texto padrão
+                    children: [
+                      TextSpan(
+                        text: playController.statusToString(
+                            widget.status), // Apenas a variável status
+                        style: widget.status == Status.Jogando
+                            ? const TextStyle(
+                                color: Colors.yellow, fontSize: 18)
+                            : widget.status == Status.Congelado
+                                ? const TextStyle(
+                                    color: Colors.blue, fontSize: 18)
+                                : const TextStyle(
+                                    color: Colors.green, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
             const Padding(
@@ -77,23 +98,23 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                 //height: 30,
               ),
             ),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Cartas:',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 CardPlay(
-                    src: 'images/logo.png',
+                    src: 'images/congelar.png',
                     tipo: CartaTipo.congelar,
-                    isUsed: true),
-                SizedBox(width: 20),
+                    isUsed: widget.useCardFrezee),
+                const SizedBox(width: 20),
                 CardPlay(
-                    src: 'images/logo.png',
+                    src: 'images/escudo.png',
                     tipo: CartaTipo.escudo,
-                    isUsed: true),
+                    isUsed: widget.useCardProtect),
               ],
             ),
           ],

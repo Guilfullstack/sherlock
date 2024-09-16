@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
@@ -10,6 +11,7 @@ import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
 import 'package:sherlock/view/widgets/card_panel_stages.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -105,12 +107,12 @@ class _HomePageState extends State<HomePage> {
           _isPopupVisible = false;
         });
       }
-    } 
+    }
   }
 
   void execultCode(String token) async {
     List<Stage> listStage = await playController.getStageListFromHive();
-    UserTeam? userTeam=UserTeam();
+    UserTeam? userTeam = UserTeam();
     for (var stage in listStage) {
       if (stage.token == token) {
         // Verifica se o token já está na lista
@@ -129,9 +131,9 @@ class _HomePageState extends State<HomePage> {
               idTeam: currentUser!.id,
               description:
                   "Prova ${stage.description} de token $token foi desbloqueada, pela equipe ${currentUser!.name}"));
-          
+
           setState(() {
-            listTokenDesbloqued=userTeam!.listTokenDesbloqued;
+            listTokenDesbloqued = userTeam!.listTokenDesbloqued;
           });
 
           ToolsController.scafoldMensage(
@@ -142,6 +144,21 @@ class _HomePageState extends State<HomePage> {
     }
 
     ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
+  }
+
+  void showFullScreenImage(BuildContext context, String imagePath) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          body: PhotoView(
+            imageProvider: AssetImage(imagePath),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -190,6 +207,8 @@ class _HomePageState extends State<HomePage> {
                   ? CardPanelInfo(
                       credit: currentUser!.credit ?? 0,
                       status: currentUser?.status ?? Status.Jogando,
+                      useCardFrezee: true,
+                      useCardProtect: true,
                     )
                   : const CircularProgressIndicator(),
               //const SizedBox(height: 10),
@@ -198,14 +217,17 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CardFuntions(icon: Icons.map, nome: 'Mapa', onTap: () {}),
+                    CardFuntions(
+                        icon: Symbols.map,
+                        nome: 'Mapa',
+                        onTap: () {
+                          showFullScreenImage(context, 'images/mapa.png');
+                        }),
                     const SizedBox(
-                      width: 10,
+                      width: 20,
                     ),
                     CardFuntions(
-                        icon: Icons.card_giftcard,
-                        nome: 'Cartas',
-                        onTap: () {}),
+                        icon: Symbols.poker_chip, nome: 'Cartas', onTap: () {}),
                   ],
                 ),
               ),
