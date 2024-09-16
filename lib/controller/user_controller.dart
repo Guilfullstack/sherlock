@@ -161,22 +161,22 @@ class UserController extends ChangeNotifier {
     await prefs.setString('category', category);
   }
 
-  Future<void> addItemListTokenStageDesbloqued(String newItem) async {
-    var box = Hive.box<List<String>>(
-        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+  // Future<void> addItemListTokenStageDesbloqued(String newItem) async {
+  //   var box = Hive.box<List<String>>(
+  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
-    List<String> currentList = box.get('TokenList', defaultValue: [])!;
+  //   List<String> currentList = box.get('TokenList', defaultValue: [])!;
 
-    currentList.add(newItem);
-    await box.put('TokenList', currentList);
-  }
+  //   currentList.add(newItem);
+  //   await box.put('TokenList', currentList);
+  // }
 
-  Future<List<String>> getListTokenStageDesbloqued() async {
-    var box = Hive.box<List<String>>(
-        'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
+  // Future<List<String>> getListTokenStageDesbloqued() async {
+  //   var box = Hive.box<List<String>>(
+  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
 
-    return box.get('TokenList', defaultValue: [])!;
-  }
+  //   return box.get('TokenList', defaultValue: [])!;
+  // }
 
   Future<void> saveUserHive(UserTeam user) async {
     var box = Hive.box<UserTeam>('userTeamBox');
@@ -242,7 +242,10 @@ class UserController extends ChangeNotifier {
                 status: snapshotTeam.docs.first.data().status,
                 credit: snapshotTeam.docs.first.data().credit,
                 listTokenDesbloqued:
-                    snapshotTeam.docs.first.data().listTokenDesbloqued);
+                    snapshotTeam.docs.first.data().listTokenDesbloqued,
+                useCardFrezee: snapshotTeam.docs.first.data().useCardFrezee,
+                useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
+                isLoged: snapshotTeam.docs.first.data().isLoged);
             saveUserHive(user);
 
             List<Code> codeList = await playController.getCodeList();
@@ -334,6 +337,12 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.listTokenDesbloqued != null) {
           data['listTokenDesbloqued'] = newUserTeam.listTokenDesbloqued;
+        }
+        if (userTeam.useCardFrezee != null) {
+          data['useCardFrezee'] = newUserTeam.useCardFrezee;
+        }
+        if (userTeam.useCardProtect != null) {
+          data['useCardFrezee'] = newUserTeam.useCardProtect;
         }
         return data;
       }

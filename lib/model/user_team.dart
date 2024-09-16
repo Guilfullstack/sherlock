@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
+
 import 'package:sherlock/controller/play_controller.dart';
+
 part 'user_team.g.dart'; // Referência para o arquivo gerado
+
 PlayController playController = PlayController();
 
 final userTeamref = FirebaseFirestore.instance
@@ -39,30 +42,45 @@ class UserTeam extends HiveObject {
   @HiveField(8)
   List? listMembers;
 
-  UserTeam({
-    this.id,
-    this.login,
-    this.password,
-    this.name,
-    this.date,
-    this.status,
-    this.credit,
-    this.listTokenDesbloqued,
-    this.listMembers,
-  });
+  @HiveField(9) // Novo campo
+  bool? useCardFrezee;
+
+  @HiveField(10) // Novo campo
+  bool? useCardProtect;
+
+  @HiveField(11) // Novo campo
+  bool? isLoged;
+
+  UserTeam(
+      {this.id,
+      this.login,
+      this.password,
+      this.name,
+      this.date,
+      this.status,
+      this.credit,
+      this.listTokenDesbloqued,
+      this.listMembers,
+      this.useCardFrezee,
+      this.useCardProtect,
+      this.isLoged});
 
   factory UserTeam.fromJson(dynamic json) {
     return UserTeam(
-      id: json["id"],
-      login: json["login"],
-      password: json["password"],
-      name: json["name"],
-      date: json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
-      status: playController.statusFromString(json["status"] as String?),
-      credit: (json["credit"] as num?)?.toDouble(),
-      listTokenDesbloqued: List<String>.from(json["listTokenDesbloqued"] ?? []),
-      listMembers: List.from(json["listMembers"] ?? []),
-    );
+        id: json["id"],
+        login: json["login"],
+        password: json["password"],
+        name: json["name"],
+        date:
+            json["date"] != null ? (json["date"] as Timestamp).toDate() : null,
+        status: playController.statusFromString(json["status"] as String?),
+        credit: (json["credit"] as num?)?.toDouble(),
+        listTokenDesbloqued:
+            List<String>.from(json["listTokenDesbloqued"] ?? []),
+        listMembers: List.from(json["listMembers"] ?? []),
+        useCardFrezee: json["useCardFrezee"],
+        useCardProtect: json["useCardProtect"],
+        isLoged: json["isLoged"]);
   }
 
   dynamic toJson() => {
@@ -71,10 +89,14 @@ class UserTeam extends HiveObject {
         "password": password,
         "name": name,
         "date": date != null ? Timestamp.fromDate(date!) : null,
-        "status": status != null ? playController.statusToString(status!) : null,
+        "status":
+            status != null ? playController.statusToString(status!) : null,
         "credit": credit,
         "listTokenDesbloqued": listTokenDesbloqued,
         "listMembers": listMembers,
+        "useCardFrezee": useCardFrezee,
+        "useCardProtect": useCardProtect,
+        "isLoged": isLoged
       };
 }
 
