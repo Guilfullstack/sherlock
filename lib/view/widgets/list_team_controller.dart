@@ -55,6 +55,8 @@ class _ListTeamControllerState extends State<ListTeamController> {
       'Adicionado',
       'Subtraido',
       'congela equipe',
+      'Prova',
+      'congelou'
     ];
 
     // Separar o texto por espaços para análise

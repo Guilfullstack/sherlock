@@ -60,6 +60,7 @@ class UserController extends ChangeNotifier {
   // lista provas
   List<String> selectedStage = [];
   List<String> selectedStageEdit = [];
+  String? selectedTeam;
 
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -536,6 +537,41 @@ class UserController extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro ao obter a lista de membros: $e');
       return [];
+    }
+  }
+
+  // Adiciona um ValueNotifier para acompanhar o status da equipe
+  final ValueNotifier<bool> _statusUpdateNotifier = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> get statusUpdateNotifier => _statusUpdateNotifier;
+
+  void startStatusUpdateTimer(UserTeam team) {
+    _statusUpdateNotifier.value =
+        true; // Notifica que o status precisa ser atualizado
+
+    Future.delayed(const Duration(seconds: 10), () async {
+      if (_statusUpdateNotifier.value) {
+        // Atualiza o status da equipe e adiciona o histórico
+        await updateTeamStatus(team);
+        _statusUpdateNotifier.value =
+            false; // Notifica que o status foi atualizado
+      }
+    });
+  }
+
+  Future<void> updateTeamStatus(UserTeam team) async {
+    // Atualiza o status da equipe para 'Jogando' e adiciona o histórico
+    try {
+      statusTeams = Status.Jogando;
+      final updatedTeam = UserTeam(id: team.id, status: statusTeams);
+      final history = History(
+        idTeam: team.id,
+        description: "Equipe ${team.name} voltou a jogar após 10 segundos.",
+      );
+      await updateTeams(updatedTeam);
+      await addHistory(history);
+    } catch (e) {
+      print("Erro ao atualizar status da equipe: $e");
     }
   }
 }

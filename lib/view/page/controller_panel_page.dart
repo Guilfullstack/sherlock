@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
@@ -41,7 +43,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   @override
   void initState() {
     super.initState();
-    userController.listTeamSubscription;
+    userController;
+    if (mounted) {
+      userController.listTeamSubscription;
+    }
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       isHistoryVisible.value =
@@ -53,10 +58,14 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
 
   @override
   void dispose() {
-    userController.listTeamSubscription?.cancel();
-    playController.dispose();
-    userController.dispose();
-    userController.addMemberFocusNode.dispose();
+    // Cancelar assinatura
+    if (mounted) {
+      // Verifique se o widget ainda está "montado"
+      userController.listTeamSubscription?.cancel();
+      playController.dispose();
+      userController.dispose();
+      userController.addMemberFocusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -121,8 +130,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
               ValueListenableBuilder<bool>(
                 valueListenable: isHistoryVisible,
                 builder: (context, value, child) {
-                  print(
-                      "Histórico Visível: $value"); // Impressão para depuração
+                  // Verificação de visibilidade
                   return value
                       ? history(context, true)
                       : listCodeStage(context, playController, 400);
@@ -2194,22 +2202,23 @@ addValue(
                         }
 
                         // Garantir que o valor inicial do dropdown seja um dos itens da lista
-                        String? selectedTeam = user.teamDropDownHistory;
+                        user.selectedTeam = user.teamDropDownHistory;
                         if (dropDonw == "Proteção" && teamNames.isNotEmpty) {
-                          selectedTeam = teamNames.first;
-                        } else if (!teamNames.contains(selectedTeam)) {
-                          selectedTeam =
+                          user.selectedTeam = teamNames.first;
+                        } else if (!teamNames.contains(user.selectedTeam)) {
+                          user.selectedTeam =
                               teamNames.isNotEmpty ? teamNames.first : null;
                         }
-
+                        print('$user.selectedTeam');
                         return CustomDropdown(
-                          value:
-                              selectedTeam, // Certifique-se de que value não é nulo
+                          value: user
+                              .selectedTeam, // Certifique-se de que value não é nulo
                           title: "Selecione a equipe",
                           items: teamNames,
                           onChanged: (newValue) {
                             setState(() {
                               user.teamDropDownHistory = newValue!;
+                              user.selectedTeam = newValue;
                             });
                           },
                         );
@@ -2265,6 +2274,37 @@ addValue(
                       user.addValueHistoty.clear();
                       break;
                     case "Congelar":
+                      // user.statusTeams = Status.Congelado;
+                      // final userTeam = UserTeam(
+                      //   id: teams.id,
+                      //   status: user.statusTeams,
+                      // );
+                      // final history = History(
+                      //     idTeam: teams.id,
+                      //     description:
+                      //         "equipe Equipe ${user.selectedTeam} congelou ${teams.name}");
+                      // print("id da equipe congelada: ${userTeam.id}");
+                      // await user.addHistory(history);
+                      // await user.updateTeams(userTeam);
+
+                      // Timer(const Duration(seconds: 10), () async {
+                      //   // Após 10 minutos, mudar o status da equipe para Jogando
+                      //   user.statusTeams = Status.Jogando;
+                      //   await user.updateTeams(UserTeam(
+                      //     id: teams.id,
+                      //     status: user.statusTeams,
+                      //   ));
+
+                      //   final historyJogando = History(
+                      //     idTeam: teams.id,
+                      //     description:
+                      //         "Equipe ${teams.name} voltou a jogar após 10 minutos.",
+                      //   );
+
+                      //   await user.addHistory(historyJogando);
+
+                      //   print("Equipe ${teams.name} voltou a jogar.");
+                      // });
                       user.statusTeams = Status.Congelado;
                       final userTeam = UserTeam(
                         id: teams.id,
@@ -2273,10 +2313,12 @@ addValue(
                       final history = History(
                           idTeam: teams.id,
                           description:
-                              "Equipe ${teams.name} congela equipe ${user.teamDropDownHistory}");
+                              "Equipe ${user.selectedTeam} congelou ${teams.name}");
                       await user.addHistory(history);
                       await user.updateTeams(userTeam);
 
+                      // Inicia o timer para atualizar o status após 10 segundos
+                      user.startStatusUpdateTimer(teams);
                       break;
                     case "Proteção":
                       user.statusTeams = Status.Protegido;
@@ -2314,4 +2356,61 @@ addValue(
       );
     },
   );
+}
+
+Future<void> congelarEquipe(UserController user, UserTeam teams) async {
+  // Congela a equipe
+  user.statusTeams = Status.Congelado;
+  final userTeam = UserTeam(
+    id: teams.id,
+    status: user.statusTeams,
+  );
+
+  final history = History(
+    idTeam: teams.id,
+    description: "Equipe ${user.selectedTeam} congelou equipe ${teams.name}",
+  );
+
+  // Salvar o timestamp do congelamento no LocalStorage (via SharedPreferences)
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt(
+      'congelamento_${teams.id}', DateTime.now().millisecondsSinceEpoch);
+
+  // Atualiza o estado da equipe e adiciona o histórico
+  await user.addHistory(history);
+  await user.updateTeams(userTeam);
+
+  print("Equipe ${teams.name} foi congelada.");
+}
+
+Future<void> verificarSeDeveDescongelar(
+    UserController user, UserTeam teams) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  int? timestamp = prefs.getInt('congelamento_${teams.id}');
+
+  if (timestamp != null) {
+    DateTime congelamentoTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    Duration difference = DateTime.now().difference(congelamentoTime);
+
+    if (difference >= const Duration(seconds: 10)) {
+      // Descongelar a equipe e mudar o status para "Jogando"
+      user.statusTeams = Status.Jogando;
+      await user.updateTeams(UserTeam(
+        id: teams.id,
+        status: user.statusTeams,
+      ));
+
+      final historyJogando = History(
+        idTeam: teams.id,
+        description: "Equipe ${teams.name} voltou a jogar após 10 segundos.",
+      );
+
+      await user.addHistory(historyJogando);
+
+      print("Equipe ${teams.name} voltou a jogar.");
+
+      // Limpar o timestamp para que não execute mais de uma vez
+      await prefs.remove('congelamento_${teams.id}');
+    }
+  }
 }
