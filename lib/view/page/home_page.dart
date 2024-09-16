@@ -207,8 +207,8 @@ class _HomePageState extends State<HomePage> {
                   ? CardPanelInfo(
                       credit: currentUser!.credit ?? 0,
                       status: currentUser?.status ?? Status.Jogando,
-                      useCardFrezee: true,
-                      useCardProtect: true,
+                      useCardFrezee: currentUser!.useCardFrezee ?? false,
+                      useCardProtect: currentUser!.useCardProtect ?? false,
                     )
                   : const CircularProgressIndicator(),
               //const SizedBox(height: 10),
