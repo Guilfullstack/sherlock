@@ -17,6 +17,7 @@ import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:sherlock/view/widgets/menssage.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -551,21 +552,67 @@ class UserController extends ChangeNotifier {
 
   // Adiciona um ValueNotifier para acompanhar o status da equipe
   final ValueNotifier<bool> _statusUpdateNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _protectUpdateNotifier = ValueNotifier<bool>(false);
 
   ValueNotifier<bool> get statusUpdateNotifier => _statusUpdateNotifier;
+  ValueNotifier<bool> get protectUpdateNotifier => _protectUpdateNotifier;
 
-  void startStatusUpdateTimer(UserTeam team) {
+  void startStatusUpdateTimer(UserTeam team, BuildContext context) {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
 
-    Future.delayed(const Duration(seconds: 10), () async {
-      if (_statusUpdateNotifier.value) {
-        // Atualiza o status da equipe e adiciona o histórico
-        await updateTeamStatus(team);
-        _statusUpdateNotifier.value =
-            false; // Notifica que o status foi atualizado
-      }
-    });
+    if (team.useCardFrezee == false) {
+      statusTeams = Status.Congelado;
+      final userTeam =
+          UserTeam(id: team.id, status: statusTeams, useCardFrezee: true);
+      final history = History(
+          idTeam: team.id,
+          description: "Equipe $selectedTeam congelou ${team.name}");
+      addHistory(history);
+      updateTeams(userTeam);
+
+      Future.delayed(const Duration(seconds: 10), () async {
+        if (_statusUpdateNotifier.value) {
+          // Atualiza o status da equipe e adiciona o histórico
+          await updateTeamStatus(team);
+          _statusUpdateNotifier.value =
+              false; // Notifica que o status foi atualizado
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text('A equipe já usou cartão de congelamento'),
+      ));
+    }
+  }
+
+  void startProtectUpdateTimer(UserTeam team, BuildContext context) {
+    _protectUpdateNotifier.value =
+        true; // Notifica que o status precisa ser atualizado
+    statusTeams = Status.Protegido;
+    if (team.useCardProtect == false) {
+      final userTeam =
+          UserTeam(id: team.id, status: statusTeams, useCardProtect: true);
+      final history = History(
+          idTeam: team.id, description: "Equipe ${team.name} usa proteção");
+      addHistory(history);
+      updateTeams(userTeam);
+
+      Future.delayed(const Duration(seconds: 10), () async {
+        if (_protectUpdateNotifier.value) {
+          // Atualiza o status da equipe e adiciona o histórico
+          await updateTeamStatus(team);
+          _protectUpdateNotifier.value =
+              false; // Notifica que o status foi atualizado
+        }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text('A equipe já usou cartão de proteção'),
+      ));
+    }
   }
 
   Future<void> updateTeamStatus(UserTeam team) async {
@@ -575,7 +622,7 @@ class UserController extends ChangeNotifier {
       final updatedTeam = UserTeam(id: team.id, status: statusTeams);
       final history = History(
         idTeam: team.id,
-        description: "Equipe ${team.name} voltou a jogar após 10 segundos.",
+        description: "Equipe ${team.name} perdeu a proteção.",
       );
       await updateTeams(updatedTeam);
       await addHistory(history);

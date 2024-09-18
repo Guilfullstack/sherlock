@@ -16,6 +16,7 @@ import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/custom_dropdown.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 import 'package:sherlock/view/widgets/list_team_controller.dart';
+import 'package:sherlock/view/widgets/menssage.dart';
 
 class ControllerPanelPage extends StatefulWidget {
   const ControllerPanelPage({super.key});
@@ -1284,6 +1285,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                               listMembers: userController
                                                   .membersTeam
                                                   .toList(),
+                                              useCardFrezee: false,
+                                              useCardProtect: false,
                                             );
                                             setState(() {
                                               userController.loading = true;
@@ -2305,32 +2308,23 @@ addValue(
 
                       //   print("Equipe ${teams.name} voltou a jogar.");
                       // });
-                      user.statusTeams = Status.Congelado;
-                      final userTeam = UserTeam(
-                        id: teams.id,
-                        status: user.statusTeams,
-                      );
-                      final history = History(
-                          idTeam: teams.id,
-                          description:
-                              "Equipe ${user.selectedTeam} congelou ${teams.name}");
-                      await user.addHistory(history);
-                      await user.updateTeams(userTeam);
 
                       // Inicia o timer para atualizar o status após 10 segundos
-                      user.startStatusUpdateTimer(teams);
+                      user.startStatusUpdateTimer(teams, context);
                       break;
                     case "Proteção":
-                      user.statusTeams = Status.Protegido;
-                      final userTeam = UserTeam(
-                        id: teams.id,
-                        status: user.statusTeams,
-                      );
-                      final history = History(
-                          idTeam: teams.id,
-                          description: "Equipe ${teams.name} usa proteção");
-                      await user.addHistory(history);
-                      await user.updateTeams(userTeam);
+                      // user.statusTeams = Status.Protegido;
+                      // final userTeam = UserTeam(
+                      //   id: teams.id,
+                      //   status: user.statusTeams,
+                      //   useCardProtect: true,
+                      // );
+                      // final history = History(
+                      //     idTeam: teams.id,
+                      //     description: "Equipe ${teams.name} usa proteção");
+                      // await user.addHistory(history);
+                      // await user.updateTeams(userTeam);
+                      user.startProtectUpdateTimer(teams, context);
                       break;
                     case "Jogando":
                       user.statusTeams = Status.Jogando;
@@ -2358,59 +2352,63 @@ addValue(
   );
 }
 
-Future<void> congelarEquipe(UserController user, UserTeam teams) async {
-  // Congela a equipe
-  user.statusTeams = Status.Congelado;
-  final userTeam = UserTeam(
-    id: teams.id,
-    status: user.statusTeams,
-  );
+// Future<void> congelarEquipe(UserController user, UserTeam teams) async {
+//   // Congela a equipe
+//   user.statusTeams = Status.Congelado;
+//   final userTeam = UserTeam(
+//     id: teams.id,
+//     status: user.statusTeams,
+//   );
 
-  final history = History(
-    idTeam: teams.id,
-    description: "Equipe ${user.selectedTeam} congelou equipe ${teams.name}",
-  );
+//   final history = History(
+//     idTeam: teams.id,
+//     description: "Equipe ${user.selectedTeam} congelou equipe ${teams.name}",
+//   );
 
-  // Salvar o timestamp do congelamento no LocalStorage (via SharedPreferences)
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setInt(
-      'congelamento_${teams.id}', DateTime.now().millisecondsSinceEpoch);
+//   // Salvar o timestamp do congelamento no LocalStorage (via SharedPreferences)
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   await prefs.setInt(
+//       'congelamento_${teams.id}', DateTime.now().millisecondsSinceEpoch);
 
-  // Atualiza o estado da equipe e adiciona o histórico
-  await user.addHistory(history);
-  await user.updateTeams(userTeam);
+//   // Atualiza o estado da equipe e adiciona o histórico
+//   await user.addHistory(history);
+//   await user.updateTeams(userTeam);
 
-  print("Equipe ${teams.name} foi congelada.");
-}
+//   print("Equipe ${teams.name} foi congelada.");
+// }
 
-Future<void> verificarSeDeveDescongelar(
-    UserController user, UserTeam teams) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  int? timestamp = prefs.getInt('congelamento_${teams.id}');
+// Future<void> verificarSeDeveDescongelar(
+//     UserController user, UserTeam teams, BuildContext context) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   int? timestamp = prefs.getInt('congelamento_${teams.id}');
 
-  if (timestamp != null) {
-    DateTime congelamentoTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    Duration difference = DateTime.now().difference(congelamentoTime);
+//   if (timestamp != null) {
+//     DateTime congelamentoTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+//     Duration difference = DateTime.now().difference(congelamentoTime);
 
-    if (difference >= const Duration(seconds: 10)) {
-      // Descongelar a equipe e mudar o status para "Jogando"
-      user.statusTeams = Status.Jogando;
-      await user.updateTeams(UserTeam(
-        id: teams.id,
-        status: user.statusTeams,
-      ));
+//     if (teams.useCardFrezee == false) {
+//       if (difference >= const Duration(seconds: 10)) {
+//         // Descongelar a equipe e mudar o status para "Jogando"
+//         user.statusTeams = Status.Jogando;
+//         await user.updateTeams(UserTeam(
+//           id: teams.id,
+//           status: user.statusTeams,
+//         ));
 
-      final historyJogando = History(
-        idTeam: teams.id,
-        description: "Equipe ${teams.name} voltou a jogar após 10 segundos.",
-      );
+//         final historyJogando = History(
+//           idTeam: teams.id,
+//           description: "Equipe ${teams.name} voltou a jogar após 10 segundos.",
+//         );
 
-      await user.addHistory(historyJogando);
+//         await user.addHistory(historyJogando);
 
-      print("Equipe ${teams.name} voltou a jogar.");
+//         print("Equipe ${teams.name} voltou a jogar.");
 
-      // Limpar o timestamp para que não execute mais de uma vez
-      await prefs.remove('congelamento_${teams.id}');
-    }
-  }
-}
+//         // Limpar o timestamp para que não execute mais de uma vez
+//         await prefs.remove('congelamento_${teams.id}');
+//       }
+//     } else {
+//       const Menssage(menssage: 'A equipe já usou esse carta');
+//     }
+//   }
+// }
