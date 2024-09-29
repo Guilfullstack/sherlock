@@ -51,6 +51,7 @@ class UserController extends ChangeNotifier {
   String selectionStaffEdit = 'Prova';
   late String? teamIdHistory;
   String teamDropDownHistory = 'Todos';
+  Future<void>? protectTimer;
 
   late List membersTeam = [];
   late List membersTeamEdit = [];
@@ -343,7 +344,7 @@ class UserController extends ChangeNotifier {
           data['useCardFrezee'] = newUserTeam.useCardFrezee;
         }
         if (userTeam.useCardProtect != null) {
-          data['useCardFrezee'] = newUserTeam.useCardProtect;
+          data['useCardProtect'] = newUserTeam.useCardProtect;
         }
         return data;
       }
@@ -561,24 +562,35 @@ class UserController extends ChangeNotifier {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
 
-    if (team.useCardFrezee == false && team.useCardProtect == false) {
-      statusTeams = Status.Congelado;
-      final userTeam =
-          UserTeam(id: team.id, status: statusTeams, useCardFrezee: true,);
+    if (team.useCardFrezee == false) {
+      statusTeams =
+          team.status == Status.Protegido ? Status.Jogando : Status.Congelado;
+      final userTeam = UserTeam(
+        id: team.id,
+        status: statusTeams,
+        useCardFrezee: true,
+      );
       final history = History(
           idTeam: team.id,
-          description: "Equipe $selectedTeam congelou ${team.name}");
+          description: team.status == Status.Protegido
+              ? "Equipe ${team.name} está com proteção e não pode ser congelado pela Equipe $selectedTeam"
+              : "Equipe $selectedTeam congelou ${team.name}");
       addHistory(history);
       updateTeams(userTeam);
-
-      Future.delayed(const Duration(seconds: 10), () async {
-        if (_statusUpdateNotifier.value) {
-          // Atualiza o status da equipe e adiciona o histórico
-          await updateTeamStatus(team);
-          _statusUpdateNotifier.value =
-              false; // Notifica que o status foi atualizado
-        }
-      });
+      // caso a equipe esteja com proteção
+      if (team.status == Status.Jogando) {
+        Future.delayed(const Duration(seconds: 10), () async {
+          if (_statusUpdateNotifier.value) {
+            // Atualiza o status da equipe e adiciona o histórico
+            await updateTeamStatus(team);
+            _statusUpdateNotifier.value =
+                false; // Notifica que o status foi atualizado
+          }
+        });
+      } else if (team.status == Status.Protegido) {
+        Status status = Status.Jogando;
+        updateTeams(UserTeam(id: team.id, status: status));
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colors.redAccent,
@@ -599,7 +611,7 @@ class UserController extends ChangeNotifier {
       addHistory(history);
       updateTeams(userTeam);
 
-      Future.delayed(const Duration(seconds: 10), () async {
+      protectTimer = Future.delayed(const Duration(seconds: 10), () async {
         if (_protectUpdateNotifier.value) {
           // Atualiza o status da equipe e adiciona o histórico
           await updateTeamStatus(team);
@@ -607,6 +619,12 @@ class UserController extends ChangeNotifier {
               false; // Notifica que o status foi atualizado
         }
       });
+      if (team.status == Status.Jogando) {
+        protectTimer = null;
+        _protectUpdateNotifier.value =
+            false; // Notifica que o status não precisa ser mais atualizado
+        print('Proteção foi cancelada, a equipe está jogando.');
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colors.redAccent,
