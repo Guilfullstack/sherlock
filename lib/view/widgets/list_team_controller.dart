@@ -18,6 +18,8 @@ class ListTeamController extends StatefulWidget {
   final bool? remove;
   final bool? check;
   final bool? valueChack;
+  final bool? usedCardFreeze;
+  final bool? usedCardProtect;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -38,6 +40,8 @@ class ListTeamController extends StatefulWidget {
     this.check = false,
     this.onChanged,
     this.valueChack,
+    this.usedCardFreeze,
+    this.usedCardProtect,
   });
 
   @override
@@ -157,25 +161,28 @@ class _ListTeamControllerState extends State<ListTeamController> {
               )
             : widget.user == false
                 ? Text(
-                    "Estatus: ${widget.status ?? ""}\nCreditos: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}")
+                    "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
+                    "\nUsou Carta Congelar. ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
+                    "\nUsou carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}",
+                    style: const TextStyle(color: Colors.white),
+                  )
                 : null,
         leading: widget.history == false
             ? null
             : widget.check == true
                 ? Checkbox(
-                    value: widget.valueChack, onChanged: widget.onChanged)
-                : CircleAvatar(
-                    backgroundColor: const Color.fromARGB(255, 95, 95, 95),
-                    child: widget.code == true
-                        ? const Icon(
-                            Icons.token,
-                            color: Colors.black,
-                          )
-                        : const Icon(
-                            Icons.people,
-                            color: Colors.black,
-                          ),
-                  ),
+                    fillColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return Colors.white.withOpacity(.32);
+                      }
+                      return Colors.white;
+                    }),
+                    focusColor: Colors.black,
+                    checkColor: Colors.black,
+                    value: widget.valueChack,
+                    onChanged: widget.onChanged)
+                : null,
         trailing: PopupMenuButton<String>(
           tooltip: "Menu",
           itemBuilder: (BuildContext context) {
@@ -226,7 +233,10 @@ class _ListTeamControllerState extends State<ListTeamController> {
               // ),
             ];
           },
-          icon: const Icon(Icons.more_vert), // Ícone do botão de ação
+          icon: const Icon(
+            Icons.more_vert,
+            color: Colors.white,
+          ), // Ícone do botão de ação
         ),
       ),
     );

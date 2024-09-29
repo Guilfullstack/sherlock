@@ -7,6 +7,7 @@ import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -74,14 +75,20 @@ Future<void> main() async {
       child: MaterialApp(
         home: LoginPage(),
         theme: ThemeData(
-          primaryColorLight: Colors.white,
-          scaffoldBackgroundColor: Colors.black87,
-          listTileTheme: const ListTileThemeData(
-            tileColor: Colors.black,
-          ),
-          cardColor: const Color.fromARGB(
-              255, 117, 21, 21), // Cor dos Cards definida em RGB
-        ),
+            primaryColorLight: Colors.black,
+            scaffoldBackgroundColor: const Color(0xFF212A3E),
+            listTileTheme: const ListTileThemeData(
+              tileColor: Color(0xFF523B76),
+            ),
+            drawerTheme: DrawerThemeData(
+              backgroundColor: Colors.black,
+            ),
+            
+            cardColor: const Color.fromARGB(
+                255, 117, 21, 21), // Cor dos Cards definida em RGB
+            appBarTheme: AppBarTheme(
+              backgroundColor: Colors.black,
+            )),
       ),
     ),
   );

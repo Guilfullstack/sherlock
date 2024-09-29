@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/view/page/controller_panel_page.dart';
+import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
@@ -30,10 +31,8 @@ class _LoginPageState extends State<LoginPage> {
       // Navega para a tela correspondente com base na categoria do usuário
       switch (category) {
         case 'Adm':
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const ControllerPanelPage()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const DashboardPanel()));
           break;
         case 'Team':
           Navigator.pushReplacement(context,
