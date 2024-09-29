@@ -7,8 +7,12 @@ class ToolsController {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
-          content: Text(mensage),
+          backgroundColor: const Color(0xFF212A3E),
+          title: Text(
+            title,
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Text(mensage, style: const TextStyle(color: Colors.white)),
           actions: [
             TextButton(
               onPressed: () {

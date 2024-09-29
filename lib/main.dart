@@ -33,10 +33,6 @@ Future<void> initializeHive() async {
       Hive.registerAdapter(StatusAdapter());
       debugPrint('StatusAdapter registrado');
     }
-    if (!Hive.isAdapterRegistered(3)) {
-      Hive.registerAdapter(CodeAdapter());
-      debugPrint('CodeAdapter registrado');
-    }
     if (!Hive.isAdapterRegistered(4)) {
       Hive.registerAdapter(CategoryAdapter());
       debugPrint('CategoryAdapter registrado');
@@ -48,11 +44,8 @@ Future<void> initializeHive() async {
     // Abra as caixas do Hive
     await Hive.openBox<UserTeam>('userTeamBox');
     debugPrint('userTeamBox aberta');
-    await Hive.openBox<Code>('codeBox');
-    debugPrint('codeBox aberta');
     await Hive.openBox<Stage>('stageBox');
     debugPrint('stageBox aberta');
-    await Hive.openBox<List<String>>('ListTokenDesbloquedBox');
     debugPrint('Caixas do Hive abertas com sucesso');
   } catch (e) {
     debugPrint('Erro ao inicializar o Hive: $e');

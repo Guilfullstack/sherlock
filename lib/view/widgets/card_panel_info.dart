@@ -24,13 +24,14 @@ class CardPanelInfo extends StatefulWidget {
 
 class _CardPanelInfoState extends State<CardPanelInfo> {
   PlayController playController = PlayController();
+  late Color cortexto = Colors.white;
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.black12,
+      color: const Color(0xFF523B76),
       shape: RoundedRectangleBorder(
         side: const BorderSide(color: Colors.white),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(40),
       ),
       margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
       child: Padding(
@@ -41,16 +42,13 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text(
-                  'Pontos:',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-                const SizedBox(
-                  width: 25,
+                Text(
+                  'Pontos:  ',
+                  style: TextStyle(color: cortexto, fontSize: 18),
                 ),
                 Text(
-                  'R\$ ${widget.credit}',
-                  style: const TextStyle(color: Colors.purple, fontSize: 20),
+                  '${widget.credit}',
+                  style: TextStyle(color: cortexto, fontSize: 18),
                 ),
               ],
             ),
@@ -68,20 +66,19 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
               children: [
                 Text.rich(
                   TextSpan(
-                    text: 'Status: ', // Texto comum, sem cor específica
-                    style: const TextStyle(
-                        color: Colors.white,
+                    text: 'Status:  ', // Texto comum, sem cor específica
+                    style: TextStyle(
+                        color: cortexto,
                         fontSize: 18), // Estilo do texto padrão
                     children: [
                       TextSpan(
                         text: playController.statusToString(
                             widget.status), // Apenas a variável status
                         style: widget.status == Status.Jogando
-                            ? const TextStyle(
-                                color: Colors.yellow, fontSize: 18)
+                            ? const TextStyle(color: Colors.white, fontSize: 18)
                             : widget.status == Status.Congelado
                                 ? const TextStyle(
-                                    color: Colors.blue, fontSize: 18)
+                                    color: Colors.blueAccent, fontSize: 18)
                                 : const TextStyle(
                                     color: Colors.green, fontSize: 18),
                       ),
@@ -101,9 +98,9 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Cartas:',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  style: TextStyle(color: cortexto, fontSize: 18),
                 ),
                 const SizedBox(width: 20),
                 CardPlay(

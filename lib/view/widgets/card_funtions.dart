@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class CardFuntions extends StatelessWidget {
   final IconData icon;
   final String nome;
@@ -18,7 +19,7 @@ class CardFuntions extends StatelessWidget {
       splashColor: Colors.white.withOpacity(0.5), // Cor do splash
       borderRadius: BorderRadius.circular(10.0),
       child: Card(
-        color: Colors.black12,
+        color: Color(0xFF523B76),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
           side: const BorderSide(
@@ -33,18 +34,17 @@ class CardFuntions extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-               Icon(
-                icon,
-              size: 50,
-              color: Colors.red,
-            ),
-           
+                Icon(
+                  icon,
+                  size: 50,
+                  color: Color(0xFF212A3E),
+                ),
                 const SizedBox(height: 8),
                 Text(
                   nome,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.normal,
                     color: Colors.white,
                   ),
                 ),

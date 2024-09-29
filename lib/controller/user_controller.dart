@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
@@ -17,7 +18,6 @@ import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:sherlock/view/widgets/menssage.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -127,20 +127,18 @@ class UserController extends ChangeNotifier {
       );
     } else {
       // Limpar Hive e então navegar para a página de login se não for Web
+      UserTeam? user = await getUserHive();
+      user!.isLoged = false;
+      await updateTeams(user!);
+
       try {
         var userTeamBox = Hive.box<UserTeam>('userTeamBox');
         await userTeamBox.clear();
         print('userTeamBox limpo com sucesso.');
 
-        var codeBox = Hive.box<Code>('codeBox');
-        await codeBox.clear();
-        print('codeBox limpo com sucesso.');
-
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
-        var listTokenDesbloquedBox =
-            Hive.box<List<String>>('ListTokenDesbloquedBox');
-        await listTokenDesbloquedBox.clear();
+
         print('stageBox limpo com sucesso.');
       } catch (e) {
         print('Erro ao limpar a caixa do Hive: $e');
@@ -161,23 +159,6 @@ class UserController extends ChangeNotifier {
     await prefs.setString('login', login);
     await prefs.setString('category', category);
   }
-
-  // Future<void> addItemListTokenStageDesbloqued(String newItem) async {
-  //   var box = Hive.box<List<String>>(
-  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
-
-  //   List<String> currentList = box.get('TokenList', defaultValue: [])!;
-
-  //   currentList.add(newItem);
-  //   await box.put('TokenList', currentList);
-  // }
-
-  // Future<List<String>> getListTokenStageDesbloqued() async {
-  //   var box = Hive.box<List<String>>(
-  //       'ListTokenDesbloquedBox'); // Acessa a caixa já aberta
-
-  //   return box.get('TokenList', defaultValue: [])!;
-  // }
 
   Future<void> saveUserHive(UserTeam user) async {
     var box = Hive.box<UserTeam>('userTeamBox');
@@ -213,26 +194,9 @@ class UserController extends ChangeNotifier {
 
         if (snapshotTeam.docs.isNotEmpty) {
           if (kIsWeb) {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Web Platform'),
-                  content:
-                      const Text('Equipes não tem acesso a plataforma Web'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
+            ToolsController.dialogMensage(context, "Web Platform",
+                "Equipes não tem acesso a plataforma Web");
           } else {
-            await _saveLoginState(true, login, 'Team');
             // Armazena o usuário na caixa do Hive
             final user = UserTeam(
                 id: snapshotTeam.docs.first.id,
@@ -247,19 +211,22 @@ class UserController extends ChangeNotifier {
                 useCardFrezee: snapshotTeam.docs.first.data().useCardFrezee,
                 useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
                 isLoged: snapshotTeam.docs.first.data().isLoged);
-            saveUserHive(user);
+            if (user.isLoged == true) {
+              ToolsController.dialogMensage(
+                  context, "Erro", "Usuário já está logado");
+            } else {
+              user.isLoged = true;
+              await updateTeams(user);
 
-            List<Code> codeList = await playController.getCodeList();
-            await playController.saveCodeListToHive(codeList);
+              saveUserHive(user);
+              await _saveLoginState(true, login, 'Team');
 
-            List<Stage> stageList = await playController.getStageList();
-            await playController.saveStageListToHive(stageList);
-            List<Stage> l2 = await playController.getStageListFromHive();
-            for (Stage stage in l2) {
-              print("${stage.description}");
+              List<Stage> stageList = await playController.getStageList();
+              await playController.saveStageListToHive(stageList);
+
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const HomePage()));
             }
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const HomePage()));
           }
         } else {
           final snapshotStaff = await userStaffRef
@@ -304,9 +271,6 @@ class UserController extends ChangeNotifier {
         await historyRef.doc(id).delete();
       default:
     }
-
-    //listTeamn.isEmpty ? null : listTeamn.removeWhere((team) => team.id == id);
-    //notifyListeners();
   }
 
   Future updateTeams(UserTeam newUserTeam) async {
@@ -344,6 +308,9 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.useCardProtect != null) {
           data['useCardFrezee'] = newUserTeam.useCardProtect;
+        }
+        if (userTeam.isLoged != null) {
+          data['isLoged'] = newUserTeam.isLoged;
         }
         return data;
       }
@@ -563,8 +530,11 @@ class UserController extends ChangeNotifier {
 
     if (team.useCardFrezee == false && team.useCardProtect == false) {
       statusTeams = Status.Congelado;
-      final userTeam =
-          UserTeam(id: team.id, status: statusTeams, useCardFrezee: true,);
+      final userTeam = UserTeam(
+        id: team.id,
+        status: statusTeams,
+        useCardFrezee: true,
+      );
       final history = History(
           idTeam: team.id,
           description: "Equipe $selectedTeam congelou ${team.name}");

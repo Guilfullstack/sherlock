@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/model/stage.dart';
 
@@ -6,12 +7,18 @@ class CardStage extends StatelessWidget {
   final Stage stage;
   final bool isUnlocked;
   final int position;
+  final Color? backgrundColor;
+  final Color? circleColor;
+  final Color? textColor;
 
   const CardStage({
     super.key,
     required this.stage,
     required this.isUnlocked,
     required this.position,
+    this.backgrundColor,
+    this.circleColor,
+    this.textColor,
   });
 
   @override
@@ -73,8 +80,8 @@ class CardStage extends StatelessWidget {
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.black38,
-          borderRadius: BorderRadius.circular(10),
+          color: backgrundColor,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: Colors.white,
             width: 1.0,
@@ -83,14 +90,14 @@ class CardStage extends StatelessWidget {
         child: ListTile(
           title: Text(
             stage.description ?? '',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+              fontWeight: FontWeight.normal,
+              color: textColor,
             ),
           ),
           leading: CircleAvatar(
-            backgroundColor: Colors.grey,
+            backgroundColor: circleColor,
             child: Text(
               '$position',
               style: const TextStyle(color: Colors.white, fontSize: 18),

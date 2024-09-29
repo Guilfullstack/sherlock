@@ -22,48 +22,37 @@ class CardPanelStages extends StatelessWidget {
         ),
       );
     }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Center(
-          child: Text(
-            'Provas',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.0,
         ),
-        Container(
-          height: 300,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.black12,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: Colors.white,
-              width: 1.0,
-            ),
-          ),
-          child: ListView.builder(
-            itemCount: liststages!.length,
-            itemBuilder: (context, index) {
-              final stage = liststages![index];
-              final isUnlocked =
-                  listTokenStageDesbloqued?.contains(stage.token) ?? false;
-
-              return CardStage(
-                stage: stage,
-                isUnlocked: isUnlocked,
-                position: index + 1,
-              );
-            },
-          ),
+      ),
+      height:
+          MediaQuery.of(context).size.height * 0.50, // 50% da altura da tela,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.all(10),
+      child: Card(
+        color: const Color(0xFF212A3E),
+        child: ListView.builder(
+          itemCount: liststages!.length,
+          itemBuilder: (context, index) {
+            final stage = liststages![index];
+            final isUnlocked =
+                listTokenStageDesbloqued?.contains(stage.token) ?? false;
+            return CardStage(
+              stage: stage,
+              isUnlocked: isUnlocked,
+              position: index + 1,
+              backgrundColor: Color(0xFF523B76),
+              circleColor: Color(0xFF212A3E),
+              textColor: Colors.white,
+            );
+          },
         ),
-      ],
+      ),
     );
   }
 }

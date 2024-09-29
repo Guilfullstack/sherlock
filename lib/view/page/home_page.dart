@@ -8,6 +8,7 @@ import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/view/page/about.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
 import 'package:sherlock/view/widgets/card_panel_stages.dart';
@@ -164,8 +165,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
       appBar: AppBar(
+        backgroundColor: Colors.black,
         leading: Image.asset(
           'images/logo.png',
         ),
@@ -175,7 +176,12 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutPage()),
+                );
+              },
               icon: const Icon(
                 Icons.info,
                 color: Colors.purple,
@@ -194,50 +200,51 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.black12,
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Exibe as informações do usuário se estiver disponível
-              currentUser != null
-                  ? CardPanelInfo(
-                      credit: currentUser!.credit ?? 0,
-                      status: currentUser?.status ?? Status.Jogando,
-                      useCardFrezee: currentUser!.useCardFrezee ?? false,
-                      useCardProtect: currentUser!.useCardProtect ?? false,
-                    )
-                  : const CircularProgressIndicator(),
-              //const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CardFuntions(
-                        icon: Symbols.map,
-                        nome: 'Mapa',
-                        onTap: () {
-                          showFullScreenImage(context, 'images/mapa.png');
-                        }),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    CardFuntions(
-                        icon: Symbols.poker_chip, nome: 'Cartas', onTap: () {}),
-                  ],
+      // backgroundColor: Color(0xFF171D26),
+      backgroundColor: const Color(0xFF212A3E),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Exibe as informações do usuário se estiver disponível
+          currentUser != null
+              ? CardPanelInfo(
+                  credit: currentUser!.credit ?? 0,
+                  status: currentUser?.status ?? Status.Jogando,
+                  useCardFrezee: currentUser!.useCardFrezee ?? false,
+                  useCardProtect: currentUser!.useCardProtect ?? false,
+                )
+              : const CircularProgressIndicator(),
+          // const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CardFuntions(
+                    icon: Symbols.map,
+                    nome: 'Mapa',
+                    onTap: () {
+                      showFullScreenImage(context, 'images/mapa.png');
+                    }),
+                const SizedBox(
+                  width: 20,
                 ),
-              ),
-              CardPanelStages(
-                liststages: listStages,
-                listTokenStageDesbloqued: listTokenDesbloqued,
-              )
-            ],
+                CardFuntions(
+                    icon: Symbols.poker_chip,
+                    nome: 'Cartas',
+                    onTap: () {
+                      playController.navigateCardPage(context);
+                    }),
+              ],
+            ),
           ),
-        ),
+          CardPanelStages(
+            liststages: listStages,
+            listTokenStageDesbloqued: listTokenDesbloqued,
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -248,16 +255,37 @@ class _HomePageState extends State<HomePage> {
               final codeController = TextEditingController();
 
               return AlertDialog(
-                title: const Text('Desbloquear Prova'),
+                backgroundColor: const Color(0xFF212A3E),
+                title: const Text(
+                  'Desbloquear Prova',
+                  style: TextStyle(color: Colors.white),
+                ),
                 content: Form(
                   key: formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
+                        style: const TextStyle(
+                            color: Colors.white), // Cor do texto digitado
                         controller: codeController,
-                        decoration:
-                            const InputDecoration(labelText: 'Inserir código'),
+                        decoration: const InputDecoration(
+                          labelText: 'Inserir código',
+                          labelStyle:
+                              TextStyle(color: Colors.white), // Cor do label
+                          hintText: 'Código', // Placeholder
+                          hintStyle: TextStyle(
+                              color: Colors.white54), // Cor do placeholder
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.white54), // Borda ao habilitar
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.white), // Borda ao focar
+                          ),
+                        ),
+                        cursorColor: Colors.white,
                         keyboardType: TextInputType.text,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -274,7 +302,10 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Cancelar'),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(color: Colors.white), // Cor do texto
+                    ),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -285,17 +316,21 @@ class _HomePageState extends State<HomePage> {
                         Navigator.of(context).pop();
                       }
                     },
-                    child: const Text('Desbloquear'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple, // Cor do fundo do botão
+                    ),
+                    child: const Text('Desbloquear',
+                        style: TextStyle(color: Colors.white)), // Cor do texto
                   ),
                 ],
               );
             },
           );
         },
-        backgroundColor: Colors.grey,
+        backgroundColor: Colors.purple,
         child: const Icon(
           Icons.key,
-          color: Colors.purple,
+          color: Color(0xFF212A3E),
         ),
       ),
     );

@@ -7,6 +7,7 @@ import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/view/page/card_page.dart';
 
 class PlayController extends ChangeNotifier {
   final GlobalKey<FormState> formKeyPlay = GlobalKey<FormState>();
@@ -26,7 +27,6 @@ class PlayController extends ChangeNotifier {
   final TextEditingController puzzleEdit = TextEditingController();
   final TextEditingController valueEdit = TextEditingController();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  
 
   Future<Code> addCode(Code code) async {
     DocumentReference<Code> codeDoc = userCodeRef.doc();
@@ -96,9 +96,6 @@ class PlayController extends ChangeNotifier {
       case 1:
         await userStageRef.doc(id).delete();
         break;
-      // case 2:
-      //   await userStaffRef.doc(id).delete();
-      //   break;
       default:
     }
   }
@@ -152,9 +149,6 @@ class PlayController extends ChangeNotifier {
       if (stage.token != null && tokenEdit.text.isNotEmpty) {
         data['token'] = tokenEdit.text;
       }
-      // if (stage.category != null && categoryEdit.text.isNotEmpty) {
-      //   data['category'] = categoryEdit.text;
-      // }
       if (stage.puzzle != null && puzzleEdit.text.isNotEmpty) {
         data['puzzle'] = puzzleEdit.text;
       }
@@ -163,7 +157,6 @@ class PlayController extends ChangeNotifier {
     }
 
     if (querySnapshot.docs.isNotEmpty) {
-      // Se houver documentos encontrados, atualizar o primeiro documento encontrado
       DocumentSnapshot document = querySnapshot.docs.first;
       Map<String, dynamic> updateData = buildUpdateData(stage);
 
@@ -207,7 +200,7 @@ class PlayController extends ChangeNotifier {
     }
   }
 
-String? statusToString(Status category) {
+  String? statusToString(Status category) {
     switch (category) {
       case Status.Jogando:
         return 'Jogando';
@@ -231,30 +224,6 @@ String? statusToString(Status category) {
       default:
         return Status.Jogando;
     }
-  }
-
-  //OPERAÇÕES COM O HIVE
-  Future<void> saveCodeListToHive(List<Code> codeList) async {
-    // Obtém a caixa onde os códigos serão armazenados
-    final codeBox = await Hive.openBox<Code>('codeBox');
-
-    // Salva os códigos na caixa
-    for (var code in codeList) {
-      if (code.id != null) {
-        await codeBox.put(
-            code.id, code); // Usa o ID como chave para cada código
-      }
-    }
-  }
-
-  Future<List<Code>> getCodeListFromHive() async {
-    // Obtém a caixa onde os códigos estão armazenados
-    final codeBox = await Hive.openBox<Code>('codeBox');
-
-    // Recupera todos os códigos da caixa
-    final codeList = codeBox.values.toList();
-
-    return codeList;
   }
 
   Future<void> saveStageListToHive(List<Stage> stageList) async {
@@ -284,6 +253,13 @@ String? statusToString(Status category) {
 
     return codeList;
   }
-  
-}
 
+  void navigateCardPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(body: CardPage()),
+      ),
+    );
+  }
+}
