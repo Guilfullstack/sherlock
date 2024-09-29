@@ -144,6 +144,10 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     );
   }
 
+  //pagina
+
+  
+
   //pagina equipes
   Padding pageTeams() {
     return Padding(

@@ -561,10 +561,10 @@ class UserController extends ChangeNotifier {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
 
-    if (team.useCardFrezee == false) {
+    if (team.useCardFrezee == false && team.useCardProtect == false) {
       statusTeams = Status.Congelado;
       final userTeam =
-          UserTeam(id: team.id, status: statusTeams, useCardFrezee: true);
+          UserTeam(id: team.id, status: statusTeams, useCardFrezee: true,);
       final history = History(
           idTeam: team.id,
           description: "Equipe $selectedTeam congelou ${team.name}");
