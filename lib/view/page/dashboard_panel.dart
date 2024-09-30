@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/view/page/about.dart';
 import 'package:sherlock/view/page/page%20Panel/manager.dart';
 
 class DashboardPanel extends StatefulWidget {
@@ -10,6 +12,7 @@ class DashboardPanel extends StatefulWidget {
 
 class _DashboardPanelState extends State<DashboardPanel> {
   int _selectedPage = 0;
+  UserController userController = UserController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,10 +36,36 @@ class _DashboardPanelState extends State<DashboardPanel> {
               child: const Icon(Icons.add),
             ),
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Image.asset(
+            'images/logo.png',
+          ),
+        ),
         title: const Text(
-          'Dashboard',
+          'SHERLOK',
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutPage()),
+                );
+              },
+              icon: const Icon(
+                Icons.info,
+                color: Colors.purple,
+              )),
+          IconButton(
+              onPressed: () => userController.logout(context),
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.purple,
+              )),
+        ],
+        centerTitle: true,
       ),
       body: Row(
         children: [

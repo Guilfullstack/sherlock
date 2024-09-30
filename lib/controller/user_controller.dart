@@ -14,6 +14,7 @@ import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/controller_panel_page.dart';
+import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:sherlock/view/page/staff_page.dart';
@@ -185,7 +186,7 @@ class UserController extends ChangeNotifier {
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => const ControllerPanelPage()));
+                builder: (context) => const DashboardPanel()));
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -529,14 +530,9 @@ class UserController extends ChangeNotifier {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
 
-<<<<<<< HEAD
-    if (team.useCardFrezee == false && team.useCardProtect == false) {
-      statusTeams = Status.Congelado;
-=======
     if (team.useCardFrezee == false) {
       statusTeams =
           team.status == Status.Protegido ? Status.Jogando : Status.Congelado;
->>>>>>> c29222ef9880dc3bc0e1bb6926d99baba63d320e
       final userTeam = UserTeam(
         id: team.id,
         status: statusTeams,

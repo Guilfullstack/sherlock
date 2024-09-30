@@ -103,140 +103,154 @@ class _ListTeamControllerState extends State<ListTeamController> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: widget.history == true
-            ? Text(
-                widget.equipe ?? "Sem nome",
-                style: TextStyle(
-                  color: ThemeData().primaryColorLight,
-                ),
-              )
-            : RichText(
-                text: TextSpan(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), // Bordas arredondadas
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2), // Cor da sombra
+              spreadRadius: 2, // Espalhamento da sombra
+              blurRadius: 5, // Desfoque da sombra
+              offset: const Offset(0, 3), // Posição da sombra (x, y)
+            ),
+          ],
+        ),
+        child: ListTile(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: widget.history == true
+              ? Text(
+                  widget.equipe ?? "Sem nome",
                   style: TextStyle(
                     color: ThemeData().primaryColorLight,
                   ),
-                  children: [
-                    _buildHighlightedText(widget.equipe ?? ""),
-                    const TextSpan(
-                      text: "\nData: ",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
+                )
+              : RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: ThemeData().primaryColorLight,
                     ),
-                    TextSpan(
-                      text:
-                          user.formatDate(widget.dateHistory ?? DateTime.now()),
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
+                    children: [
+                      _buildHighlightedText(widget.equipe ?? ""),
+                      const TextSpan(
+                        text: "\nData: ",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
                       ),
+                      TextSpan(
+                        text: user
+                            .formatDate(widget.dateHistory ?? DateTime.now()),
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 14,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          subtitle: widget.code == true
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.stage != true)
+                      Text(
+                        "Categoria: ${widget.category ?? ""}",
+                        style: TextStyle(color: ThemeData().primaryColorLight),
+                      ),
+                    if (widget.stage != true)
+                      Text(
+                        "Valor: ${widget.credit == 0 ? "Sem valor" : widget.credit}",
+                        style: TextStyle(color: ThemeData().primaryColorLight),
+                      ),
+                    Text(
+                      "Código: ${widget.status ?? ""}",
+                      style: TextStyle(color: ThemeData().primaryColorLight),
                     ),
                   ],
-                ),
-              ),
-        subtitle: widget.code == true
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.stage != true)
-                    Text(
-                      "Categoria: ${widget.category ?? ""}",
-                      style: TextStyle(color: ThemeData().primaryColorLight),
+                )
+              : widget.user == false
+                  ? Text(
+                      "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
+                      "\nUsou Carta Congelar. ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
+                      "\nUsou Carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}",
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  : null,
+          leading: widget.history == false
+              ? null
+              : widget.check == true
+                  ? Checkbox(
+                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                          (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return Colors.white.withOpacity(.32);
+                        }
+                        return Colors.white;
+                      }),
+                      focusColor: Colors.black,
+                      checkColor: Colors.black,
+                      value: widget.valueChack,
+                      onChanged: widget.onChanged)
+                  : null,
+          trailing: PopupMenuButton<String>(
+            tooltip: "Menu",
+            itemBuilder: (BuildContext context) {
+              return [
+                if (widget.history == true)
+                  PopupMenuItem<String>(
+                    onTap: widget.onTapEdit,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.edit),
+                        SizedBox(width: 8),
+                        Text('Editar'),
+                      ],
                     ),
-                  if (widget.stage != true)
-                    Text(
-                      "Valor: ${widget.credit == 0 ? "Sem valor" : widget.credit}",
-                      style: TextStyle(color: ThemeData().primaryColorLight),
+                  ),
+                if (widget.remove == true)
+                  PopupMenuItem<String>(
+                    onTap: widget.onTapRemove,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.delete),
+                        SizedBox(width: 8),
+                        Text('Remover'),
+                      ],
                     ),
-                  Text(
-                    "Código: ${widget.status ?? ""}",
-                    style: TextStyle(color: ThemeData().primaryColorLight),
                   ),
-                ],
-              )
-            : widget.user == false
-                ? Text(
-                    "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
-                    "\nUsou Carta Congelar. ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
-                    "\nUsou carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}",
-                    style: const TextStyle(color: Colors.white),
-                  )
-                : null,
-        leading: widget.history == false
-            ? null
-            : widget.check == true
-                ? Checkbox(
-                    fillColor: WidgetStateProperty.resolveWith<Color>(
-                        (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors.white.withOpacity(.32);
-                      }
-                      return Colors.white;
-                    }),
-                    focusColor: Colors.black,
-                    checkColor: Colors.black,
-                    value: widget.valueChack,
-                    onChanged: widget.onChanged)
-                : null,
-        trailing: PopupMenuButton<String>(
-          tooltip: "Menu",
-          itemBuilder: (BuildContext context) {
-            return [
-              if (widget.history == true)
-                PopupMenuItem<String>(
-                  onTap: widget.onTapEdit,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.edit),
-                      SizedBox(width: 8),
-                      Text('Editar'),
-                    ],
+                if (widget.addValue == true)
+                  PopupMenuItem<String>(
+                    onTap: widget.onTapAddValue,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.task),
+                        SizedBox(width: 8),
+                        Text('Estatus'),
+                      ],
+                    ),
                   ),
-                ),
-              if (widget.remove == true)
-                PopupMenuItem<String>(
-                  onTap: widget.onTapRemove,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.delete),
-                      SizedBox(width: 8),
-                      Text('Remover'),
-                    ],
-                  ),
-                ),
-              if (widget.addValue == true)
-                PopupMenuItem<String>(
-                  onTap: widget.onTapAddValue,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.task),
-                      SizedBox(width: 8),
-                      Text('Estatus'),
-                    ],
-                  ),
-                ),
-              // PopupMenuItem<String>(
-              //   enabled: widget.onDesktop == false ? true : false,
-              //   onTap: widget.onTapHistory,
-              //   child: const Row(
-              //     children: [
-              //       Icon(Icons.history),
-              //       SizedBox(width: 8),
-              //       Text('Historico'),
-              //     ],
-              //   ),
-              // ),
-            ];
-          },
-          icon: const Icon(
-            Icons.more_vert,
-            color: Colors.white,
-          ), // Ícone do botão de ação
+                // PopupMenuItem<String>(
+                //   enabled: widget.onDesktop == false ? true : false,
+                //   onTap: widget.onTapHistory,
+                //   child: const Row(
+                //     children: [
+                //       Icon(Icons.history),
+                //       SizedBox(width: 8),
+                //       Text('Historico'),
+                //     ],
+                //   ),
+                // ),
+              ];
+            },
+            icon: const Icon(
+              Icons.more_vert,
+              color: Colors.white,
+            ), // Ícone do botão de ação
+          ),
         ),
       ),
     );

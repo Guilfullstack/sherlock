@@ -61,134 +61,168 @@ class _ManagerState extends State<Manager> {
   Widget changeList(int page) {
     switch (page) {
       case 1:
-        return ListUsers<UserTeam>(
-          size: 4 / 1,
-          stream: userController.teamStream,
-          emptyMessage: 'Não há equipes',
-          errorMessage: 'Erro ao carregar equipes',
-          itemBuilder: (context, team, index) {
-            return ListTeamController(
-              addValue: true,
-              equipe: team.name,
-              credit: team.credit,
-              usedCardFreeze: team.useCardFrezee,
-              usedCardProtect: team.useCardProtect,
-              status: playController.statusToString(team.status!),
-              onTapRemove: () {
-                userController.removeUser(0, team.id.toString());
-              },
-              onTapEdit: () {
-                showDialog(
-                    context: context,
-                    builder: (build) {
-                      userController.memberId.text = team.id ?? "";
-                      userController.id.text = team.id ?? "";
-                      userController.nameEdit.text = team.name ?? "";
-                      userController.loginEdit.text = team.login ?? "";
-                      userController.passwordEdit.text = team.password ?? "";
-                      return AlertDialog(
-                        backgroundColor: Colors.grey,
-                        content: Form(
-                          key: userController.formKeyEditTeam,
-                          child: SizedBox(
-                            width: 300,
-                            height: 450,
-                            child: _addTeams(
-                                context, false, true, false, userController),
-                          ),
-                        ),
-                      );
-                    });
-              },
-              onTapAddValue: () {
-                userController.addValueStatus.clear();
-                addValue(teamsDropDown, context, userController, team,
-                    valueDropDown);
-              },
-            );
-          },
-        );
-      case 2:
-        return ListUsers<UserAdm>(
-          columGrid: 1,
-          size: 9 / 1,
-          stream: userController.admStream,
-          emptyMessage: 'Não há nenhum colaborador',
-          errorMessage: 'Erro ao carregar colaboradores',
-          itemBuilder: (context, team, index) {
-            return ListTeamController(
-              user: true,
-              equipe: team.login,
-              onTapRemove: () {
-                userController.removeUser(1, team.id.toString());
-              },
-              onTapEdit: () {
-                showDialog(
-                    context: context,
-                    builder: (build) {
-                      userController.id.text = team.id ?? "";
-                      userController.nameEdit.text = team.name ?? "";
-                      userController.loginEdit.text = team.login ?? "";
-                      userController.passwordEdit.text = team.password ?? "";
-                      return AlertDialog(
-                        backgroundColor: Colors.grey,
-                        content: Form(
-                          key: userController.formKeyEditTeam,
-                          child: SizedBox(
-                            width: 300,
-                            height: 450,
-                            child: _addTeams(
-                                context, true, true, false, userController),
-                          ),
-                        ),
-                      );
-                    });
-              },
-            );
-          },
-        );
-      case 3:
-        return ListUsers<UserStaff>(
-          columGrid: 1,
-          size: 9 / 1,
-          stream: userController.staffStream,
-          emptyMessage: 'Não há nenhum colaborador',
-          errorMessage: 'Erro ao carregar colaboradores',
-          itemBuilder: (context, team, index) {
-            return ListTeamController(
-              user: true,
-              equipe: team.login,
-              onTapRemove: () {
-                userController.removeUser(2, team.id.toString());
-              },
-              onTapEdit: () {
-                showDialog(
-                  context: context,
-                  builder: (build) {
-                    userController.id.text = team.id ?? "";
-                    userController.loginEdit.text = team.login ?? "";
-                    userController.passwordEdit.text = team.password ?? "";
-                    selectionStaffEdit = team.office ?? "";
-                    userController.selectedStageEdit = team.listCode ?? [];
-                    return AlertDialog(
-                      backgroundColor: Colors.grey,
-                      content: Form(
-                        key: userController.formKeyEditTeam,
-                        child: SizedBox(
-                          width: 300,
-                          height: 450,
-                          child: _addTeams(
-                              context, false, true, true, userController),
-                        ),
-                      ),
+        return Column(
+          children: [
+            titleList("Equipes"),
+            Expanded(
+              child: Card.filled(
+                color: const Color.fromARGB(0, 0, 0, 0),
+                child: ListUsers<UserTeam>(
+                  size: 4 / 1,
+                  stream: userController.teamStream,
+                  emptyMessage: 'Não há equipes',
+                  errorMessage: 'Erro ao carregar equipes',
+                  itemBuilder: (context, team, index) {
+                    return ListTeamController(
+                      addValue: true,
+                      equipe: team.name,
+                      credit: team.credit,
+                      usedCardFreeze: team.useCardFrezee,
+                      usedCardProtect: team.useCardProtect,
+                      status: playController.statusToString(team.status!),
+                      onTapRemove: () {
+                        userController.removeUser(0, team.id.toString());
+                      },
+                      onTapEdit: () {
+                        showDialog(
+                            context: context,
+                            builder: (build) {
+                              userController.memberId.text = team.id ?? "";
+                              userController.id.text = team.id ?? "";
+                              userController.nameEdit.text = team.name ?? "";
+                              userController.loginEdit.text = team.login ?? "";
+                              userController.passwordEdit.text =
+                                  team.password ?? "";
+                              return AlertDialog(
+                                backgroundColor: Colors.black,
+                                content: Form(
+                                  key: userController.formKeyEditTeam,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 450,
+                                    child: _addTeams(context, false, true,
+                                        false, userController),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      onTapAddValue: () {
+                        userController.addValueStatus.clear();
+                        addValue(teamsDropDown, context, userController, team,
+                            valueDropDown);
+                      },
                     );
                   },
-                ).then((_) {
-                  setState(() {});
-                });
-              },
-            );
-          },
+                ),
+              ),
+            ),
+          ],
+        );
+      case 2:
+        return Column(
+          children: [
+            titleList("Administrado"),
+            Expanded(
+              child: Card.filled(
+                color: const Color.fromARGB(0, 0, 0, 0),
+                child: ListUsers<UserAdm>(
+                  columGrid: 1,
+                  size: 9 / 1,
+                  stream: userController.admStream,
+                  emptyMessage: 'Não há nenhum colaborador',
+                  errorMessage: 'Erro ao carregar colaboradores',
+                  itemBuilder: (context, team, index) {
+                    return ListTeamController(
+                      user: true,
+                      equipe: team.login,
+                      onTapRemove: () {
+                        userController.removeUser(1, team.id.toString());
+                      },
+                      onTapEdit: () {
+                        showDialog(
+                            context: context,
+                            builder: (build) {
+                              userController.id.text = team.id ?? "";
+                              userController.nameEdit.text = team.name ?? "";
+                              userController.loginEdit.text = team.login ?? "";
+                              userController.passwordEdit.text =
+                                  team.password ?? "";
+                              return AlertDialog(
+                                backgroundColor: Colors.black,
+                                content: Form(
+                                  key: userController.formKeyEditTeam,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 450,
+                                    child: _addTeams(context, true, true, false,
+                                        userController),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      case 3:
+        return Column(
+          children: [
+            titleList("Staff"),
+            Expanded(
+              child: Card.filled(
+                color: const Color.fromARGB(0, 0, 0, 0),
+                child: ListUsers<UserStaff>(
+                  columGrid: 1,
+                  size: 9 / 1,
+                  stream: userController.staffStream,
+                  emptyMessage: 'Não há nenhum colaborador',
+                  errorMessage: 'Erro ao carregar colaboradores',
+                  itemBuilder: (context, team, index) {
+                    return ListTeamController(
+                      user: true,
+                      equipe: team.login,
+                      onTapRemove: () {
+                        userController.removeUser(2, team.id.toString());
+                      },
+                      onTapEdit: () {
+                        showDialog(
+                          context: context,
+                          builder: (build) {
+                            userController.id.text = team.id ?? "";
+                            userController.loginEdit.text = team.login ?? "";
+                            userController.passwordEdit.text =
+                                team.password ?? "";
+                            selectionStaffEdit = team.office ?? "";
+                            userController.selectedStageEdit =
+                                team.listCode ?? [];
+                            return AlertDialog(
+                              backgroundColor: Colors.black,
+                              content: Form(
+                                key: userController.formKeyEditTeam,
+                                child: SizedBox(
+                                  width: 300,
+                                  height: 450,
+                                  child: _addTeams(context, false, true, true,
+                                      userController),
+                                ),
+                              ),
+                            );
+                          },
+                        ).then((_) {
+                          setState(() {});
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         );
       case 4:
         return Row(
@@ -200,53 +234,57 @@ class _ManagerState extends State<Manager> {
               ),
             ),
             Expanded(
-              child: ListUsers<Stage>(
-                columGrid: 1,
-                size: 7 / 1,
-                stream: playController.codeStreamFilter,
-                emptyMessage: 'Não há nenhum colaborador',
-                errorMessage: 'Erro ao carregar colaboradores',
-                itemBuilder: (context, team, index) {
-                  return ListTeamController(
-                    user: true,
-                    code: true,
-                    stage: true,
-                    equipe: team.description,
-                    status: team.token,
-                    credit: 0,
-                    onTapRemove: () {
-                      playController.removePlay(1, team.id.toString());
-                    },
-                    onTapEdit: () {
-                      showDialog(
-                          context: context,
-                          builder: (builder) {
-                            playController.id.text = team.id ?? "";
-                            playController.tokenEdit.text = team.token ?? "";
-                            playController.descriptionEdit.text =
-                                team.description ?? "";
-                            playController.puzzleEdit.text = team.puzzle ?? "";
-                            playController.valueEdit.text = "0";
-                            value2Edit = Category.stage;
-                            return Form(
-                              key: playController.formKeyPlayEdit,
-                              child: AlertDialog(
-                                backgroundColor: Colors.grey,
-                                content: SizedBox(
-                                  height: 500,
-                                  width: 450,
-                                  child: StatefulBuilder(builder:
-                                      (BuildContext context, setState) {
-                                    return _addTolkien(
-                                        context, playController, true, true);
-                                  }),
+              child: Card.filled(
+                color: Color.fromARGB(0, 0, 0, 0),
+                child: ListUsers<Stage>(
+                  columGrid: 1,
+                  size: 7 / 1,
+                  stream: playController.codeStreamFilter,
+                  emptyMessage: 'Não há nenhum colaborador',
+                  errorMessage: 'Erro ao carregar colaboradores',
+                  itemBuilder: (context, team, index) {
+                    return ListTeamController(
+                      user: true,
+                      code: true,
+                      stage: true,
+                      equipe: team.description,
+                      status: team.token,
+                      credit: 0,
+                      onTapRemove: () {
+                        playController.removePlay(1, team.id.toString());
+                      },
+                      onTapEdit: () {
+                        showDialog(
+                            context: context,
+                            builder: (builder) {
+                              playController.id.text = team.id ?? "";
+                              playController.tokenEdit.text = team.token ?? "";
+                              playController.descriptionEdit.text =
+                                  team.description ?? "";
+                              playController.puzzleEdit.text =
+                                  team.puzzle ?? "";
+                              playController.valueEdit.text = "0";
+                              value2Edit = Category.stage;
+                              return Form(
+                                key: playController.formKeyPlayEdit,
+                                child: AlertDialog(
+                                  backgroundColor: Colors.black,
+                                  content: SizedBox(
+                                    height: 500,
+                                    width: 450,
+                                    child: StatefulBuilder(builder:
+                                        (BuildContext context, setState) {
+                                      return _addTolkien(
+                                          context, playController, true, true);
+                                    }),
+                                  ),
                                 ),
-                              ),
-                            );
-                          });
-                    },
-                  );
-                },
+                              );
+                            });
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -254,29 +292,35 @@ class _ManagerState extends State<Manager> {
       case 5:
         return Column(
           children: [
-            teamsDropDown(setState),
+            SizedBox(
+              width: double.infinity,
+              child: Card(child: teamsDropDown(setState)),
+            ),
             Expanded(
-              child: ListUsers<History>(
-                  size: 6 / 1,
-                  stream: userController.historyStream,
-                  emptyMessage: 'Não há nenhum colaborador',
-                  errorMessage: 'Erro ao carregar colaboradores',
-                  itemBuilder: (context, team, index) {
-                    if (userController.teamDropDownHistory == 'Todos' ||
-                        team.idTeam == userController.teamIdHistory) {
-                      return ListTeamController(
-                        dateHistory: team.date,
-                        user: true,
-                        history: false,
-                        equipe: team.description,
-                        onTapRemove: () {
-                          userController.removeUser(3, team.id.toString());
-                        },
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  }),
+              child: Card.filled(
+                color: const Color.fromARGB(0, 0, 0, 0),
+                child: ListUsers<History>(
+                    size: 6 / 1,
+                    stream: userController.historyStream,
+                    emptyMessage: 'Não há nenhum colaborador',
+                    errorMessage: 'Erro ao carregar colaboradores',
+                    itemBuilder: (context, team, index) {
+                      if (userController.teamDropDownHistory == 'Todos' ||
+                          team.idTeam == userController.teamIdHistory) {
+                        return ListTeamController(
+                          dateHistory: team.date,
+                          user: true,
+                          history: false,
+                          equipe: team.description,
+                          onTapRemove: () {
+                            userController.removeUser(3, team.id.toString());
+                          },
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    }),
+              ),
             ),
           ],
         );
@@ -284,6 +328,17 @@ class _ManagerState extends State<Manager> {
       default:
     }
     return const Text("Nada encontrado");
+  }
+
+  Text titleList(String name) {
+    return Text(
+      name,
+      style: const TextStyle(
+        fontSize: 25,
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 
   Widget pageCreate(int page) {
@@ -484,7 +539,7 @@ class _ManagerState extends State<Manager> {
                     ),
                   ),
                   SizedBox(
-                    height: 200,
+                    height: 10,
                     child: ListView.builder(
                         itemCount: userController.membersTeam.length,
                         itemBuilder: (builder, index) {
@@ -983,10 +1038,8 @@ class _ManagerState extends State<Manager> {
                                           if (staff == true &&
                                               update == false) {
                                             selectedList.add(code.id!);
-                                            print('add normal');
                                           } else {
                                             selectedListEdit.add(code.id!);
-                                            print('add edit');
                                           }
                                         } else if (value == false) {
                                           if (staff == true &&
@@ -994,10 +1047,8 @@ class _ManagerState extends State<Manager> {
                                             selectedList.remove(code.id!);
                                           } else {
                                             selectedListEdit.remove(code.id!);
-                                            print("remover");
                                           }
                                         }
-                                        print("${selectedListEdit}");
                                       });
                                     },
                                     //
@@ -1083,10 +1134,11 @@ class _ManagerState extends State<Manager> {
               return Column(
                 children: [
                   Visibility(
-                    visible:
-                        editStage == true && update == true || update == false
-                            ? true
-                            : false,
+                    visible: false,
+
+                    // editStage == true && update == true || update == false
+                    //     ? true
+                    //     : false,
                     child: categorySelected(
                       'Prova',
                       update == true ? value2Edit : value2,
@@ -1278,7 +1330,6 @@ class _ManagerState extends State<Manager> {
                                     if (playController.formKeyPlay.currentState!
                                         .validate()) {
                                       //add stage
-                                      print("1");
                                       if (value2 == Category.stage) {
                                         final newCode = Stage(
                                           token: playController.token.text,
@@ -1287,7 +1338,6 @@ class _ManagerState extends State<Manager> {
                                           puzzle: playController.puzzle.text,
                                           category: value2,
                                         );
-                                        print(newCode);
                                         setState(() {
                                           userController.loading = true;
                                         });
@@ -1532,7 +1582,7 @@ class _ManagerState extends State<Manager> {
             context: context,
             builder: (builder) {
               return AlertDialog(
-                backgroundColor: Colors.grey,
+                backgroundColor: Colors.black,
                 content: SizedBox(
                   width: 400,
                   height: 408,
@@ -1564,69 +1614,73 @@ class _ManagerState extends State<Manager> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: SizedBox(
-                            height: 300,
-                            width: 400,
-                            child: ListView.builder(
-                              itemCount: member.length,
-                              itemBuilder: (context, index) {
-                                final listMember = member[index];
-                                return ListTeamController(
-                                  user: true,
-                                  equipe: listMember,
-                                  onTapRemove: () {
-                                    setStateDialog(() {
-                                      member.remove(listMember);
-                                    });
-                                  },
-                                  onTapEdit: () {
-                                    bool updateLocal = true;
-                                    userController.addMemberEdit.text =
-                                        listMember;
+                          child: Card.filled(
+                            color: Colors.black,
+                            child: SizedBox(
+                              height: 300,
+                              width: 400,
+                              child: ListView.builder(
+                                itemCount: member.length,
+                                itemBuilder: (context, index) {
+                                  final listMember = member[index];
+                                  return ListTeamController(
+                                    user: true,
+                                    equipe: listMember,
+                                    onTapRemove: () {
+                                      setStateDialog(() {
+                                        member.remove(listMember);
+                                      });
+                                    },
+                                    onTapEdit: () {
+                                      bool updateLocal = true;
+                                      userController.addMemberEdit.text =
+                                          listMember;
 
-                                    showDialog(
-                                      context: context,
-                                      builder: (builder) {
-                                        return AlertDialog(
-                                          backgroundColor: Colors.black87,
-                                          content: ImputTextFormField(
-                                            title: updateLocal == true
-                                                ? "Atualizar membro"
-                                                : "Nome do Membro",
-                                            controller: updateLocal == true
-                                                ? userController.addMemberEdit
-                                                : userController.addMember,
-                                            onFieldSubmitted: (value) {
-                                              setStateDialog(() {
-                                                member[index] = value;
-                                                updateLocal == true
-                                                    ? userController
-                                                        .addMemberEdit
-                                                        .clear()
-                                                    : userController.addMember
-                                                        .clear();
-                                                exitWindows();
-                                              });
-                                            },
-                                            icon: IconButton(
-                                              onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (builder) {
+                                          return AlertDialog(
+                                            backgroundColor: Colors.black87,
+                                            content: ImputTextFormField(
+                                              title: updateLocal == true
+                                                  ? "Atualizar membro"
+                                                  : "Nome do Membro",
+                                              controller: updateLocal == true
+                                                  ? userController.addMemberEdit
+                                                  : userController.addMember,
+                                              onFieldSubmitted: (value) {
                                                 setStateDialog(() {
-                                                  member[index] = userController
-                                                      .addMemberEdit.text;
+                                                  member[index] = value;
+                                                  updateLocal == true
+                                                      ? userController
+                                                          .addMemberEdit
+                                                          .clear()
+                                                      : userController.addMember
+                                                          .clear();
                                                   exitWindows();
                                                 });
                                               },
-                                              icon: Icon(updateLocal == true
-                                                  ? Icons.update
-                                                  : Icons.add),
+                                              icon: IconButton(
+                                                onPressed: () {
+                                                  setStateDialog(() {
+                                                    member[index] =
+                                                        userController
+                                                            .addMemberEdit.text;
+                                                    exitWindows();
+                                                  });
+                                                },
+                                                icon: Icon(updateLocal == true
+                                                    ? Icons.update
+                                                    : Icons.add),
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -1707,7 +1761,6 @@ class _ManagerState extends State<Manager> {
                       onChanged: (value) {
                         setState(() {
                           dropDonw = value!;
-                          print(dropDonw);
                         });
                       },
                     ),
@@ -1759,7 +1812,6 @@ class _ManagerState extends State<Manager> {
                               user.selectedTeam =
                                   teamNames.isNotEmpty ? teamNames.first : null;
                             }
-                            print('$user.selectedTeam');
                             return CustomDropdown(
                               value: user
                                   .selectedTeam, // Certifique-se de que value não é nulo
