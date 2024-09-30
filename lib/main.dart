@@ -80,13 +80,12 @@ Future<void> main() async {
             listTileTheme: const ListTileThemeData(
               tileColor: Color(0xFF523B76),
             ),
-            drawerTheme: DrawerThemeData(
+            drawerTheme: const DrawerThemeData(
               backgroundColor: Colors.black,
             ),
-            
             cardColor: const Color.fromARGB(
                 255, 117, 21, 21), // Cor dos Cards definida em RGB
-            appBarTheme: AppBarTheme(
+            appBarTheme: const AppBarTheme(
               backgroundColor: Colors.black,
             )),
       ),

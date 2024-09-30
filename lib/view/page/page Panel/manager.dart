@@ -294,7 +294,8 @@ class _ManagerState extends State<Manager> {
           children: [
             SizedBox(
               width: double.infinity,
-              child: Card(child: teamsDropDown(setState)),
+              child: Card.filled(
+                  color: Colors.black, child: teamsDropDown(setState)),
             ),
             Expanded(
               child: Card.filled(
@@ -1732,6 +1733,8 @@ class _ManagerState extends State<Manager> {
     UserTeam teams,
     String dropDonw,
   ) {
+    bool isSwitch1On = teams.useCardFrezee == true ? true : false;
+    bool isSwitch2On = teams.useCardProtect == true ? true : false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1743,11 +1746,56 @@ class _ManagerState extends State<Manager> {
           builder: (BuildContext context, StateSetter setState) {
             return SizedBox(
               child: AlertDialog(
-                backgroundColor: Colors.grey,
-                title: Text(teams.name ?? ""),
+                backgroundColor: Colors.black,
+                title: Text(
+                  teams.name ?? "",
+                  style: const TextStyle(color: Colors.white),
+                ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    //siwtch
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Carta  de Congelar",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Switch(
+                          value: isSwitch1On,
+                          onChanged: (value) async {
+                            await user.updateTeams(
+                                UserTeam(id: teams.id, useCardFrezee: value));
+                            setState(() {
+                              isSwitch1On = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // Segundo Switch
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Carta de Proteção",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Switch(
+                          value: isSwitch2On,
+                          onChanged: (value) async {
+                            await user.updateTeams(
+                                UserTeam(id: teams.id, useCardProtect: value));
+                            setState(() {
+                              isSwitch2On = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+
                     CustomDropdown(
                       items: const [
                         "Adicionar",
@@ -1812,17 +1860,25 @@ class _ManagerState extends State<Manager> {
                               user.selectedTeam =
                                   teamNames.isNotEmpty ? teamNames.first : null;
                             }
-                            return CustomDropdown(
-                              value: user
-                                  .selectedTeam, // Certifique-se de que value não é nulo
-                              title: "Selecione a equipe",
-                              items: teamNames,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  user.teamDropDownHistory = newValue!;
-                                  user.selectedTeam = newValue;
-                                });
-                              },
+                            return Column(
+                              children: [
+                                Text(
+                                  "Qual Equipe vai congelar\n(${teams.name})",
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                CustomDropdown(
+                                  value: user
+                                      .selectedTeam, // Certifique-se de que value não é nulo
+                                  title: "Selecione a equipe",
+                                  items: teamNames,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      user.teamDropDownHistory = newValue!;
+                                      user.selectedTeam = newValue;
+                                    });
+                                  },
+                                ),
+                              ],
                             );
                           }
                         },
@@ -1877,53 +1933,9 @@ class _ManagerState extends State<Manager> {
                           user.addValueHistoty.clear();
                           break;
                         case "Congelar":
-                          // user.statusTeams = Status.Congelado;
-                          // final userTeam = UserTeam(
-                          //   id: teams.id,
-                          //   status: user.statusTeams,
-                          // );
-                          // final history = History(
-                          //     idTeam: teams.id,
-                          //     description:
-                          //         "equipe Equipe ${user.selectedTeam} congelou ${teams.name}");
-                          // print("id da equipe congelada: ${userTeam.id}");
-                          // await user.addHistory(history);
-                          // await user.updateTeams(userTeam);
-
-                          // Timer(const Duration(seconds: 10), () async {
-                          //   // Após 10 minutos, mudar o status da equipe para Jogando
-                          //   user.statusTeams = Status.Jogando;
-                          //   await user.updateTeams(UserTeam(
-                          //     id: teams.id,
-                          //     status: user.statusTeams,
-                          //   ));
-
-                          //   final historyJogando = History(
-                          //     idTeam: teams.id,
-                          //     description:
-                          //         "Equipe ${teams.name} voltou a jogar após 10 minutos.",
-                          //   );
-
-                          //   await user.addHistory(historyJogando);
-
-                          //   print("Equipe ${teams.name} voltou a jogar.");
-                          // });
-
-                          // Inicia o timer para atualizar o status após 10 segundos
                           user.startStatusUpdateTimer(teams, context);
                           break;
                         case "Proteção":
-                          // user.statusTeams = Status.Protegido;
-                          // final userTeam = UserTeam(
-                          //   id: teams.id,
-                          //   status: user.statusTeams,
-                          //   useCardProtect: true,
-                          // );
-                          // final history = History(
-                          //     idTeam: teams.id,
-                          //     description: "Equipe ${teams.name} usa proteção");
-                          // await user.addHistory(history);
-                          // await user.updateTeams(userTeam);
                           user.startProtectUpdateTimer(teams, context);
                           break;
                         case "Jogando":

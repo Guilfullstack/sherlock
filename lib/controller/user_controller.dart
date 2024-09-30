@@ -183,10 +183,8 @@ class UserController extends ChangeNotifier {
 
       if (snapshotAdm.docs.isNotEmpty) {
         await _saveLoginState(true, login, 'Adm');
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const DashboardPanel()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const DashboardPanel()));
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -578,21 +576,23 @@ class UserController extends ChangeNotifier {
           idTeam: team.id, description: "Equipe ${team.name} usa proteção");
       addHistory(history);
       updateTeams(userTeam);
-
-      protectTimer = Future.delayed(const Duration(seconds: 10), () async {
-        if (_protectUpdateNotifier.value) {
-          // Atualiza o status da equipe e adiciona o histórico
-          await updateTeamStatus(team);
-          _protectUpdateNotifier.value =
-              false; // Notifica que o status foi atualizado
-        }
-      });
       if (team.status == Status.Jogando) {
         protectTimer = null;
         _protectUpdateNotifier.value =
             false; // Notifica que o status não precisa ser mais atualizado
         print('Proteção foi cancelada, a equipe está jogando.');
       }
+      protectTimer = Future.delayed(
+        const Duration(seconds: 10),
+        () async {
+          if (_protectUpdateNotifier.value) {
+            // Atualiza o status da equipe e adiciona o histórico
+            await updateTeamStatus(team);
+            _protectUpdateNotifier.value =
+                false; // Notifica que o status foi atualizado
+          }
+        },
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colors.redAccent,

@@ -229,7 +229,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
                       children: [
                         Icon(Icons.task),
                         SizedBox(width: 8),
-                        Text('Estatus'),
+                        Text('Gerenciar'),
                       ],
                     ),
                   ),
