@@ -238,7 +238,7 @@ class _ManagerState extends State<Manager> {
             ),
             Expanded(
               child: Card.filled(
-                color: Color.fromARGB(0, 0, 0, 0),
+                color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<Stage>(
                   columGrid: 1,
                   size: 150,
@@ -1853,7 +1853,6 @@ class _ManagerState extends State<Manager> {
                                     useCardFrezee: team.useCardFrezee,
                                     useCardProtect: team.useCardProtect),
                             };
-                            List<UserTeam> teamDetails = availableTeams;
 
                             Map<String, String> teamIdMap = {
                               for (var team in availableTeams)
@@ -1916,6 +1915,7 @@ class _ManagerState extends State<Manager> {
                                       user.selectedTeam = newValue;
                                       user.selectedTeamId = teamIdMap[newValue];
                                       user.selectedTeamStatus =
+                                          // ignore: collection_methods_unrelated_type
                                           teamStatusMap[newValue];
                                       user.selectedTeamName =
                                           teamNameMap[newValue];

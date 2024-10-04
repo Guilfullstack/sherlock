@@ -7,7 +7,6 @@ import 'package:sherlock/firebase_options.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
-import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/login_page.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter/foundation.dart' show kIsWeb;

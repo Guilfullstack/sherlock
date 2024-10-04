@@ -7,13 +7,11 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
-import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_adm.dart';
 import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/model/user_team.dart';
-import 'package:sherlock/view/page/controller_panel_page.dart';
 import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/page/login_page.dart';
@@ -72,6 +70,13 @@ class UserController extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PlayController playController = PlayController();
+
+  // Adiciona um ValueNotifier para acompanhar o status da equipe
+  final ValueNotifier<bool> _statusUpdateNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _protectUpdateNotifier = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> get statusUpdateNotifier => _statusUpdateNotifier;
+  ValueNotifier<bool> get protectUpdateNotifier => _protectUpdateNotifier;
 
   Future<UserTeam> addUserTeam(UserTeam userTeam) async {
     DocumentReference<UserTeam> userTeamDoc = userTeamref.doc();
@@ -521,13 +526,6 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  // Adiciona um ValueNotifier para acompanhar o status da equipe
-  final ValueNotifier<bool> _statusUpdateNotifier = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> _protectUpdateNotifier = ValueNotifier<bool>(false);
-
-  ValueNotifier<bool> get statusUpdateNotifier => _statusUpdateNotifier;
-  ValueNotifier<bool> get protectUpdateNotifier => _protectUpdateNotifier;
-
   void startStatusUpdateTimer(UserTeam team, BuildContext context) {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
@@ -537,16 +535,16 @@ class UserController extends ChangeNotifier {
           ? Status.Jogando
           : Status.Congelado;
       final userTeam = UserTeam(
-        id: selectedTeamId,
+        id: team.id,
         status: statusTeams,
-        useCardFrezee: true,
       );
       final history = History(
           idTeam: selectedTeamId,
-          description: team.status == Status.Protegido
+          description: selectedTeamStatus == Status.Protegido
               ? "Equipe \"${team.name}\" está com proteção e não pode ser congelado pela Equipe \"$selectedTeam\""
               : "Equipe\" $selectedTeam\" congelou \"${team.name}\"");
       addHistory(history);
+      updateTeams(UserTeam(id: selectedTeamId, useCardFrezee: true));
       updateTeams(userTeam);
       // caso a equipe esteja com proteção
       if (selectedTeamStatus == Status.Jogando) {
@@ -560,7 +558,7 @@ class UserController extends ChangeNotifier {
         });
       } else if (selectedTeamStatus == Status.Protegido) {
         Status status = Status.Jogando;
-        updateTeams(UserTeam(id: selectedTeamId, status: status));
+        updateTeams(UserTeam(id: team.id, status: status));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -587,6 +585,7 @@ class UserController extends ChangeNotifier {
             false; // Notifica que o status não precisa ser mais atualizado
         print('Proteção foi cancelada, a equipe está jogando.');
       }
+
       protectTimer = Future.delayed(
         const Duration(seconds: 10),
         () async {
@@ -610,10 +609,10 @@ class UserController extends ChangeNotifier {
     // Atualiza o status da equipe para 'Jogando' e adiciona o histórico
     try {
       statusTeams = Status.Jogando;
-      final updatedTeam = UserTeam(id: selectedTeamId, status: statusTeams);
+      final updatedTeam = UserTeam(id: team.id, status: statusTeams);
       final history = History(
         idTeam: selectedTeamId,
-        description: "Equipe \"$selectedTeamName\" Não está mais congelado",
+        description: "Equipe \"${team.name}\" Não está mais congelado",
       );
       await updateTeams(updatedTeam);
       await addHistory(history);
