@@ -52,48 +52,50 @@ class _ListTeamControllerState extends State<ListTeamController> {
   UserController user = UserController();
 
   TextSpan _buildHighlightedText(String text) {
-    // Definir palavras a serem destacadas
-    const highlightKeywords = [
-      'Equipe',
-      'equipe',
-      'Adicionado',
-      'Subtraido',
-      'congela equipe',
-      'Prova',
-      'congelou'
-    ];
-
-    // Separar o texto por espaços para análise
-    final words = text.split(' ');
+    // Expressão regular para identificar o texto entre aspas
+    final RegExp quoteRegExp = RegExp(r'".+?"');
 
     // Lista de TextSpan para construir o texto formatado
     final children = <TextSpan>[];
 
-    // Variável para rastrear a palavra anterior
-    String? previousWord;
+    // Usar a expressão regular para separar o texto em partes
+    final matches = quoteRegExp.allMatches(text);
 
-    for (var word in words) {
-      if (highlightKeywords.contains(previousWord)) {
-        // Adicionar a palavra destacada
+    int currentIndex = 0;
+
+    for (final match in matches) {
+      // Pega o texto anterior à próxima parte entre aspas
+      if (match.start > currentIndex) {
+        final normalText = text.substring(currentIndex, match.start);
         children.add(TextSpan(
-          text: '$word ',
+          text: normalText,
+          style: const TextStyle(color: Colors.white), // Estilo normal
+        ));
+      }
+
+      // Pega o texto entre aspas e remove as aspas
+      final highlightedText = match.group(0)?.replaceAll('"', '');
+      if (highlightedText != null) {
+        children.add(TextSpan(
+          text: highlightedText, // O texto entre aspas, sem as aspas
           style: const TextStyle(
             color: Colors.red, // Cor do destaque
             fontWeight: FontWeight.bold, // Peso do destaque
           ),
         ));
-      } else {
-        // Adicionar a palavra normal
-        children.add(TextSpan(
-          text: '$word ',
-          style: const TextStyle(
-            color: Colors.white, // Cor normal
-          ),
-        ));
       }
 
-      // Atualizar a palavra anterior
-      previousWord = word;
+      // Atualizar o índice atual
+      currentIndex = match.end;
+    }
+
+    // Adicionar qualquer texto restante após a última parte destacada
+    if (currentIndex < text.length) {
+      final remainingText = text.substring(currentIndex);
+      children.add(TextSpan(
+        text: remainingText,
+        style: const TextStyle(color: Colors.white), // Estilo normal
+      ));
     }
 
     return TextSpan(children: children);

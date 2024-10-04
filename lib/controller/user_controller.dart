@@ -64,6 +64,10 @@ class UserController extends ChangeNotifier {
   List<String> selectedStage = [];
   List<String> selectedStageEdit = [];
   String? selectedTeam;
+  String? selectedTeamId;
+  Status? selectedTeamStatus;
+  String? selectedTeamName;
+  UserTeam? selectedUserTeam;
 
   StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -528,23 +532,24 @@ class UserController extends ChangeNotifier {
     _statusUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
 
-    if (team.useCardFrezee == false) {
-      statusTeams =
-          team.status == Status.Protegido ? Status.Jogando : Status.Congelado;
+    if (selectedUserTeam!.useCardFrezee == false) {
+      statusTeams = selectedTeamStatus == Status.Protegido
+          ? Status.Jogando
+          : Status.Congelado;
       final userTeam = UserTeam(
-        id: team.id,
+        id: selectedTeamId,
         status: statusTeams,
         useCardFrezee: true,
       );
       final history = History(
-          idTeam: team.id,
+          idTeam: selectedTeamId,
           description: team.status == Status.Protegido
-              ? "Equipe ${team.name} está com proteção e não pode ser congelado pela Equipe $selectedTeam"
-              : "Equipe $selectedTeam congelou ${team.name}");
+              ? "Equipe \"${team.name}\" está com proteção e não pode ser congelado pela Equipe \"$selectedTeam\""
+              : "Equipe\" $selectedTeam\" congelou \"${team.name}\"");
       addHistory(history);
       updateTeams(userTeam);
       // caso a equipe esteja com proteção
-      if (team.status == Status.Jogando) {
+      if (selectedTeamStatus == Status.Jogando) {
         Future.delayed(const Duration(seconds: 10), () async {
           if (_statusUpdateNotifier.value) {
             // Atualiza o status da equipe e adiciona o histórico
@@ -553,9 +558,9 @@ class UserController extends ChangeNotifier {
                 false; // Notifica que o status foi atualizado
           }
         });
-      } else if (team.status == Status.Protegido) {
+      } else if (selectedTeamStatus == Status.Protegido) {
         Status status = Status.Jogando;
-        updateTeams(UserTeam(id: team.id, status: status));
+        updateTeams(UserTeam(id: selectedTeamId, status: status));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -573,7 +578,7 @@ class UserController extends ChangeNotifier {
       final userTeam =
           UserTeam(id: team.id, status: statusTeams, useCardProtect: true);
       final history = History(
-          idTeam: team.id, description: "Equipe ${team.name} usa proteção");
+          idTeam: team.id, description: "Equipe \"${team.name}\" usa proteção");
       addHistory(history);
       updateTeams(userTeam);
       if (team.status == Status.Jogando) {
@@ -605,10 +610,26 @@ class UserController extends ChangeNotifier {
     // Atualiza o status da equipe para 'Jogando' e adiciona o histórico
     try {
       statusTeams = Status.Jogando;
+      final updatedTeam = UserTeam(id: selectedTeamId, status: statusTeams);
+      final history = History(
+        idTeam: selectedTeamId,
+        description: "Equipe \"$selectedTeamName\" Não está mais congelado",
+      );
+      await updateTeams(updatedTeam);
+      await addHistory(history);
+    } catch (e) {
+      print("Erro ao atualizar status da equipe: $e");
+    }
+  }
+
+  Future<void> updateTeamStatusProtect(UserTeam team) async {
+    // Atualiza o status da equipe para 'Jogando' e adiciona o histórico
+    try {
+      statusTeams = Status.Jogando;
       final updatedTeam = UserTeam(id: team.id, status: statusTeams);
       final history = History(
         idTeam: team.id,
-        description: "Equipe ${team.name} perdeu a proteção.",
+        description: "Equipe \"${team.name}\" perdeu a proteção.",
       );
       await updateTeams(updatedTeam);
       await addHistory(history);

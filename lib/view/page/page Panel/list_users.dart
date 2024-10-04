@@ -6,6 +6,7 @@ class ListUsers<T> extends StatelessWidget {
   final String emptyMessage;
   final String errorMessage;
   final double size;
+  final double aspectRatio; // Novo parâmetro para o aspecto
   final int? columGrid;
 
   const ListUsers({
@@ -14,7 +15,9 @@ class ListUsers<T> extends StatelessWidget {
     required this.itemBuilder,
     required this.emptyMessage,
     required this.errorMessage,
-    required this.size, this.columGrid,
+    required this.size,
+    this.columGrid,
+    this.aspectRatio = 1.0, // Valor padrão para o aspecto
   });
 
   @override
@@ -35,17 +38,26 @@ class ListUsers<T> extends StatelessWidget {
 
         final listData = snapshot.data!;
 
-        return GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columGrid ?? 2, // Número de colunas
-            crossAxisSpacing: 10.0, // Espaço horizontal entre os itens
-            mainAxisSpacing: 10.0, // Espaço vertical entre os itens
-            childAspectRatio:
-                size, // Ajuste o aspecto dos itens (largura/altura)
-          ),
-          itemCount: listData.length,
-          itemBuilder: (context, index) {
-            return itemBuilder(context, listData[index], index);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Calcular o número de colunas baseado na largura disponível
+            double width = constraints.maxWidth;
+            int columns =
+                columGrid ?? (width ~/ size).clamp(1, 4); // 1 a 4 colunas
+
+            return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                crossAxisSpacing: 10.0, // Espaço horizontal entre os itens
+                mainAxisSpacing: 10.0, // Espaço vertical entre os itens
+                childAspectRatio:
+                    aspectRatio, // Ajuste o aspecto dos itens (largura/altura)
+              ),
+              itemCount: listData.length,
+              itemBuilder: (context, index) {
+                return itemBuilder(context, listData[index], index);
+              },
+            );
           },
         );
       },

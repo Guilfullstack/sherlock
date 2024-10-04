@@ -68,7 +68,8 @@ class _ManagerState extends State<Manager> {
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserTeam>(
-                  size: 4 / 1,
+                  aspectRatio: 2,
+                  size: 350,
                   stream: userController.teamStream,
                   emptyMessage: 'Não há equipes',
                   errorMessage: 'Erro ao carregar equipes',
@@ -128,7 +129,8 @@ class _ManagerState extends State<Manager> {
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserAdm>(
                   columGrid: 1,
-                  size: 9 / 1,
+                  size: 150,
+                  aspectRatio: 9.0,
                   stream: userController.admStream,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -178,7 +180,8 @@ class _ManagerState extends State<Manager> {
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserStaff>(
                   columGrid: 1,
-                  size: 9 / 1,
+                  size: 150,
+                  aspectRatio: 9.0,
                   stream: userController.staffStream,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -238,7 +241,8 @@ class _ManagerState extends State<Manager> {
                 color: Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<Stage>(
                   columGrid: 1,
-                  size: 7 / 1,
+                  size: 150,
+                  aspectRatio: 7.0,
                   stream: playController.codeStreamFilter,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -301,7 +305,8 @@ class _ManagerState extends State<Manager> {
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<History>(
-                    size: 6 / 1,
+                    aspectRatio: 6,
+                    size: 400,
                     stream: userController.historyStream,
                     emptyMessage: 'Não há nenhum colaborador',
                     errorMessage: 'Erro ao carregar colaboradores',
@@ -1838,6 +1843,33 @@ class _ManagerState extends State<Manager> {
                             return const Text('Nenhuma equipe disponível');
                           } else {
                             List<UserTeam> availableTeams = snapshot.data!;
+
+                            Map<String, UserTeam> teamDetailsMap = {
+                              for (var team in availableTeams)
+                                (team.name ?? "Sem nome"): UserTeam(
+                                    id: team.id ?? "",
+                                    name: team.name ?? "Sem nome",
+                                    status: team.status ?? Status.Jogando,
+                                    useCardFrezee: team.useCardFrezee,
+                                    useCardProtect: team.useCardProtect),
+                            };
+                            List<UserTeam> teamDetails = availableTeams;
+
+                            Map<String, String> teamIdMap = {
+                              for (var team in availableTeams)
+                                (team.name ?? "Sem nome"): team.id ?? ""
+                            };
+                            Map<Status, Status> teamStatusMap = {
+                              for (var team in availableTeams)
+                                (team.status ?? Status.Jogando):
+                                    team.status ?? Status.Jogando
+                            };
+
+                            Map<String, String> teamNameMap = {
+                              for (var team in availableTeams)
+                                (team.name ?? ""): team.name ?? ""
+                            };
+
                             List<String> teamNames = availableTeams
                                 .map((team) => team.name ?? "Sem nome")
                                 .toList();
@@ -1860,6 +1892,13 @@ class _ManagerState extends State<Manager> {
                               user.selectedTeam =
                                   teamNames.isNotEmpty ? teamNames.first : null;
                             }
+                            user.selectedUserTeam =
+                                teamDetailsMap[user.selectedTeam];
+                            user.selectedTeamId = teamIdMap[user.selectedTeam];
+                            user.selectedTeamStatus =
+                                teamStatusMap[teams.status];
+                            user.selectedTeamName = user.selectedTeam;
+
                             return Column(
                               children: [
                                 Text(
@@ -1875,6 +1914,11 @@ class _ManagerState extends State<Manager> {
                                     setState(() {
                                       user.teamDropDownHistory = newValue!;
                                       user.selectedTeam = newValue;
+                                      user.selectedTeamId = teamIdMap[newValue];
+                                      user.selectedTeamStatus =
+                                          teamStatusMap[newValue];
+                                      user.selectedTeamName =
+                                          teamNameMap[newValue];
                                     });
                                   },
                                 ),
@@ -1903,7 +1947,7 @@ class _ManagerState extends State<Manager> {
                           final history = History(
                               idTeam: teams.id,
                               description:
-                                  "Adicionado ${user.addValueHistoty.text} a Equipe ${teams.name}");
+                                  "Adicionado \"${user.addValueHistoty.text}\" a Equipe \"${teams.name}\"");
                           await user.addHistory(history);
                           await user.updateTeams(userTeam);
                           user.addValueStatus.clear();
@@ -1926,7 +1970,7 @@ class _ManagerState extends State<Manager> {
                           final history = History(
                               idTeam: teams.id,
                               description:
-                                  "Subtraido ${user.addValueHistoty.text} a equipe ${teams.name}");
+                                  "Subtraido \"${user.addValueHistoty.text}\" a equipe \"${teams.name}\"");
                           await user.addHistory(history);
                           await user.updateTeams(userTeam);
                           user.addValueStatus.clear();

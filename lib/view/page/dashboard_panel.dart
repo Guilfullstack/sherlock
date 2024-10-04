@@ -72,35 +72,47 @@ class _DashboardPanelState extends State<DashboardPanel> {
           // Drawer fixo na lateral esquerda
           Expanded(
             flex: 2,
-            child: Drawer(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.zero,
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.black, // Cor da borda
+                    width: 1.0, // Largura da borda
+                  ),
                 ),
               ),
-              child: ListView(
-                children: [
-                  item('Home', 0, () {
-                    setState(() {
-                      _selectedPage = 0; // Muda para a página Dashboard
-                    });
-                  }),
-                  item('Colaboradores', 1, () {
-                    setState(() {
-                      _selectedPage = 1; // Muda para a página Usuários
-                    });
-                  }),
-                  item('Provas', 2, () {
-                    setState(() {
-                      _selectedPage = 2; // Muda para a página Vendas
-                    });
-                  }),
-                  item('Hitorico', 3, () {
-                    setState(() {
-                      _selectedPage = 3; // Muda para a página Relatórios
-                    });
-                  }),
-                ],
+              child: Drawer(
+                elevation: 5,
+                backgroundColor: const Color(0xFF212A3E),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.zero,
+                  ),
+                ),
+                child: ListView(
+                  children: [
+                    item('Home', 0, () {
+                      setState(() {
+                        _selectedPage = 0; // Muda para a página Dashboard
+                      });
+                    }),
+                    item('Colaboradores', 1, () {
+                      setState(() {
+                        _selectedPage = 1; // Muda para a página Usuários
+                      });
+                    }),
+                    item('Provas', 2, () {
+                      setState(() {
+                        _selectedPage = 2; // Muda para a página Vendas
+                      });
+                    }),
+                    item('Hitorico', 3, () {
+                      setState(() {
+                        _selectedPage = 3; // Muda para a página Relatórios
+                      });
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
