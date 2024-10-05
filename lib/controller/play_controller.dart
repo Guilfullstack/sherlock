@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:sherlock/controller/tools_controller.dart';
-import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -47,11 +45,9 @@ class PlayController extends ChangeNotifier {
   }
 
   Future<List<Code>> getCodeList() async {
-    // Obtém os documentos da coleção 'Code'
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('Code').get();
 
-    // Converte os documentos em uma lista de objetos Code
     List<Code> codeList = querySnapshot.docs.map((doc) {
       return Code.fromJson(doc.data() as Map<String, dynamic>);
     }).toList();
@@ -60,11 +56,9 @@ class PlayController extends ChangeNotifier {
   }
 
   Future<List<Stage>> getStageList() async {
-    // Obtém os documentos da coleção 'Code'
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance.collection('Stage').get();
 
-    // Converte os documentos em uma lista de objetos Code
     List<Stage> stageList = querySnapshot.docs.map((doc) {
       return Stage.fromJson(doc.data() as Map<String, dynamic>);
     }).toList();
@@ -104,7 +98,6 @@ class PlayController extends ChangeNotifier {
     QuerySnapshot querySnapshot =
         await userCodeRef.where('id', isEqualTo: code.id).get();
 
-    // Função auxiliar para construir dinamicamente o mapa de atualização
     Map<String, dynamic> buildUpdateData(Code code) {
       Map<String, dynamic> data = {};
 
@@ -125,7 +118,6 @@ class PlayController extends ChangeNotifier {
     }
 
     if (querySnapshot.docs.isNotEmpty) {
-      // Se houver documentos encontrados, atualizar o primeiro documento encontrado
       DocumentSnapshot document = querySnapshot.docs.first;
       Map<String, dynamic> updateData = buildUpdateData(code);
 
@@ -229,26 +221,21 @@ class PlayController extends ChangeNotifier {
   Future<void> saveStageListToHive(List<Stage> stageList) async {
     try {
       final stageBox = Hive.box<Stage>('stageBox');
-      await stageBox
-          .clear(); // Opcional: limpa a caixa antes de adicionar novos itens
+      await stageBox.clear();
 
       for (var stage in stageList) {
         if (stage.id != null) {
-          await stageBox.put(
-              stage.id, stage); // Usa o ID como chave para cada stage
+          await stageBox.put(stage.id, stage);
         }
       }
-      print('Lista de estágios salva com sucesso no Hive.');
     } catch (e) {
-      print('Erro ao salvar a lista de estágios no Hive: $e');
+      debugPrint("Erro ao salvar lista: $e");
     }
   }
 
   Future<List<Stage>> getStageListFromHive() async {
-    // Obtém a caixa onde os códigos estão armazenados
     final codeBox = await Hive.openBox<Stage>('stageBox');
 
-    // Recupera todos os códigos da caixa
     final codeList = codeBox.values.toList();
 
     return codeList;

@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
           userController.addHistory(History(
               idTeam: currentUser!.id,
               description:
-                  "Prova \"${stage.description}\" de token \"$token\" foi desbloqueada, pela equipe \"${currentUser!.name}\""));
+                  "Equipe \"${currentUser!.name}\" desbloqueou a prova \"${stage.description}\""));
 
           setState(() {
             listTokenDesbloqued = userTeam!.listTokenDesbloqued;

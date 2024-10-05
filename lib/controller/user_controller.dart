@@ -71,7 +71,6 @@ class UserController extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PlayController playController = PlayController();
 
-  // Adiciona um ValueNotifier para acompanhar o status da equipe
   final ValueNotifier<bool> _statusUpdateNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _protectUpdateNotifier = ValueNotifier<bool>(false);
 
@@ -132,34 +131,28 @@ class UserController extends ChangeNotifier {
 
     if (kIsWeb) {
       // Navegar para a página de login se for Web
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
+      if (context.mounted) {
+        ToolsController.navigate(context, LoginPage());
+      }
     } else {
       // Limpar Hive e então navegar para a página de login se não for Web
       UserTeam? user = await getUserHive();
       user!.isLoged = false;
-      await updateTeams(user!);
-
+      await updateTeams(user);
+      addHistory(History(
+          idTeam: user.id,
+          description: "Equipe \"${user.name}\" saiu do jogo"));
       try {
         var userTeamBox = Hive.box<UserTeam>('userTeamBox');
         await userTeamBox.clear();
-        print('userTeamBox limpo com sucesso.');
-
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
-
-        print('stageBox limpo com sucesso.');
       } catch (e) {
-        print('Erro ao limpar a caixa do Hive: $e');
+        debugPrint('Erro ao limpar a caixa do Hive: $e');
       }
-
-      // Navegar para a página de login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
+      if (context.mounted) {
+        ToolsController.navigate(context, LoginPage());
+      }
     }
   }
 
@@ -192,8 +185,9 @@ class UserController extends ChangeNotifier {
 
       if (snapshotAdm.docs.isNotEmpty) {
         await _saveLoginState(true, login, 'Adm');
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const DashboardPanel()));
+        if (context.mounted) {
+          ToolsController.navigate(context, const DashboardPanel());
+        }
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -203,8 +197,10 @@ class UserController extends ChangeNotifier {
 
         if (snapshotTeam.docs.isNotEmpty) {
           if (kIsWeb) {
-            ToolsController.dialogMensage(context, "Web Platform",
-                "Equipes não tem acesso a plataforma Web");
+            if (context.mounted) {
+              ToolsController.dialogMensage(context, "Web Platform",
+                  "Equipes não tem acesso a plataforma Web");
+            }
           } else {
             // Armazena o usuário na caixa do Hive
             final user = UserTeam(
@@ -221,20 +217,25 @@ class UserController extends ChangeNotifier {
                 useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
                 isLoged: snapshotTeam.docs.first.data().isLoged);
             if (user.isLoged == true) {
-              ToolsController.dialogMensage(
-                  context, "Erro", "Usuário já está logado");
+              if (context.mounted) {
+                ToolsController.dialogMensage(
+                    context, "Erro", "Usuário já está logado");
+              }
             } else {
               user.isLoged = true;
               await updateTeams(user);
-
+              addHistory(History(
+                  idTeam: user.id,
+                  description: "Equipe \"${user.name}\" entrou no jogo"));
               saveUserHive(user);
               await _saveLoginState(true, login, 'Team');
 
               List<Stage> stageList = await playController.getStageList();
               await playController.saveStageListToHive(stageList);
 
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()));
+              if (context.mounted) {
+                ToolsController.navigate(context, const HomePage());
+              }
             }
           }
         } else {
@@ -246,17 +247,17 @@ class UserController extends ChangeNotifier {
 
           if (snapshotStaff.docs.isNotEmpty) {
             await _saveLoginState(true, login, 'Staff');
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const StaffPage())); // Substitua 'StaffPage' pela página correta.
+            if (context.mounted) {
+              ToolsController.navigate(context, const StaffPage());
+            }
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(
-                  'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
-            ));
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                backgroundColor: Colors.redAccent,
+                content: Text(
+                    'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
+              ));
+            }
           }
         }
       }
@@ -325,7 +326,6 @@ class UserController extends ChangeNotifier {
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newUserTeam);
 
@@ -343,7 +343,6 @@ class UserController extends ChangeNotifier {
       QuerySnapshot querySnapshot =
           await userAdmRef.where('id', isEqualTo: newUserAdm.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(UserAdm userAdm) {
         Map<String, dynamic> data = {};
 
@@ -358,8 +357,8 @@ class UserController extends ChangeNotifier {
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
+
         Map<String, dynamic> updateData = buildUpdateData(newUserAdm);
 
         if (updateData.isNotEmpty) {
@@ -376,7 +375,6 @@ class UserController extends ChangeNotifier {
       QuerySnapshot querySnapshot =
           await historyRef.where('id', isEqualTo: newHystory.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(History history) {
         Map<String, dynamic> data = {};
 
@@ -388,7 +386,6 @@ class UserController extends ChangeNotifier {
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newHystory);
 
@@ -406,7 +403,6 @@ class UserController extends ChangeNotifier {
       QuerySnapshot querySnapshot =
           await userStaffRef.where('id', isEqualTo: newUserStaff.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(UserStaff userStaff) {
         Map<String, dynamic> data = {};
 
@@ -427,7 +423,6 @@ class UserController extends ChangeNotifier {
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newUserStaff);
 
@@ -465,7 +460,6 @@ class UserController extends ChangeNotifier {
   }
 
   Stream<List<History>> get historyStream {
-    // Verifique se "Todos" está selecionado ou se o ID da equipe está definido
     if (teamDropDownHistory == 'Todos' || teamIdHistory == null) {
       return _firestore
           .collection('History')
@@ -477,7 +471,6 @@ class UserController extends ChangeNotifier {
         }).toList();
       });
     } else {
-      // Certifique-se de que o ID da equipe está sendo passado corretamente
       debugPrint('Filtrando pelo ID da equipe: $teamIdHistory');
       return _firestore
           .collection('History')
@@ -503,18 +496,15 @@ class UserController extends ChangeNotifier {
 
   Future<List<String>> getListMembers(String teamId) async {
     try {
-      // Obtém o documento da coleção 'Teams' pelo ID
       DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
           .collection('Teams')
           .doc(teamId)
           .get();
 
-      // Verifica se o documento existe e contém o campo 'listMembers'
       if (docSnapshot.exists) {
         Map data = docSnapshot.data() as Map<String, dynamic>;
         List? listMembers = data['listMembers'] ?? [];
 
-        // Converte a lista de membros para uma lista de strings
         if (listMembers != null) {
           return List<String>.from(listMembers);
         }
@@ -527,8 +517,7 @@ class UserController extends ChangeNotifier {
   }
 
   void startStatusUpdateTimer(UserTeam team, BuildContext context) {
-    _statusUpdateNotifier.value =
-        true; // Notifica que o status precisa ser atualizado
+    _statusUpdateNotifier.value = true;
 
     if (selectedUserTeam!.useCardFrezee == false) {
       statusTeams = selectedTeamStatus == Status.Protegido
@@ -546,14 +535,11 @@ class UserController extends ChangeNotifier {
       addHistory(history);
       updateTeams(UserTeam(id: selectedTeamId, useCardFrezee: true));
       updateTeams(userTeam);
-      // caso a equipe esteja com proteção
       if (selectedTeamStatus == Status.Jogando) {
         Future.delayed(const Duration(seconds: 10), () async {
           if (_statusUpdateNotifier.value) {
-            // Atualiza o status da equipe e adiciona o histórico
             await updateTeamStatus(team);
-            _statusUpdateNotifier.value =
-                false; // Notifica que o status foi atualizado
+            _statusUpdateNotifier.value = false;
           }
         });
       } else if (selectedTeamStatus == Status.Protegido) {
@@ -561,10 +547,8 @@ class UserController extends ChangeNotifier {
         updateTeams(UserTeam(id: team.id, status: status));
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text('A equipe já usou cartão de congelamento'),
-      ));
+      ToolsController.scafoldMensage(
+          context, Colors.redAccent, "A equipe já usou cartão de congelament");
     }
   }
 
@@ -583,25 +567,20 @@ class UserController extends ChangeNotifier {
         protectTimer = null;
         _protectUpdateNotifier.value =
             false; // Notifica que o status não precisa ser mais atualizado
-        print('Proteção foi cancelada, a equipe está jogando.');
       }
 
       protectTimer = Future.delayed(
         const Duration(seconds: 10),
         () async {
           if (_protectUpdateNotifier.value) {
-            // Atualiza o status da equipe e adiciona o histórico
             await updateTeamStatus(team);
-            _protectUpdateNotifier.value =
-                false; // Notifica que o status foi atualizado
+            _protectUpdateNotifier.value = false;
           }
         },
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text('A equipe já usou cartão de proteção'),
-      ));
+      ToolsController.scafoldMensage(
+          context, Colors.redAccent, "A equipe já usou cartão de proteção");
     }
   }
 
@@ -617,12 +596,11 @@ class UserController extends ChangeNotifier {
       await updateTeams(updatedTeam);
       await addHistory(history);
     } catch (e) {
-      print("Erro ao atualizar status da equipe: $e");
+      debugPrint("Erro ao atualizar status da equipe: $e");
     }
   }
 
   Future<void> updateTeamStatusProtect(UserTeam team) async {
-    // Atualiza o status da equipe para 'Jogando' e adiciona o histórico
     try {
       statusTeams = Status.Jogando;
       final updatedTeam = UserTeam(id: team.id, status: statusTeams);
@@ -633,7 +611,7 @@ class UserController extends ChangeNotifier {
       await updateTeams(updatedTeam);
       await addHistory(history);
     } catch (e) {
-      print("Erro ao atualizar status da equipe: $e");
+      debugPrint("Erro ao atualizar status da equipe: $e");
     }
   }
 }
