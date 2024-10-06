@@ -221,7 +221,11 @@ class UserController extends ChangeNotifier {
                     snapshotTeam.docs.first.data().listTokenDesbloqued,
                 useCardFrezee: snapshotTeam.docs.first.data().useCardFrezee,
                 useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
-                isLoged: snapshotTeam.docs.first.data().isLoged);
+                isLoged: snapshotTeam.docs.first.data().isLoged,
+                isPrisionBreak: snapshotTeam.docs.first.data().isPrisionBreak,
+                isPayCardFrezee: snapshotTeam.docs.first.data().isPayCardFrezee,
+                isPayCardProtected:
+                    snapshotTeam.docs.first.data().isPayCardProtected);
             if (user.isLoged == true) {
               if (context.mounted) {
                 ToolsController.dialogMensage(
@@ -248,7 +252,6 @@ class UserController extends ChangeNotifier {
               .get();
 
           staffId = snapshotStaff.docs.first.id;
-          print(staffId);
 
           if (snapshotStaff.docs.isNotEmpty) {
             if (context.mounted) {
@@ -325,6 +328,15 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.isLoged != null) {
           data['isLoged'] = newUserTeam.isLoged;
+        }
+        if (userTeam.isPrisionBreak != null) {
+          data['isPrisionBreak'] = newUserTeam.isPrisionBreak;
+        }
+        if (userTeam.isPayCardFrezee != null) {
+          data['isPayCardFrezee'] = newUserTeam.isPayCardFrezee;
+        }
+        if (userTeam.isPayCardProtected != null) {
+          data['isPayCardProtected'] = newUserTeam.isPayCardProtected;
         }
         return data;
       }

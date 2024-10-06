@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   PlayController playController = PlayController();
   StreamSubscription<DocumentSnapshot>? userSubscription;
   bool _isPopupVisible = false;
+  bool _isPop2Visible = false;
 
   @override
   void initState() {
@@ -70,27 +71,58 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           currentUser = updatedUser;
         });
-        await _checkIfUserIsFrozen();
+
+        await _checkUserStatus(
+          isStatusActive: currentUser!.status == Status.Congelado,
+          isPopupVisible: _isPopupVisible,
+          setPopupVisible: (visible) => _isPopupVisible = visible,
+          message: 'Sua equipe está congelada por 10 minutos',
+          iconContent: const Icon(Icons.ac_unit,
+              size: 50, color: Colors.blue), // Ícone de congelamento
+        );
+        await _checkUserStatus(
+          isStatusActive: currentUser!.isPrisionBreak == true,
+          isPopupVisible: _isPop2Visible,
+          setPopupVisible: (visible) => _isPop2Visible = visible,
+          message: 'Sua equipe está presa, pague a fiança',
+          iconContent: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.local_police,
+                  size: 50, color: Colors.blue), // Ícones de prisão
+              Icon(Icons.lock, size: 50, color: Colors.blue),
+            ],
+          ),
+        );
       }
     });
   }
 
-  Future<void> _checkIfUserIsFrozen() async {
+  Future<void> _checkUserStatus({
+    required bool isStatusActive,
+    required bool isPopupVisible,
+    required Function setPopupVisible,
+    required String message,
+    required Widget iconContent,
+  }) async {
     if (currentUser != null) {
-      if (currentUser!.status == Status.Congelado && !_isPopupVisible) {
-        _isPopupVisible = true;
+      if (isStatusActive && !isPopupVisible) {
+        setPopupVisible(true);
         showDialog(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
-            return const PopScope(
+            return PopScope(
               canPop: false,
               child: AlertDialog(
-                backgroundColor: Color(0xFF212A3E),
-                title: Icon(Icons.ac_unit, size: 50, color: Colors.blue),
+                backgroundColor: const Color(0xFF212A3E),
+                title: Center(
+                  child:
+                      iconContent, // Ícones personalizados com base no status
+                ),
                 content: Text(
-                  'Sua equipe está conjelada',
-                  style: TextStyle(color: Colors.white),
+                  message,
+                  style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -98,13 +130,13 @@ class _HomePageState extends State<HomePage> {
           },
         ).then((_) {
           setState(() {
-            _isPopupVisible = false;
+            setPopupVisible(false);
           });
         });
-      } else if (currentUser!.status != Status.Congelado && _isPopupVisible) {
+      } else if (!isStatusActive && isPopupVisible) {
         Navigator.of(context, rootNavigator: true).pop();
         setState(() {
-          _isPopupVisible = false;
+          setPopupVisible(false);
         });
       }
     }

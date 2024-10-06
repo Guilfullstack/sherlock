@@ -42,14 +42,20 @@ class UserTeam extends HiveObject {
   @HiveField(8)
   List? listMembers;
 
-  @HiveField(9) // Novo campo
+  @HiveField(9)
   bool? useCardFrezee;
 
-  @HiveField(10) // Novo campo
+  @HiveField(10)
   bool? useCardProtect;
 
-  @HiveField(11) // Novo campo
+  @HiveField(11)
   bool? isLoged;
+  @HiveField(12)
+  bool? isPrisionBreak;
+  @HiveField(13)
+  bool? isPayCardFrezee;
+  @HiveField(14)
+  bool? isPayCardProtected;
 
   UserTeam(
       {this.id,
@@ -63,7 +69,10 @@ class UserTeam extends HiveObject {
       this.listMembers,
       this.useCardFrezee,
       this.useCardProtect,
-      this.isLoged});
+      this.isLoged,
+      this.isPrisionBreak,
+      this.isPayCardFrezee,
+      this.isPayCardProtected});
 
   factory UserTeam.fromJson(dynamic json) {
     return UserTeam(
@@ -80,7 +89,10 @@ class UserTeam extends HiveObject {
         listMembers: List.from(json["listMembers"] ?? []),
         useCardFrezee: json["useCardFrezee"],
         useCardProtect: json["useCardProtect"],
-        isLoged: json["isLoged"]);
+        isLoged: json["isLoged"],
+        isPrisionBreak: json["isPrisionBreak"],
+        isPayCardFrezee: json["isPayCardFrezee"],
+        isPayCardProtected: json["isPayCardProtected"]);
   }
 
   dynamic toJson() => {
@@ -96,7 +108,10 @@ class UserTeam extends HiveObject {
         "listMembers": listMembers,
         "useCardFrezee": useCardFrezee,
         "useCardProtect": useCardProtect,
-        "isLoged": isLoged
+        "isLoged": isLoged,
+        "isPrisionBreak": isPrisionBreak,
+        "isPayCardFrezee": isPayCardFrezee,
+        "isPayCardProtected": isPayCardProtected
       };
 }
 

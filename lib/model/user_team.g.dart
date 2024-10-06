@@ -29,13 +29,16 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       useCardFrezee: fields[9] as bool?,
       useCardProtect: fields[10] as bool?,
       isLoged: fields[11] as bool?,
+      isPrisionBreak: fields[12] as bool?,
+      isPayCardFrezee: fields[13] as bool?,
+      isPayCardProtected: fields[14] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserTeam obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,7 +62,13 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       ..writeByte(10)
       ..write(obj.useCardProtect)
       ..writeByte(11)
-      ..write(obj.isLoged);
+      ..write(obj.isLoged)
+      ..writeByte(12)
+      ..write(obj.isPrisionBreak)
+      ..writeByte(13)
+      ..write(obj.isPayCardFrezee)
+      ..writeByte(14)
+      ..write(obj.isPayCardProtected);
   }
 
   @override
