@@ -13,39 +13,27 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 Future<void> initializeHive() async {
   if (kIsWeb) {
-    debugPrint('Inicialização do Hive ignorada na plataforma Web.');
-    return; // Não inicializa o Hive se for a Web
+    return;
   }
-
   try {
-    debugPrint('Inicializando o Hive...');
     final appDocumentDir =
         await path_provider.getApplicationDocumentsDirectory();
     await Hive.initFlutter(appDocumentDir.path);
-    debugPrint('Hive inicializado com o caminho: ${appDocumentDir.path}');
-
     // Registra os adaptadores do Hive
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(UserTeamAdapter());
-      debugPrint('UserTeamAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(StatusAdapter());
-      debugPrint('StatusAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(4)) {
       Hive.registerAdapter(CategoryAdapter());
-      debugPrint('CategoryAdapter registrado');
     }
     if (!Hive.isAdapterRegistered(5)) {
       Hive.registerAdapter(StageAdapter());
-      debugPrint('StageAdapter registrado');
     }
-    // Abra as caixas do Hive
     await Hive.openBox<UserTeam>('userTeamBox');
-    debugPrint('userTeamBox aberta');
     await Hive.openBox<Stage>('stageBox');
-    debugPrint('stageBox aberta');
     debugPrint('Caixas do Hive abertas com sucesso');
   } catch (e) {
     debugPrint('Erro ao inicializar o Hive: $e');
@@ -57,14 +45,11 @@ Future<void> main() async {
 
   // Inicializa o Firebase
   try {
-    debugPrint('Initializing Firebase...');
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
-    debugPrint('Firebase initialized successfully');
   } catch (e) {
     debugPrint('Error initializing Firebase: $e');
   }
-  // Pequeno atraso para garantir que os plugins estão carregados
   await Future.delayed(const Duration(seconds: 1));
   await initializeHive();
 

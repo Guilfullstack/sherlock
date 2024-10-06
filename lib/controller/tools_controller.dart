@@ -11,8 +11,13 @@ class ToolsController {
           title: Text(
             title,
             style: const TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
           ),
-          content: Text(mensage, style: const TextStyle(color: Colors.white)),
+          content: Text(
+            mensage,
+            style: const TextStyle(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
           actions: [
             TextButton(
               onPressed: () {

@@ -45,9 +45,7 @@ class CardPanelStages extends StatelessWidget {
             return CardStage(
               stage: stage,
               isUnlocked: isUnlocked,
-              position: index + 1,
               backgrundColor: const Color(0xFF523B76),
-              circleColor: const Color(0xFF212A3E),
               textColor: Colors.white,
             );
           },
