@@ -541,27 +541,22 @@ class UserController extends ChangeNotifier {
         status: statusTeams,
       );
       final history = History(
-        idTeam: selectedTeamId,
-        description: selectedTeamStatus == Status.Protegido
-            ? "Equipe \"${team.name}\" está com proteção e não pode ser congelado pela Equipe \"$selectedTeam\""
-            : "Equipe \"$selectedTeam\" congelou \"${team.name}\"",
-      );
+          idTeam: selectedTeamId,
+          description: selectedTeamStatus == Status.Protegido
+              ? "Equipe \"${team.name}\" está com proteção e não pode ser congelado pela Equipe \"$selectedTeam\""
+              : "Equipe\" $selectedTeam\" congelou \"${team.name}\"");
       addHistory(history);
       updateTeams(UserTeam(id: selectedTeamId, useCardFrezee: true));
       updateTeams(userTeam);
 
       if (selectedTeamStatus == Status.Jogando) {
-        // Cria um temporizador único para esta equipe
-        freezeTimers[team.id ?? ""] =
-            Future.delayed(const Duration(seconds: 30), () async {
+        Future.delayed(const Duration(seconds: 30), () async {
           if (_statusUpdateNotifier.value) {
             // Atualiza o status da equipe e adiciona o histórico
             await updateTeamStatus(team);
             _statusUpdateNotifier.value =
                 false; // Notifica que o status foi atualizado
           }
-          freezeTimers
-              .remove(team.id); // Remove o temporizador após a conclusão
         });
       } else if (selectedTeamStatus == Status.Protegido) {
         Status status = Status.Jogando;
@@ -579,31 +574,32 @@ class UserController extends ChangeNotifier {
     _protectUpdateNotifier.value =
         true; // Notifica que o status precisa ser atualizado
     statusTeams = Status.Protegido;
-
     if (team.useCardProtect == false) {
-      final userTeam = UserTeam(
-        id: team.id,
-        status: statusTeams,
-        useCardProtect: true,
-      );
+      final userTeam =
+          UserTeam(id: team.id, status: statusTeams, useCardProtect: true);
       final history = History(
-        idTeam: team.id,
-        description: "Equipe \"${team.name}\" usa proteção",
-      );
+          idTeam: team.id, description: "Equipe \"${team.name}\" usa proteção");
       await addHistory(history);
       await updateTeams(userTeam);
+      print(team.status);
+      if (statusTeams == Status.Jogando) {
+        protectTimer = null;
+        _protectUpdateNotifier.value =
+            false; // Notifica que o status não precisa ser mais atualizado
+        print('Proteção foi cancelada, a equipe está jogando.');
+      }
 
-      // Cria um temporizador de proteção único para esta equipe
-      protectTimers[team.id ?? ""] =
-          Future.delayed(const Duration(seconds: 30), () async {
-        if (_protectUpdateNotifier.value) {
-          // Atualiza o status da equipe e adiciona o histórico
-          await updateTeamStatusProtect(team);
-          _protectUpdateNotifier.value =
-              false; // Notifica que o status foi atualizado
-        }
-        protectTimers.remove(team.id); // Remove o temporizador após a conclusão
-      });
+      protectTimer = Future.delayed(
+        const Duration(seconds: 30),
+        () async {
+          if (_protectUpdateNotifier.value) {
+            // Atualiza o status da equipe e adiciona o histórico
+            await updateTeamStatus(team);
+            _protectUpdateNotifier.value =
+                false; // Notifica que o status foi atualizado
+          }
+        },
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colors.redAccent,
@@ -619,7 +615,7 @@ class UserController extends ChangeNotifier {
       final updatedTeam = UserTeam(id: team.id, status: statusTeams);
       final history = History(
         idTeam: selectedTeamId,
-        description: "Equipe \"${team.name}\" não está mais congelado",
+        description: "Equipe \"${team.name}\" Não está mais congelado",
       );
       await updateTeams(updatedTeam);
       await addHistory(history);

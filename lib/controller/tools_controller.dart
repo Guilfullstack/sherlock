@@ -32,4 +32,11 @@ class ToolsController {
       SnackBar(backgroundColor: color, content: Text(mensage)),
     );
   }
+
+  static void navigate(BuildContext context, Widget widget) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => widget),
+    );
+  }
 }
