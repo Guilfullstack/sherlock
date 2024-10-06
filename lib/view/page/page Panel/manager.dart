@@ -1569,11 +1569,14 @@ class _ManagerState extends State<Manager> {
         // Carrega os membros apenas uma vez
         try {
           userController.getListMembers(idTeams).then((userTeams) {
-            setState(() {
-              member = userTeams;
-              membersNumeber = member.length;
-              hasLoadedMembers = true; // Marca como carregado
-            });
+            if (mounted) {
+              setState(() {
+                member = userTeams;
+                membersNumeber = member.length;
+                hasLoadedMembers = true; // Marca como carregado
+              });
+            }
+
             // hasLoadedMembers != hasLoadedMembers;
           }).catchError((error) {
             // Tratar o erro se necessário
