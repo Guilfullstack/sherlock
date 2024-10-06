@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
@@ -16,7 +15,6 @@ import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/widgets/custom_dropdown.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 import 'package:sherlock/view/widgets/list_team_controller.dart';
-import 'package:sherlock/view/widgets/menssage.dart';
 
 class ControllerPanelPage extends StatefulWidget {
   const ControllerPanelPage({super.key});
@@ -1532,10 +1530,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                           if (staff == true &&
                                               update == false) {
                                             selectedList.add(code.id!);
-                                            print('add normal');
                                           } else {
                                             selectedListEdit.add(code.id!);
-                                            print('add edit');
                                           }
                                         } else if (value == false) {
                                           if (staff == true &&
@@ -1543,10 +1539,8 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                             selectedList.remove(code.id!);
                                           } else {
                                             selectedListEdit.remove(code.id!);
-                                            print("remover");
                                           }
                                         }
-                                        print("${selectedListEdit}");
                                       });
                                     },
                                     //
@@ -2168,7 +2162,6 @@ addValue(
                   onChanged: (value) {
                     setState(() {
                       dropDonw = value!;
-                      print(dropDonw);
                     });
                   },
                 ),
@@ -2216,7 +2209,6 @@ addValue(
                           user.selectedTeam =
                               teamNames.isNotEmpty ? teamNames.first : null;
                         }
-                        print('$user.selectedTeam');
                         return CustomDropdown(
                           value: user
                               .selectedTeam, // Certifique-se de que value não é nulo

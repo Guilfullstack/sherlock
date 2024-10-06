@@ -80,6 +80,7 @@ class _ManagerState extends State<Manager> {
                       credit: team.credit,
                       usedCardFreeze: team.useCardFrezee,
                       usedCardProtect: team.useCardProtect,
+                      isLoged: team.isLoged,
                       status: playController.statusToString(team.status!),
                       onTapRemove: () {
                         userController.removeUser(0, team.id.toString());
@@ -217,7 +218,7 @@ class _ManagerState extends State<Manager> {
                             );
                           },
                         ).then((_) {
-                          setState(() {});
+                          // setState(() {});
                         });
                       },
                     );
@@ -554,10 +555,7 @@ class _ManagerState extends State<Manager> {
                         }),
                   ),
                   Wrap(
-                    alignment: MediaQuery.of(context).size.width > 1329 ||
-                            update == true
-                        ? WrapAlignment.center
-                        : WrapAlignment.spaceEvenly,
+                    alignment: WrapAlignment.center,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -622,9 +620,8 @@ class _ManagerState extends State<Manager> {
                                         });
                                         await userController
                                             .addUserStaff(newUserStaff);
-                                        setState(() {
-                                          userController.loading = false;
-                                        });
+
+                                        userController.loading = false;
                                       } else {
                                         if (update == false) {
                                           //addAdm
@@ -862,14 +859,16 @@ class _ManagerState extends State<Manager> {
                                     addAdm == false
                             ? true
                             : false,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: addMembers(
-                              false,
-                              userController.memberId.text,
-                              userController.membersTeam,
-                              update == true ? true : false),
-                        ),
+                        child: userController.loading == false
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: addMembers(
+                                    false,
+                                    userController.memberId.text,
+                                    userController.membersTeam,
+                                    update == true ? true : false),
+                              )
+                            : const SizedBox.shrink(),
                       ),
                       Visibility(
                         visible: staff == true
@@ -881,23 +880,25 @@ class _ManagerState extends State<Manager> {
                             //         (selectionStaff == 'Prova' && staff == true)
                             ? true
                             : false,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                addCodeStaff(
-                                    setState,
-                                    userController.selectedStage,
-                                    userController.selectedStageEdit,
-                                    update,
-                                    staff);
-                              },
-                              child: staff == true && update == false
-                                  ? Text(
-                                      'Adiconar Visualização ${userController.selectedStage.length}')
-                                  : Text(
-                                      ' Visualizar provas ${userController.selectedStageEdit.length}')),
-                        ),
+                        child: userController.loading == false
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                    onPressed: () {
+                                      addCodeStaff(
+                                          setState,
+                                          userController.selectedStage,
+                                          userController.selectedStageEdit,
+                                          update,
+                                          staff);
+                                    },
+                                    child: staff == true && update == false
+                                        ? Text(
+                                            'Adiconar Visualização ${userController.selectedStage.length}')
+                                        : Text(
+                                            ' Visualizar provas ${userController.selectedStageEdit.length}')),
+                              )
+                            : const SizedBox.shrink(),
                       ),
                       // Botão adicionar equipes
                       // Botão remover equipes
@@ -944,7 +945,7 @@ class _ManagerState extends State<Manager> {
         context: context,
         builder: (build) {
           return AlertDialog(
-            backgroundColor: Colors.grey,
+            backgroundColor: Colors.black,
             content: SizedBox(
               width: 300,
               height: 450,
@@ -974,7 +975,7 @@ class _ManagerState extends State<Manager> {
                           return SizedBox(
                             height: MediaQuery.of(context).size.height * 0.6,
                             child: Card(
-                              color: Colors.grey,
+                              color: Colors.black,
                               child: ListView.builder(
                                 itemCount: listCode.length,
                                 itemBuilder: (context, index) {
@@ -1472,7 +1473,7 @@ class _ManagerState extends State<Manager> {
             ? MediaQuery.of(context).size.height - 140
             : MediaQuery.of(context).size.height / 2 - 100,
         child: Card(
-          color: const Color.fromRGBO(189, 189, 189, 189),
+          color: Colors.black,
           child: StreamBuilder<List<Stage>>(
             stream: playController.codeStreamFilter,
             builder: (context, snapshot) {
@@ -1740,6 +1741,7 @@ class _ManagerState extends State<Manager> {
   ) {
     bool isSwitch1On = teams.useCardFrezee == true ? true : false;
     bool isSwitch2On = teams.useCardProtect == true ? true : false;
+    bool isLogado = teams.isLoged == true ? true : false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1795,6 +1797,25 @@ class _ManagerState extends State<Manager> {
                                 UserTeam(id: teams.id, useCardProtect: value));
                             setState(() {
                               isSwitch2On = value;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Esta logado",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Switch(
+                          value: isLogado,
+                          onChanged: (value) async {
+                            await user.updateTeams(
+                                UserTeam(id: teams.id, isLoged: value));
+                            setState(() {
+                              isLogado = value;
                             });
                           },
                         ),

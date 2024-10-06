@@ -20,6 +20,7 @@ class ListTeamController extends StatefulWidget {
   final bool? valueChack;
   final bool? usedCardFreeze;
   final bool? usedCardProtect;
+  final bool? isLoged;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -42,6 +43,7 @@ class ListTeamController extends StatefulWidget {
     this.valueChack,
     this.usedCardFreeze,
     this.usedCardProtect,
+    this.isLoged,
   });
 
   @override
@@ -178,7 +180,8 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   ? Text(
                       "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
                       "\nUsou Carta Congelar. ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
-                      "\nUsou Carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}",
+                      "\nUsou Carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}"
+                      "\nEsta logado. ${widget.isLoged == true ? "Logado" : "Deslogado"}",
                       style: const TextStyle(color: Colors.white),
                     )
                   : null,
