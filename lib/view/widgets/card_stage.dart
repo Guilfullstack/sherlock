@@ -6,18 +6,14 @@ import 'package:sherlock/model/stage.dart';
 class CardStage extends StatelessWidget {
   final Stage stage;
   final bool isUnlocked;
-  final int position;
   final Color? backgrundColor;
-  final Color? circleColor;
   final Color? textColor;
 
   const CardStage({
     super.key,
     required this.stage,
     required this.isUnlocked,
-    required this.position,
     this.backgrundColor,
-    this.circleColor,
     this.textColor,
   });
 
@@ -49,9 +45,9 @@ class CardStage extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              "Enigma",
-                              style: TextStyle(
+                            Text(
+                              stage.description ?? '',
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -81,10 +77,10 @@ class CardStage extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: backgrundColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: Colors.white,
-            width: 1.0,
+            //width: 1.0,
           ),
         ),
         child: ListTile(
@@ -96,13 +92,12 @@ class CardStage extends StatelessWidget {
               color: textColor,
             ),
           ),
-          leading: CircleAvatar(
-            backgroundColor: circleColor,
-            child: Text(
-              '$position',
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-            ),
-          ),
+          leading: const CircleAvatar(
+              child: Icon(
+            Icons.search,
+            color: Colors.purple,
+            size: 30,
+          )),
           trailing: isUnlocked
               ? const Icon(
                   Icons.check_circle,

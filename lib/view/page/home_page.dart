@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
@@ -28,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   UserController userController = UserController();
   PlayController playController = PlayController();
   StreamSubscription<DocumentSnapshot>? userSubscription;
-  bool _isPopupVisible = false; // Flag de controle para o pop-up
+  bool _isPopupVisible = false;
 
   @override
   void initState() {
@@ -38,8 +37,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    userSubscription
-        ?.cancel(); // Cancela a assinatura quando o widget é destruído
+    userSubscription?.cancel();
     super.dispose();
   }
 
@@ -61,16 +59,14 @@ class _HomePageState extends State<HomePage> {
 
   void _listenToDatabaseChanges(String id) {
     userSubscription = FirebaseFirestore.instance
-        .collection('Teams') // Nome da coleção no Firestore
-        .doc(id) // Substitua 'user_id' pelo ID do usuário específico
-        .snapshots() // Obtém as mudanças em tempo real
+        .collection('Teams')
+        .doc(id)
+        .snapshots()
         .listen((DocumentSnapshot snapshot) async {
       if (snapshot.exists) {
-        UserTeam updatedUser = UserTeam.fromJson(snapshot.data()
-            as Map<String, dynamic>); // Converte o documento para um UserTeam
-        // Salva as atualizações no Hive
+        UserTeam updatedUser =
+            UserTeam.fromJson(snapshot.data() as Map<String, dynamic>);
         await userController.saveUserHive(updatedUser);
-        // Atualiza a interface do usuário
         setState(() {
           currentUser = updatedUser;
         });
@@ -82,28 +78,31 @@ class _HomePageState extends State<HomePage> {
   Future<void> _checkIfUserIsFrozen() async {
     if (currentUser != null) {
       if (currentUser!.status == Status.Congelado && !_isPopupVisible) {
-        _isPopupVisible = true; // Marca o pop-up como visível
+        _isPopupVisible = true;
         showDialog(
           context: context,
-          barrierDismissible: false, // Não permite fechar clicando fora
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return const PopScope(
-              canPop: false, // Impede o fechamento com o botão de voltar
+              canPop: false,
               child: AlertDialog(
-                title: Icon(Icons.lock, size: 50, color: Colors.red),
-                content: Text('Você está bloqueado!'),
+                backgroundColor: Color(0xFF212A3E),
+                title: Icon(Icons.ac_unit, size: 50, color: Colors.blue),
+                content: Text(
+                  'Sua equipe está conjelada',
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
               ),
             );
           },
         ).then((_) {
-          // Após o pop-up ser fechado, defina a flag como falsa
           setState(() {
             _isPopupVisible = false;
           });
         });
       } else if (currentUser!.status != Status.Congelado && _isPopupVisible) {
-        // Fecha o pop-up automaticamente quando o status mudar de "congelado"
-        Navigator.of(context, rootNavigator: true).pop(); // Fecha o pop-up
+        Navigator.of(context, rootNavigator: true).pop();
         setState(() {
           _isPopupVisible = false;
         });
@@ -111,23 +110,21 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void execultCode(String token) async {
+  void execultCode(BuildContext context, String token) async {
     List<Stage> listStage = await playController.getStageListFromHive();
     UserTeam? userTeam = UserTeam();
     for (var stage in listStage) {
       if (stage.token == token) {
-        // Verifica se o token já está na lista
         if (listTokenDesbloqued!.contains(stage.token)) {
-          ToolsController.dialogMensage(
-              context, 'Info', 'Essa prova já está desbloqueada!');
+          if (context.mounted) {
+            ToolsController.dialogMensage(
+                context, 'Info', 'Essa prova já está desbloqueada!');
+          }
         } else {
-          // //salvar no hive
           userTeam = await userController.getUserHive();
           userTeam!.listTokenDesbloqued!.add(token);
-          // await userController.saveUserHive(userTeam);
-          // //mandar para banco de dados
+          await userController.saveUserHive(userTeam);
           userController.updateTeams(userTeam);
-          //historico
           userController.addHistory(History(
               idTeam: currentUser!.id,
               description:
@@ -136,30 +133,17 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             listTokenDesbloqued = userTeam!.listTokenDesbloqued;
           });
-
-          ToolsController.scafoldMensage(
-              context, Colors.green, 'Prova desbloqueada com sucesso!');
+          if (context.mounted) {
+            ToolsController.scafoldMensage(
+                context, Colors.green, 'Prova desbloqueada com sucesso!');
+          }
         }
         return;
       }
     }
-
-    ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
-  }
-
-  void showFullScreenImage(BuildContext context, String imagePath) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          body: PhotoView(
-            imageProvider: AssetImage(imagePath),
-            minScale: PhotoViewComputedScale.contained,
-            maxScale: PhotoViewComputedScale.covered * 2,
-          ),
-        ),
-      ),
-    );
+    if (context.mounted) {
+      ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
+    }
   }
 
   @override
@@ -171,16 +155,13 @@ class _HomePageState extends State<HomePage> {
           'images/logo.png',
         ),
         title: const Text(
-          'SHERLOK',
+          'SHERLOCK',
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutPage()),
-                );
+                ToolsController.navigate(context, const AboutPage());
               },
               icon: const Icon(
                 Icons.info,
@@ -201,7 +182,6 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      // backgroundColor: Color(0xFF171D26),
       backgroundColor: const Color(0xFF212A3E),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -216,7 +196,6 @@ class _HomePageState extends State<HomePage> {
                   useCardProtect: currentUser!.useCardProtect ?? false,
                 )
               : const CircularProgressIndicator(),
-          // const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
@@ -226,7 +205,8 @@ class _HomePageState extends State<HomePage> {
                     icon: Symbols.map,
                     nome: 'Mapa',
                     onTap: () {
-                      showFullScreenImage(context, 'images/mapa.png');
+                      playController.showFullScreenImage(
+                          context, 'images/mapa.png');
                     }),
                 const SizedBox(
                   width: 20,
@@ -266,23 +246,18 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextFormField(
-                        style: const TextStyle(
-                            color: Colors.white), // Cor do texto digitado
+                        style: const TextStyle(color: Colors.white),
                         controller: codeController,
                         decoration: const InputDecoration(
                           labelText: 'Inserir código',
-                          labelStyle:
-                              TextStyle(color: Colors.white), // Cor do label
-                          hintText: 'Código', // Placeholder
-                          hintStyle: TextStyle(
-                              color: Colors.white54), // Cor do placeholder
+                          labelStyle: TextStyle(color: Colors.white),
+                          hintText: 'Código',
+                          hintStyle: TextStyle(color: Colors.white54),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.white54), // Borda ao habilitar
+                            borderSide: BorderSide(color: Colors.white54),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.white), // Borda ao focar
+                            borderSide: BorderSide(color: Colors.white),
                           ),
                         ),
                         cursorColor: Colors.white,
@@ -304,23 +279,23 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: const Text(
                       'Cancelar',
-                      style: TextStyle(color: Colors.white), // Cor do texto
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
                         final String token = codeController.text;
-                        execultCode(token);
+                        execultCode(context, token);
 
                         Navigator.of(context).pop();
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple, // Cor do fundo do botão
+                      backgroundColor: Colors.purple,
                     ),
                     child: const Text('Desbloquear',
-                        style: TextStyle(color: Colors.white)), // Cor do texto
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               );

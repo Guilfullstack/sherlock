@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
@@ -246,6 +247,21 @@ class PlayController extends ChangeNotifier {
       context,
       MaterialPageRoute(
         builder: (context) => const Scaffold(body: CardPage()),
+      ),
+    );
+  }
+
+  void showFullScreenImage(BuildContext context, String imagePath) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          body: PhotoView(
+            imageProvider: AssetImage(imagePath),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          ),
+        ),
       ),
     );
   }
