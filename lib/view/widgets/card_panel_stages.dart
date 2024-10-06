@@ -31,7 +31,7 @@ class CardPanelStages extends StatelessWidget {
         ),
       ),
       height:
-          MediaQuery.of(context).size.height * 0.50, // 50% da altura da tela,
+          MediaQuery.of(context).size.height / 2.2, // 50% da altura da tela,
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(10),
       child: Card(

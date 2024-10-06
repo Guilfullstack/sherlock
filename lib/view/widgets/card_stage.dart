@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/model/stage.dart';
@@ -32,10 +33,10 @@ class CardStage extends StatelessWidget {
                       width: 300, // Define a largura do container
                       height: 400, // Define a altura do container
                       decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                         image: DecorationImage(
                           image: AssetImage(
-                              'images/eniguima2.jpg'), // Caminho da imagem
-
+                              'images/eniguima.jpg'), // Caminho da imagem
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -46,19 +47,27 @@ class CardStage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              stage.description ?? '',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                              'SHERLOCK',
+                              style: GoogleFonts.anton(
+                                textStyle: const TextStyle(
+                                  fontSize:
+                                      48, // Aumente o tamanho para dar um impacto maior
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing:
+                                      2.0, // Espaçamento entre letras para efeito de manchete
+                                ),
                               ),
                             ),
                             const SizedBox(height: 20),
                             Text(
                               stage.puzzle ?? '',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
+                              style: GoogleFonts.libreBaskerville(
+                                textStyle: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                ),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -78,10 +87,6 @@ class CardStage extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgrundColor,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: Colors.white,
-            //width: 1.0,
-          ),
         ),
         child: ListTile(
           title: Text(
@@ -93,11 +98,12 @@ class CardStage extends StatelessWidget {
             ),
           ),
           leading: const CircleAvatar(
+              backgroundColor: Color(0xFF212A3E),
               child: Icon(
-            Icons.search,
-            color: Colors.purple,
-            size: 30,
-          )),
+                Icons.search,
+                color: Colors.purple,
+                size: 30,
+              )),
           trailing: isUnlocked
               ? const Icon(
                   Icons.check_circle,
@@ -105,7 +111,7 @@ class CardStage extends StatelessWidget {
                 )
               : const Icon(
                   Icons.lock,
-                  color: Colors.red,
+                  color: Color(0xFF212A3E),
                 ),
         ),
       ),
