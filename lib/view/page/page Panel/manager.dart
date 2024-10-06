@@ -818,38 +818,7 @@ class _ManagerState extends State<Manager> {
                                     : "Atualizar"))
                             : const Center(child: CircularProgressIndicator()),
                       ),
-                      //botão historico
-                      // Visibility(
-                      //   visible: MediaQuery.of(context).size.width > 1250 ||
-                      //           update == true
-                      //       ? false
-                      //       : true,
-                      //   child: StatefulBuilder(
-                      //       builder: (BuildContext context, setState) {
-                      //     return Padding(
-                      //       padding: const EdgeInsets.only(top: 8.0),
-                      //       child: ElevatedButton(
-                      //         onPressed: () {
-                      //           setState(() {
-                      //             historyVisible = true;
-                      //             debugPrint("${userController.history}");
-                      //           });
-
-                      //           showModalBottomSheet(
-                      //               isScrollControlled: true,
-                      //               context: context,
-                      //               builder: (BuildContext context) {
-                      //                 return Form(
-                      //                     key: userController.formKeyEditTeam,
-                      //                     child: history(context, true));
-                      //               });
-                      //           historyVisible = false;
-                      //         },
-                      //         child: const Text("Historico"),
-                      //       ),
-                      //     );
-                      //   }),
-                      // ),
+                      
                       Visibility(
                         visible: (addAdm == false &&
                                     update == true &&
@@ -1181,93 +1150,7 @@ class _ManagerState extends State<Manager> {
                       ),
                     ),
                   ),
-                  // Visibility(
-                  //   visible: (value2 == Category.stage ||
-                  //               value2Edit == Category.stage) &&
-                  //           update == true &&
-                  //           editStage == true
-                  //       ? false
-                  //       : true,
-                  //   child: Column(
-                  //     children: [
-                  //       categorySelected(
-                  //         'Adicionar',
-                  //         update == true ? value2Edit : value2,
-                  //         Category.receive,
-                  //         (value) {
-                  //           setState(() {
-                  //             update == true
-                  //                 ? value2Edit = Category.receive
-                  //                 : value2 = Category.receive;
-                  //           });
-                  //         },
-                  //       ),
-                  //       categorySelected(
-                  //         'Subtrair',
-                  //         update == true ? value2Edit : value2,
-                  //         Category.pay,
-                  //         (value) {
-                  //           setState(() {
-                  //             update == true
-                  //                 ? value2Edit = Category.pay
-                  //                 : value2 = Category.pay;
-                  //           });
-                  //         },
-                  //       ),
-                  //       categorySelected(
-                  //         'Congelar',
-                  //         update == true ? value2Edit : value2,
-                  //         Category.freezing,
-                  //         (value) {
-                  //           setState(() {
-                  //             update == true
-                  //                 ? value2Edit = Category.freezing
-                  //                 : value2 = Category.freezing;
-                  //             update == true
-                  //                 ? playController.valueEdit.text = "0"
-                  //                 : playController.value.text = "0";
-                  //           });
-                  //         },
-                  //       ),
-                  //       categorySelected(
-                  //         'Escudo',
-                  //         update == true ? value2Edit : value2,
-                  //         Category.protect,
-                  //         (value) {
-                  //           setState(() {
-                  //             update == true
-                  //                 ? value2Edit = Category.protect
-                  //                 : value2 = Category.protect;
-                  //             update == true
-                  //                 ? playController.valueEdit.text = "0"
-                  //                 : playController.value.text = "0";
-                  //           });
-                  //         },
-                  //       ),
-                  //       Padding(
-                  //         padding: const EdgeInsets.only(top: 8.0),
-                  //         child: ImputTextFormField(
-                  //           enabled: value2 == Category.pay ||
-                  //                   value2 == Category.receive ||
-                  //                   value2Edit == Category.pay ||
-                  //                   value2Edit == Category.receive
-                  //               ? true
-                  //               : false,
-                  //           title: 'Valor',
-                  //           controller: update == true
-                  //               ? playController.valueEdit
-                  //               : playController.value,
-                  //           keyboardType: const TextInputType.numberWithOptions(
-                  //               decimal: true),
-                  //           inputFormatters: [
-                  //             FilteringTextInputFormatter.allow(
-                  //                 RegExp(r'^\d*\.?\d*')),
-                  //           ],
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -1293,7 +1176,6 @@ class _ManagerState extends State<Manager> {
                                               .descriptionEdit.text,
                                           puzzle:
                                               playController.puzzleEdit.text,
-                                          //category: value2Edit,
                                         );
                                         setState(() {
                                           userController.loading = true;
@@ -1314,7 +1196,6 @@ class _ManagerState extends State<Manager> {
                                           token: playController.tokenEdit.text,
                                           description: playController
                                               .descriptionEdit.text,
-                                          // puzzle: playController.puzzleEdit.text,
                                           category: value2Edit,
                                           value: playController
                                                   .valueEdit.text.isEmpty
@@ -1360,7 +1241,6 @@ class _ManagerState extends State<Manager> {
                                           token: playController.token.text,
                                           description:
                                               playController.description.text,
-                                          //puzzle: playController.puzzle.text,
                                           category: value2,
                                           value: playController
                                                   .value.text.isEmpty
@@ -1384,36 +1264,6 @@ class _ManagerState extends State<Manager> {
                                     update == true ? "Atualizar" : "Adicionar"))
                             : const Center(child: CircularProgressIndicator()),
                       ),
-                      // lsita de prova versão mobile
-                      // Visibility(
-                      //   visible: MediaQuery.of(context).size.width > 1250 ||
-                      //           update == true
-                      //       ? false
-                      //       : true,
-                      //   child: StatefulBuilder(
-                      //       builder: (BuildContext context, setState) {
-                      //     return ElevatedButton(
-                      //       onPressed: () {
-                      //         setState(() {
-                      //           historyVisible = true;
-                      //           debugPrint("${userController.history}");
-                      //         });
-
-                      //         showModalBottomSheet(
-                      //             isScrollControlled: true,
-                      //             context: context,
-                      //             builder: (BuildContext context) {
-                      //               return Form(
-                      //                   key: userController.formKeyEditTeam,
-                      //                   child: listCodeStage(
-                      //                       context, playController, 400));
-                      //             });
-                      //         historyVisible = false;
-                      //       },
-                      //       child: const Text("Provas"),
-                      //     );
-                      //   }),
-                      // ),
                     ],
                   ),
                 ],
@@ -1449,8 +1299,6 @@ class _ManagerState extends State<Manager> {
           titulo,
           style: const TextStyle(
             color: Colors.white,
-            // fontWeight: FontWeight.bold,
-            // fontSize: 24,
           ),
         ),
         value: valor,
@@ -1512,8 +1360,6 @@ class _ManagerState extends State<Manager> {
                             equipe: code.description,
                             status: code.token,
                             credit: 0,
-                            // category: playController
-                            //     .categoryToString(code.category as Category),
                             onTapRemove: () {
                               playController.removePlay(1, code.id.toString());
                             },
@@ -1577,7 +1423,6 @@ class _ManagerState extends State<Manager> {
               });
             }
 
-            // hasLoadedMembers != hasLoadedMembers;
           }).catchError((error) {
             // Tratar o erro se necessário
             debugPrint('Erro ao carregar membros: $error');
@@ -1705,7 +1550,6 @@ class _ManagerState extends State<Manager> {
                               setStateDialog(() {
                                 hasLoadedMembers = false;
                               });
-
                               exitWindows(); // Fechar o diálogo
                             } else {
                               exitWindows(); // Fechar o diálogo
@@ -1731,7 +1575,6 @@ class _ManagerState extends State<Manager> {
   }
 
   exitWindows() {
-    // hasLoadedMembers = false;
     Navigator.pop(context);
   }
 
