@@ -3,7 +3,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/home_page.dart';
-import 'package:sherlock/view/page/staff_page.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     String category = prefs.getString('category') ?? '';
 
-    if (!mounted) return; 
+    if (!mounted) return;
 
     if (isLoggedIn) {
       // Navega para a tela correspondente com base na categoria do usuário
@@ -37,17 +36,10 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const HomePage()));
           break;
-        case 'Staff':
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      const StaffPage())); // Substitua 'StaffPage' pela página correta.
-          break;
         default:
           // Caso não haja uma categoria válida, volte para a tela de login
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const LoginPage()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const LoginPage()));
       }
     }
   }

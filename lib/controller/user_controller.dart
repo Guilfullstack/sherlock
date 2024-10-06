@@ -128,12 +128,10 @@ class UserController extends ChangeNotifier {
   }
 
   Future<void> logout(BuildContext context) async {
-    // Limpar SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
     if (kIsWeb) {
-      // Navegar para a página de login se for Web
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -141,7 +139,6 @@ class UserController extends ChangeNotifier {
         );
       }
     } else {
-      // Limpar Hive e então navegar para a página de login se não for Web
       UserTeam? user = await getUserHive();
       user!.isLoged = false;
       await updateTeams(user);
@@ -149,22 +146,18 @@ class UserController extends ChangeNotifier {
       try {
         var userTeamBox = Hive.box<UserTeam>('userTeamBox');
         await userTeamBox.clear();
-
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
-
       } catch (e) {
         debugPrint('Erro ao limpar a caixa do Hive: $e');
       }
 
-      // Navegar para a página de login
       if (context.mounted) {
         Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
       }
-      
     }
   }
 
@@ -197,11 +190,9 @@ class UserController extends ChangeNotifier {
 
       if (snapshotAdm.docs.isNotEmpty) {
         await _saveLoginState(true, login, 'Adm');
-        if (context.mounted){
-Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const DashboardPanel()));
+        if (context.mounted) {
+          ToolsController.navigate(context, const DashboardPanel());
         }
-        
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -211,11 +202,10 @@ Navigator.pushReplacement(context,
 
         if (snapshotTeam.docs.isNotEmpty) {
           if (kIsWeb) {
-            if(context.mounted){
+            if (context.mounted) {
               ToolsController.dialogMensage(context, "Web Platform",
-                "Equipes não tem acesso a plataforma Web");
+                  "Equipes não tem acesso a plataforma Web");
             }
-            
           } else {
             // Armazena o usuário na caixa do Hive
             final user = UserTeam(
@@ -232,25 +222,21 @@ Navigator.pushReplacement(context,
                 useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
                 isLoged: snapshotTeam.docs.first.data().isLoged);
             if (user.isLoged == true) {
-              if(context.mounted){
+              if (context.mounted) {
                 ToolsController.dialogMensage(
-                  context, "Erro", "Usuário já está logado");
+                    context, "Erro", "Usuário já está logado");
               }
-              
             } else {
               user.isLoged = true;
               await updateTeams(user);
-
               saveUserHive(user);
               await _saveLoginState(true, login, 'Team');
-
               List<Stage> stageList = await playController.getStageList();
               await playController.saveStageListToHive(stageList);
-              if(context.mounted){
+              if (context.mounted) {
                 Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()));
+                    MaterialPageRoute(builder: (context) => const HomePage()));
               }
-              
             }
           }
         } else {
@@ -261,24 +247,14 @@ Navigator.pushReplacement(context,
               .get();
 
           if (snapshotStaff.docs.isNotEmpty) {
-            await _saveLoginState(true, login, 'Staff');
-            if(context.mounted){
-Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const StaffPage())); 
+            if (context.mounted) {
+              ToolsController.navigate(context, const StaffPage());
             }
-            // Substitua 'StaffPage' pela página correta.
           } else {
-            if(context.mounted){
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(
-                  'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
-            ));
+            if (context.mounted) {
+              ToolsController.scafoldMensage(context, Colors.redAccent,
+                  'Usuário não encontrado\nVerifique suas credenciais e tente novamente.');
             }
-            
           }
         }
       }
@@ -309,7 +285,6 @@ Navigator.pushReplacement(
       QuerySnapshot querySnapshot =
           await userTeamref.where('id', isEqualTo: newUserTeam.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(UserTeam userTeam) {
         Map<String, dynamic> data = {};
 
@@ -347,7 +322,6 @@ Navigator.pushReplacement(
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newUserTeam);
 
@@ -365,7 +339,6 @@ Navigator.pushReplacement(
       QuerySnapshot querySnapshot =
           await userAdmRef.where('id', isEqualTo: newUserAdm.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(UserAdm userAdm) {
         Map<String, dynamic> data = {};
 
@@ -380,7 +353,6 @@ Navigator.pushReplacement(
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newUserAdm);
 
@@ -398,7 +370,6 @@ Navigator.pushReplacement(
       QuerySnapshot querySnapshot =
           await historyRef.where('id', isEqualTo: newHystory.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(History history) {
         Map<String, dynamic> data = {};
 
@@ -410,7 +381,6 @@ Navigator.pushReplacement(
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newHystory);
 
@@ -428,7 +398,6 @@ Navigator.pushReplacement(
       QuerySnapshot querySnapshot =
           await userStaffRef.where('id', isEqualTo: newUserStaff.id).get();
 
-      // Função auxiliar para construir dinamicamente o mapa de atualização
       Map<String, dynamic> buildUpdateData(UserStaff userStaff) {
         Map<String, dynamic> data = {};
 
@@ -449,7 +418,6 @@ Navigator.pushReplacement(
       }
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Se houver documentos encontrados, atualizar o primeiro documento encontrado
         DocumentSnapshot document = querySnapshot.docs.first;
         Map<String, dynamic> updateData = buildUpdateData(newUserStaff);
 
@@ -487,7 +455,6 @@ Navigator.pushReplacement(
   }
 
   Stream<List<History>> get historyStream {
-    // Verifique se "Todos" está selecionado ou se o ID da equipe está definido
     if (teamDropDownHistory == 'Todos' || teamIdHistory == null) {
       return _firestore
           .collection('History')
@@ -499,15 +466,12 @@ Navigator.pushReplacement(
         }).toList();
       });
     } else {
-      // Certifique-se de que o ID da equipe está sendo passado corretamente
-      debugPrint('Filtrando pelo ID da equipe: $teamIdHistory');
       return _firestore
           .collection('History')
           .where('idTeam', isEqualTo: teamIdHistory)
           .orderBy('date', descending: true)
           .snapshots()
           .map((querySnapshot) {
-        debugPrint('Documentos retornados: ${querySnapshot.docs.length}');
         return querySnapshot.docs.map((doc) {
           return History.fromJson(doc.data());
         }).toList();
@@ -593,10 +557,8 @@ Navigator.pushReplacement(
         updateTeams(UserTeam(id: team.id, status: status));
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text('A equipe já usou cartão de congelamento'),
-      ));
+      ToolsController.dialogMensage(
+          context, 'Alerta!', 'A equipe já usou cartão de congelamento');
     }
   }
 
@@ -635,10 +597,8 @@ Navigator.pushReplacement(
         protectTimers.remove(team.id); // Remove o temporizador após a conclusão
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text('A equipe já usou cartão de proteção'),
-      ));
+      ToolsController.dialogMensage(
+          context, 'Alerta!', 'A equipe já usou cartão de proteção');
     }
   }
 
