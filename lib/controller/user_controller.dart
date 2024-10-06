@@ -53,6 +53,7 @@ class UserController extends ChangeNotifier {
   Future<void>? protectTimer;
 
   late String? staffId;
+  late String? staffOffice;
   late List membersTeam = [];
   late List membersTeamEdit = [];
   List<UserTeam> listTeamn = [];
@@ -68,7 +69,6 @@ class UserController extends ChangeNotifier {
   String? selectedTeamName;
   UserTeam? selectedUserTeam;
 
-  StreamSubscription<QuerySnapshot>? listTeamSubscription;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final PlayController playController = PlayController();
 
@@ -252,6 +252,7 @@ class UserController extends ChangeNotifier {
               .get();
 
           staffId = snapshotStaff.docs.first.id;
+          staffOffice = snapshotStaff.docs.first.data().office;
 
           if (snapshotStaff.docs.isNotEmpty) {
             if (context.mounted) {
@@ -259,6 +260,7 @@ class UserController extends ChangeNotifier {
                   context,
                   StaffPage(
                     staffId: staffId ?? "",
+                    staffOffice: staffOffice ?? "",
                   ));
             }
           } else {

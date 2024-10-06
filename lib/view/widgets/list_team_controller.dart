@@ -22,6 +22,8 @@ class ListTeamController extends StatefulWidget {
   final bool? usedCardProtect;
   final bool? isLoged;
   final bool? listStageProva;
+  final bool? prisionBreak;
+  final bool? listPrision;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -46,6 +48,7 @@ class ListTeamController extends StatefulWidget {
     this.usedCardProtect,
     this.isLoged,
     this.listStageProva,
+    this.prisionBreak, this.listPrision,
   });
 
   @override
@@ -181,9 +184,10 @@ class _ListTeamControllerState extends State<ListTeamController> {
               : widget.user == false
                   ? Text(
                       "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
-                      "\nUsou Carta Congelar. ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
-                      "\nUsou Carta Proteção. ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}"
-                      "\nEsta logado. ${widget.isLoged == true ? "Logado" : "Deslogado"}",
+                      "\nUsou Carta Congelar: ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
+                      "\nUsou Carta Proteção: ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}"
+                      "\nPrisão: ${widget.prisionBreak == true ? "Preso" : "Livre"}"
+                      "\nEsta logado: ${widget.isLoged == true ? "Logado" : "Deslogado"}",
                       style: const TextStyle(color: Colors.white),
                     )
                   : null,
@@ -209,7 +213,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   tooltip: "Menu",
                   itemBuilder: (BuildContext context) {
                     return [
-                      if (widget.history == true)
+                      if (widget.history == true || widget.listPrision == true)
                         PopupMenuItem<String>(
                           onTap: widget.onTapEdit,
                           child: const Row(

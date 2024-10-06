@@ -43,7 +43,6 @@ class _ManagerState extends State<Manager> {
     // Cancelar assinatura
     if (mounted) {
       // Verifique se o widget ainda está "montado"
-      userController.listTeamSubscription?.cancel();
       playController.dispose();
       userController.dispose();
       userController.addMemberFocusNode.dispose();
@@ -80,6 +79,7 @@ class _ManagerState extends State<Manager> {
                       credit: team.credit,
                       usedCardFreeze: team.useCardFrezee,
                       usedCardProtect: team.useCardProtect,
+                      prisionBreak: team.isPrisionBreak,
                       isLoged: team.isLoged,
                       status: playController.statusToString(team.status!),
                       onTapRemove: () {
@@ -102,8 +102,8 @@ class _ManagerState extends State<Manager> {
                                   child: SizedBox(
                                     width: 300,
                                     height: 450,
-                                    child: _addTeams(context, false, true,
-                                        false, userController),
+                                    child: addTeams(context, false, true, false,
+                                        userController),
                                   ),
                                 ),
                               );
@@ -158,7 +158,7 @@ class _ManagerState extends State<Manager> {
                                   child: SizedBox(
                                     width: 300,
                                     height: 450,
-                                    child: _addTeams(context, true, true, false,
+                                    child: addTeams(context, true, true, false,
                                         userController),
                                   ),
                                 ),
@@ -211,7 +211,7 @@ class _ManagerState extends State<Manager> {
                                 child: SizedBox(
                                   width: 300,
                                   height: 450,
-                                  child: _addTeams(context, false, true, true,
+                                  child: addTeams(context, false, true, true,
                                       userController),
                                 ),
                               ),
@@ -354,19 +354,19 @@ class _ManagerState extends State<Manager> {
       case 1:
         return Form(
           key: userController.formKey,
-          child: _addTeams(context, false, false, false, userController),
+          child: addTeams(context, false, false, false, userController),
         );
       //adm
       case 2:
         return Form(
           key: userController.formKey,
-          child: _addTeams(context, true, false, false, userController),
+          child: addTeams(context, true, false, false, userController),
         );
       //staff
       case 3:
         return Form(
           key: userController.formKey,
-          child: _addTeams(context, true, false, true, userController),
+          child: addTeams(context, true, false, true, userController),
         );
       //proga
       case 4:
@@ -378,8 +378,8 @@ class _ManagerState extends State<Manager> {
     }
   }
 
-  Container _addTeams(BuildContext context, bool addAdm, bool update,
-      bool staff, UserController userController) {
+  Container addTeams(BuildContext context, bool addAdm, bool update, bool staff,
+      UserController userController) {
     bool obscureVisible = true, obsucreVisibleComfirm = true;
     return Container(
       constraints: const BoxConstraints(
@@ -513,16 +513,16 @@ class _ManagerState extends State<Manager> {
                           },
                         ),
                         selectStaff(
-                          'Banco',
+                          'Policia',
                           update == true ? selectionStaffEdit : selectionStaff,
-                          'Banco',
+                          'Policia',
                           (value) {
                             setState(() {
                               update == true
-                                  ? selectionStaffEdit = 'Banco'
-                                  : selectionStaff = 'Banco';
+                                  ? selectionStaffEdit = 'Policia'
+                                  : selectionStaff = 'Policia';
                               if (update == true) {
-                                userController.selectionStaffEdit = 'Banco';
+                                userController.selectionStaffEdit = 'Policia';
                               }
                             });
                           },
@@ -550,7 +550,6 @@ class _ManagerState extends State<Manager> {
                     child: ListView.builder(
                         itemCount: userController.membersTeam.length,
                         itemBuilder: (builder, index) {
-                          setState(() {});
                           return Text(userController.membersTeam[index]);
                         }),
                   ),
@@ -817,7 +816,7 @@ class _ManagerState extends State<Manager> {
                                     : "Atualizar"))
                             : const Center(child: CircularProgressIndicator()),
                       ),
-                      
+
                       Visibility(
                         visible: (addAdm == false &&
                                     update == true &&
@@ -1149,7 +1148,6 @@ class _ManagerState extends State<Manager> {
                       ),
                     ),
                   ),
-                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -1421,7 +1419,6 @@ class _ManagerState extends State<Manager> {
                 hasLoadedMembers = true; // Marca como carregado
               });
             }
-
           }).catchError((error) {
             // Tratar o erro se necessário
             debugPrint('Erro ao carregar membros: $error');
@@ -1563,9 +1560,11 @@ class _ManagerState extends State<Manager> {
               );
             },
           ).then((_) {
-            setState(() {
-              hasLoadedMembers = false;
-            });
+            if (mounted) {
+              setState(() {
+                hasLoadedMembers = false;
+              });
+            }
           });
         },
         child: Text("Membros ${member.length}"),

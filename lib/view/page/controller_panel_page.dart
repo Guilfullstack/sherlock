@@ -43,9 +43,9 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
   void initState() {
     super.initState();
     userController;
-    if (mounted) {
-      userController.listTeamSubscription;
-    }
+    // if (mounted) {
+    //   userController.listTeamSubscription;
+    // }
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       isHistoryVisible.value =
@@ -60,7 +60,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
     // Cancelar assinatura
     if (mounted) {
       // Verifique se o widget ainda está "montado"
-      userController.listTeamSubscription?.cancel();
+      // userController.listTeamSubscription?.cancel();
       playController.dispose();
       userController.dispose();
       userController.addMemberFocusNode.dispose();
