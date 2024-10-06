@@ -72,7 +72,7 @@ Future<void> main() async {
     ChangeNotifierProvider(
       create: (context) => UserController(),
       child: MaterialApp(
-        home: LoginPage(),
+        home: const LoginPage(),
         theme: ThemeData(
             primaryColorLight: Colors.black,
             scaffoldBackgroundColor: const Color(0xFF212A3E),

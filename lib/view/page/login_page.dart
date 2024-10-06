@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     String category = prefs.getString('category') ?? '';
+
+    if (!mounted) return; 
 
     if (isLoggedIn) {
       // Navega para a tela correspondente com base na categoria do usuário
@@ -45,26 +47,17 @@ class _LoginPageState extends State<LoginPage> {
         default:
           // Caso não haja uma categoria válida, volte para a tela de login
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => LoginPage()));
+              context, MaterialPageRoute(builder: (context) => const LoginPage()));
       }
     }
-  }
-
-  loginForcado() {
-    userController.login.text = "teste";
-    userController.password.text = "teste1";
-    userController.loginSystem(context, userController.login.text.trim(),
-        userController.password.text.trim());
   }
 
   @override
   void initState() {
     super.initState();
-    //loginForcado();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       checkLoginStatus();
     });
-    //checkLoginStatus();
   }
 
   @override

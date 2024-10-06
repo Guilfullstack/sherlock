@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:sherlock/view/widgets/game_card.dart';
 
 class CardPage extends StatelessWidget {
+  const CardPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF212A3E),
+      backgroundColor: const Color(0xFF212A3E),
       appBar: AppBar(
         title: const Text('Cartas do Jogo'),
         backgroundColor: Colors.black,

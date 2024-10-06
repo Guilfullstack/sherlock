@@ -6,11 +6,11 @@ class GameCard extends StatelessWidget {
   final String imagePath;
 
   const GameCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class GameCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Card(
-          color: Color(0xFF523B76),
+          color: const Color(0xFF523B76),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),

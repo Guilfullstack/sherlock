@@ -7,10 +7,10 @@ class CardPanelStages extends StatelessWidget {
   final List<String>? listTokenStageDesbloqued;
 
   const CardPanelStages({
-    Key? key,
+    super.key,
     this.liststages,
     this.listTokenStageDesbloqued,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +46,8 @@ class CardPanelStages extends StatelessWidget {
               stage: stage,
               isUnlocked: isUnlocked,
               position: index + 1,
-              backgrundColor: Color(0xFF523B76),
-              circleColor: Color(0xFF212A3E),
+              backgrundColor: const Color(0xFF523B76),
+              circleColor: const Color(0xFF212A3E),
               textColor: Colors.white,
             );
           },

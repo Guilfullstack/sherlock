@@ -11,7 +11,7 @@ class CardPanelInfo extends StatefulWidget {
   final bool useCardFrezee;
   final bool useCardProtect;
 
-  CardPanelInfo({
+  const CardPanelInfo({
     super.key,
     required this.credit,
     required this.status,

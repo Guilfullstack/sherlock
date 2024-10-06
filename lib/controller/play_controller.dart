@@ -245,7 +245,7 @@ class PlayController extends ChangeNotifier {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(body: CardPage()),
+        builder: (context) => const Scaffold(body: CardPage()),
       ),
     );
   }

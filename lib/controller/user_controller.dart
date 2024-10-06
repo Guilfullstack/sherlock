@@ -134,34 +134,37 @@ class UserController extends ChangeNotifier {
 
     if (kIsWeb) {
       // Navegar para a página de login se for Web
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      }
     } else {
       // Limpar Hive e então navegar para a página de login se não for Web
       UserTeam? user = await getUserHive();
       user!.isLoged = false;
-      await updateTeams(user!);
+      await updateTeams(user);
 
       try {
         var userTeamBox = Hive.box<UserTeam>('userTeamBox');
         await userTeamBox.clear();
-        print('userTeamBox limpo com sucesso.');
 
         var stageBox = Hive.box<Stage>('stageBox');
         await stageBox.clear();
 
-        print('stageBox limpo com sucesso.');
       } catch (e) {
-        print('Erro ao limpar a caixa do Hive: $e');
+        debugPrint('Erro ao limpar a caixa do Hive: $e');
       }
 
       // Navegar para a página de login
-      Navigator.pushReplacement(
+      if (context.mounted) {
+        Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
+      }
+      
     }
   }
 
@@ -194,8 +197,11 @@ class UserController extends ChangeNotifier {
 
       if (snapshotAdm.docs.isNotEmpty) {
         await _saveLoginState(true, login, 'Adm');
-        Navigator.pushReplacement(context,
+        if (context.mounted){
+Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const DashboardPanel()));
+        }
+        
       } else {
         final snapshotTeam = await userTeamref
             .where("login", isEqualTo: login)
@@ -205,8 +211,11 @@ class UserController extends ChangeNotifier {
 
         if (snapshotTeam.docs.isNotEmpty) {
           if (kIsWeb) {
-            ToolsController.dialogMensage(context, "Web Platform",
+            if(context.mounted){
+              ToolsController.dialogMensage(context, "Web Platform",
                 "Equipes não tem acesso a plataforma Web");
+            }
+            
           } else {
             // Armazena o usuário na caixa do Hive
             final user = UserTeam(
@@ -223,8 +232,11 @@ class UserController extends ChangeNotifier {
                 useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
                 isLoged: snapshotTeam.docs.first.data().isLoged);
             if (user.isLoged == true) {
-              ToolsController.dialogMensage(
+              if(context.mounted){
+                ToolsController.dialogMensage(
                   context, "Erro", "Usuário já está logado");
+              }
+              
             } else {
               user.isLoged = true;
               await updateTeams(user);
@@ -234,9 +246,11 @@ class UserController extends ChangeNotifier {
 
               List<Stage> stageList = await playController.getStageList();
               await playController.saveStageListToHive(stageList);
-
-              Navigator.pushReplacement(context,
+              if(context.mounted){
+                Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const HomePage()));
+              }
+              
             }
           }
         } else {
@@ -248,17 +262,23 @@ class UserController extends ChangeNotifier {
 
           if (snapshotStaff.docs.isNotEmpty) {
             await _saveLoginState(true, login, 'Staff');
-            Navigator.pushReplacement(
+            if(context.mounted){
+Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        const StaffPage())); // Substitua 'StaffPage' pela página correta.
+                        const StaffPage())); 
+            }
+            // Substitua 'StaffPage' pela página correta.
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            if(context.mounted){
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Colors.redAccent,
               content: Text(
                   'Usuário não encontrado\nVerifique suas credenciais e tente novamente.'),
             ));
+            }
+            
           }
         }
       }
@@ -633,7 +653,7 @@ class UserController extends ChangeNotifier {
       await updateTeams(updatedTeam);
       await addHistory(history);
     } catch (e) {
-      print("Erro ao atualizar status da equipe: $e");
+      debugPrint("Erro ao atualizar status da equipe: $e");
     }
   }
 
@@ -648,7 +668,7 @@ class UserController extends ChangeNotifier {
       await updateTeams(updatedTeam);
       await addHistory(history);
     } catch (e) {
-      print("Erro ao atualizar status da equipe: $e");
+      debugPrint("Erro ao atualizar status da equipe: $e");
     }
   }
 }
