@@ -605,7 +605,6 @@ class _ManagerState extends State<Manager> {
                                         setState(() {
                                           userController.loading = false;
                                         });
-                                        //exitWindows();
                                       }
                                       if (staff == true && update == false) {
                                         //add Staff

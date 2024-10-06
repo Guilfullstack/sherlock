@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
+import 'package:sherlock/model/user_staf.dart';
 import 'package:sherlock/view/page/card_page.dart';
 
 class PlayController extends ChangeNotifier {
@@ -81,6 +82,53 @@ class PlayController extends ChangeNotifier {
       }).toList();
     });
   }
+
+  Stream<List<Map<String, dynamic>>> getListStaff(String staffId) async* {
+  try {
+    // Faz o stream do documento do Staff logado pelo UID
+    final staffSnapshotStream = userStaffRef
+        .where("id", isEqualTo: staffId)
+        .snapshots(); // Usa snapshots() para obter atualizações em tempo real
+
+    await for (var staffSnapshot in staffSnapshotStream) {
+      if (staffSnapshot.docs.isNotEmpty) {
+        // Obtém o campo 'listCode' que contém os IDs de Stage
+        List<dynamic> listCodeDynamic = staffSnapshot.docs.first['listCode'] ?? [];
+
+        // Converte para uma lista de strings, assumindo que cada item em 'listCodeDynamic' é um ID de Stage
+        List<String> listCode = listCodeDynamic.cast<String>();
+
+        // Lista para armazenar os detalhes de cada Stage
+        List<Map<String, dynamic>> stageDetails = [];
+
+        // Itera sobre os IDs presentes em 'listCode'
+        for (String stageId in listCode) {
+          // Faz o stream de cada documento de Stage em tempo real
+          DocumentSnapshot stageSnapshot = await FirebaseFirestore.instance
+              .collection('Stage')
+              .doc(stageId)
+              .get();
+
+          if (stageSnapshot.exists) {
+            // Adiciona os campos 'description' e 'token' à lista
+            stageDetails.add({
+              'description': stageSnapshot['description'],
+              'token': stageSnapshot['token'],
+            });
+          }
+        }
+
+        // Emite (yield) a lista de detalhes de Stage sempre que os dados do Staff são atualizados
+        yield stageDetails;
+      }
+    }
+  } catch (e) {
+    debugPrint('Erro ao obter detalhes de prova: $e');
+    yield []; // Emite uma lista vazia em caso de erro
+  }
+}
+
+
 
   Future removePlay(int category, String id) async {
     switch (category) {

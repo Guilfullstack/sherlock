@@ -52,6 +52,7 @@ class UserController extends ChangeNotifier {
   String teamDropDownHistory = 'Todos';
   Future<void>? protectTimer;
 
+  late String? staffId;
   late List membersTeam = [];
   late List membersTeamEdit = [];
   List<UserTeam> listTeamn = [];
@@ -246,9 +247,16 @@ class UserController extends ChangeNotifier {
               .limit(1)
               .get();
 
+          staffId = snapshotStaff.docs.first.id;
+          print(staffId);
+
           if (snapshotStaff.docs.isNotEmpty) {
             if (context.mounted) {
-              ToolsController.navigate(context, const StaffPage());
+              ToolsController.navigate(
+                  context,
+                  StaffPage(
+                    staffId: staffId ?? "",
+                  ));
             }
           } else {
             if (context.mounted) {

@@ -21,6 +21,7 @@ class ListTeamController extends StatefulWidget {
   final bool? usedCardFreeze;
   final bool? usedCardProtect;
   final bool? isLoged;
+  final bool? listStageProva;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -44,6 +45,7 @@ class ListTeamController extends StatefulWidget {
     this.usedCardFreeze,
     this.usedCardProtect,
     this.isLoged,
+    this.listStageProva,
   });
 
   @override
@@ -201,61 +203,63 @@ class _ListTeamControllerState extends State<ListTeamController> {
                       value: widget.valueChack,
                       onChanged: widget.onChanged)
                   : null,
-          trailing: PopupMenuButton<String>(
-            tooltip: "Menu",
-            itemBuilder: (BuildContext context) {
-              return [
-                if (widget.history == true)
-                  PopupMenuItem<String>(
-                    onTap: widget.onTapEdit,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                        Text('Editar'),
-                      ],
-                    ),
-                  ),
-                if (widget.remove == true)
-                  PopupMenuItem<String>(
-                    onTap: widget.onTapRemove,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.delete),
-                        SizedBox(width: 8),
-                        Text('Remover'),
-                      ],
-                    ),
-                  ),
-                if (widget.addValue == true)
-                  PopupMenuItem<String>(
-                    onTap: widget.onTapAddValue,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.task),
-                        SizedBox(width: 8),
-                        Text('Gerenciar'),
-                      ],
-                    ),
-                  ),
-                // PopupMenuItem<String>(
-                //   enabled: widget.onDesktop == false ? true : false,
-                //   onTap: widget.onTapHistory,
-                //   child: const Row(
-                //     children: [
-                //       Icon(Icons.history),
-                //       SizedBox(width: 8),
-                //       Text('Historico'),
-                //     ],
-                //   ),
-                // ),
-              ];
-            },
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ), // Ícone do botão de ação
-          ),
+          trailing: widget.listStageProva == true
+              ? null
+              : PopupMenuButton<String>(
+                  tooltip: "Menu",
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      if (widget.history == true)
+                        PopupMenuItem<String>(
+                          onTap: widget.onTapEdit,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.edit),
+                              SizedBox(width: 8),
+                              Text('Editar'),
+                            ],
+                          ),
+                        ),
+                      if (widget.remove == true)
+                        PopupMenuItem<String>(
+                          onTap: widget.onTapRemove,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.delete),
+                              SizedBox(width: 8),
+                              Text('Remover'),
+                            ],
+                          ),
+                        ),
+                      if (widget.addValue == true)
+                        PopupMenuItem<String>(
+                          onTap: widget.onTapAddValue,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.task),
+                              SizedBox(width: 8),
+                              Text('Gerenciar'),
+                            ],
+                          ),
+                        ),
+                      // PopupMenuItem<String>(
+                      //   enabled: widget.onDesktop == false ? true : false,
+                      //   onTap: widget.onTapHistory,
+                      //   child: const Row(
+                      //     children: [
+                      //       Icon(Icons.history),
+                      //       SizedBox(width: 8),
+                      //       Text('Historico'),
+                      //     ],
+                      //   ),
+                      // ),
+                    ];
+                  },
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                  ), // Ícone do botão de ação
+                ),
         ),
       ),
     );
