@@ -44,6 +44,7 @@ dependencies:
   intl: ^0.19.0
   material_symbols_icons: ^4.2785.1
   photo_view: ^0.14.0
+  google_fonts: ^5.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

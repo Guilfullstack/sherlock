@@ -19,6 +19,7 @@ class CardPlay extends StatelessWidget {
       width: 45,
       height: 70,
       decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(5)),
         border: Border.all(
           color: Colors.white, // Cor da borda
           width: 1.0, // Largura da borda
@@ -26,10 +27,10 @@ class CardPlay extends StatelessWidget {
         //borderRadius: BorderRadius.circular(5.0), // Bordas arredondadas
       ),
       child: isUsed
-          ?Image.asset(
-            src,
-            fit: BoxFit.cover,
-          )
+          ? Image.asset(
+              src,
+              fit: BoxFit.cover,
+            )
           : const Center(
               child: Icon(
                 Icons.add,
@@ -40,4 +41,3 @@ class CardPlay extends StatelessWidget {
     );
   }
 }
-

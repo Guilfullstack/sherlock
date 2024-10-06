@@ -228,8 +228,8 @@ class UserController extends ChangeNotifier {
                     snapshotTeam.docs.first.data().isPayCardProtected);
             if (user.isLoged == true) {
               if (context.mounted) {
-                ToolsController.dialogMensage(
-                    context, "Erro", "Usuário já está logado");
+                ToolsController.dialogMensage(context, "Erro",
+                    "Usuário já está logado em outro dispositivo");
               }
             } else {
               user.isLoged = true;
@@ -251,10 +251,11 @@ class UserController extends ChangeNotifier {
               .limit(1)
               .get();
 
-          staffId = snapshotStaff.docs.first.id;
-          staffOffice = snapshotStaff.docs.first.data().office;
+          
 
           if (snapshotStaff.docs.isNotEmpty) {
+            staffId = snapshotStaff.docs.first.id;
+            staffOffice = snapshotStaff.docs.first.data().office;
             if (context.mounted) {
               ToolsController.navigate(
                   context,
@@ -266,7 +267,7 @@ class UserController extends ChangeNotifier {
           } else {
             if (context.mounted) {
               ToolsController.scafoldMensage(context, Colors.redAccent,
-                  'Usuário não encontrado\nVerifique suas credenciais e tente novamente.');
+                  'Usuário não encontrado, verifique suas credenciais');
             }
           }
         }

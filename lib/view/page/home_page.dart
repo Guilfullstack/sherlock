@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sherlock/controller/play_controller.dart';
 import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
@@ -8,6 +9,7 @@ import 'package:sherlock/model/history.dart';
 import 'package:sherlock/model/stage.dart';
 import 'package:sherlock/model/user_team.dart';
 import 'package:sherlock/view/page/about.dart';
+import 'package:sherlock/view/page/card_page.dart';
 import 'package:sherlock/view/widgets/card_funtions.dart';
 import 'package:sherlock/view/widgets/card_panel_info.dart';
 import 'package:sherlock/view/widgets/card_panel_stages.dart';
@@ -181,19 +183,28 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: Image.asset(
           'images/logo.png',
         ),
-        title: const Text(
+        title: Text(
           'SHERLOCK',
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.anton(
+            textStyle: const TextStyle(
+              fontSize: 30, // Aumente o tamanho para dar um impacto maior
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing:
+                  2.0, // Espaçamento entre letras para efeito de manchete
+            ),
+          ),
         ),
         actions: [
           IconButton(
               onPressed: () {
-                ToolsController.navigate(context, const AboutPage());
+                ToolsController.navigateReturn(context, const AboutPage());
               },
               icon: const Icon(
                 Icons.info,
@@ -247,7 +258,7 @@ class _HomePageState extends State<HomePage> {
                     icon: Symbols.poker_chip,
                     nome: 'Cartas',
                     onTap: () {
-                      playController.navigateCardPage(context);
+                      ToolsController.navigateReturn(context, const CardPage());
                     }),
               ],
             ),

@@ -9,6 +9,7 @@ class CardPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF212A3E),
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Cartas do Jogo'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -24,7 +25,6 @@ class CardPage extends StatelessWidget {
               imagePath:
                   'images/congelar.png', // Certifique-se de adicionar uma imagem apropriada na pasta assets
             ),
-            SizedBox(width: 16), // Espaçamento entre as cartas
             GameCard(
               title: 'Escudo',
               description: 'Protege contra o próximo ataque.',
