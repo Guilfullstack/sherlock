@@ -103,11 +103,14 @@ class UserTeam extends HiveObject {
 @HiveType(typeId: 1)
 enum Status {
   @HiveField(0)
+  // ignore: constant_identifier_names
   Jogando,
 
   @HiveField(1)
+  // ignore: constant_identifier_names
   Congelado,
 
   @HiveField(2)
+  // ignore: constant_identifier_names
   Protegido,
 }
