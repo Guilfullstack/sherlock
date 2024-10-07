@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/view/page/about.dart';
 import 'package:sherlock/view/page/page%20Panel/manager.dart';
@@ -36,35 +38,44 @@ class _DashboardPanelState extends State<DashboardPanel> {
               child: const Icon(Icons.add),
             ),
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Image.asset(
-            'images/logo.png',
-          ),
+        backgroundColor: Colors.black,
+        leading: Image.asset(
+          'images/logo2.png',
         ),
-        title: const Text(
+        title: Text(
           'SHERLOCK',
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.anton(
+            textStyle: const TextStyle(
+              fontSize: 30, // Aumente o tamanho para dar um impacto maior
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing:
+                  2.0, // Espaçamento entre letras para efeito de manchete
+            ),
+          ),
         ),
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutPage()),
-                );
+                ToolsController.navigateReturn(context, const AboutPage());
               },
               icon: const Icon(
                 Icons.info,
-                color: Colors.purple,
+                color: Colors.blue,
               )),
           IconButton(
               onPressed: () => userController.logout(context),
               icon: const Icon(
                 Icons.logout,
-                color: Colors.purple,
+                color: Colors.blue,
               )),
         ],
+        shape: const Border(
+          bottom: BorderSide(
+            color: Colors.blue, // Cor da borda
+            width: 2.0, // Largura da borda
+          ),
+        ),
         centerTitle: true,
       ),
       body: Row(

@@ -149,15 +149,16 @@ class UserController extends ChangeNotifier {
         );
       }
     } else {
-      UserTeam? user = await getUserHive();
-      user!.isLoged = false;
-      await updateTeams(user);
-
       try {
-        var userTeamBox = Hive.box<UserTeam>('userTeamBox');
-        await userTeamBox.clear();
-        var stageBox = Hive.box<Stage>('stageBox');
-        await stageBox.clear();
+        UserTeam? user = await getUserHive();
+        if (user != null) {
+          user.isLoged = false;
+          await updateTeams(user);
+          var userTeamBox = Hive.box<UserTeam>('userTeamBox');
+          await userTeamBox.clear();
+          var stageBox = Hive.box<Stage>('stageBox');
+          await stageBox.clear();
+        }
       } catch (e) {
         debugPrint('Erro ao limpar a caixa do Hive: $e');
       }
