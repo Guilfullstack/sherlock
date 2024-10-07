@@ -19,11 +19,11 @@ class CardFuntions extends StatelessWidget {
       splashColor: Colors.white.withOpacity(0.5), // Cor do splash
       borderRadius: BorderRadius.circular(10.0),
       child: Card(
-        color: const Color(0xFF523B76),
+        color: Colors.black,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
           side: const BorderSide(
-            color: Colors.white, // Cor da borda
+            color: Colors.blueAccent, // Cor da borda
             width: 1.0, // Largura da borda
           ),
         ),
@@ -37,7 +37,7 @@ class CardFuntions extends StatelessWidget {
                 Icon(
                   icon,
                   size: 50,
-                  color: const Color(0xFF212A3E),
+                  color: Colors.blue,
                 ),
                 const SizedBox(height: 8),
                 Text(

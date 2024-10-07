@@ -24,9 +24,10 @@ class CardPanelStages extends StatelessWidget {
     }
     return Container(
       decoration: BoxDecoration(
+        color: Colors.black,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white,
+          color: Colors.blue,
           width: 1.0,
         ),
       ),
@@ -35,7 +36,7 @@ class CardPanelStages extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       padding: const EdgeInsets.all(10),
       child: Card(
-        color: const Color(0xFF212A3E),
+        color: Colors.black,
         child: ListView.builder(
           itemCount: liststages!.length,
           itemBuilder: (context, index) {
@@ -45,7 +46,7 @@ class CardPanelStages extends StatelessWidget {
             return CardStage(
               stage: stage,
               isUnlocked: isUnlocked,
-              backgrundColor: const Color(0xFF523B76),
+              backgrundColor: const Color(0xFF212A3E),
               textColor: Colors.white,
             );
           },

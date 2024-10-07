@@ -27,16 +27,16 @@ class CardStage extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.black,
                     contentPadding: EdgeInsets.zero,
                     content: Container(
                       width: 300, // Define a largura do container
                       height: 400, // Define a altura do container
                       decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                         image: DecorationImage(
                           image: AssetImage(
-                              'images/eniguima.jpg'), // Caminho da imagem
+                              'images/eniguima1.png'), // Caminho da imagem
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -53,7 +53,7 @@ class CardStage extends StatelessWidget {
                                   fontSize:
                                       48, // Aumente o tamanho para dar um impacto maior
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   letterSpacing:
                                       2.0, // Espaçamento entre letras para efeito de manchete
                                 ),
@@ -66,7 +66,7 @@ class CardStage extends StatelessWidget {
                                 textStyle: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.normal,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                               textAlign: TextAlign.center,
@@ -98,10 +98,10 @@ class CardStage extends StatelessWidget {
             ),
           ),
           leading: const CircleAvatar(
-              backgroundColor: Color(0xFF212A3E),
+              backgroundColor: Colors.black,
               child: Icon(
                 Icons.search,
-                color: Colors.purple,
+                color: Colors.blue,
                 size: 30,
               )),
           trailing: isUnlocked
@@ -111,7 +111,7 @@ class CardStage extends StatelessWidget {
                 )
               : const Icon(
                   Icons.lock,
-                  color: Color(0xFF212A3E),
+                  color: Colors.blue,
                 ),
         ),
       ),

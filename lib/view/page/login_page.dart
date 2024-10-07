@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'images/logo.png',
+                'images/logo2.png',
               ),
               Form(
                 key: formKey,
@@ -111,12 +111,11 @@ class _LoginPageState extends State<LoginPage> {
                   style: ButtonStyle(
                     shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        side: const BorderSide(color: Colors.white),
+                        side: const BorderSide(color: Colors.blue),
                         borderRadius: BorderRadius.circular(18.0),
                       ),
                     ),
-                    backgroundColor: WidgetStateProperty.all(
-                        const Color.fromARGB(255, 90, 29, 160)),
+                    backgroundColor: WidgetStateProperty.all(Colors.blue),
                   ),
                   child: const Text('Login',
                       style: TextStyle(

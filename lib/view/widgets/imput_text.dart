@@ -24,7 +24,8 @@ class ImputTextFormField extends StatelessWidget {
     this.maxLines,
     this.onFieldSubmitted,
     this.focusNode,
-    this.keyboardType, this.inputFormatters,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -54,13 +55,13 @@ class ImputTextFormField extends StatelessWidget {
           labelText: title,
           labelStyle: const TextStyle(color: Colors.white),
           enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.purple),
+            borderSide: BorderSide(color: Colors.blue),
           ),
           focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.purple),
+            borderSide: BorderSide(color: Colors.blue),
           ),
           border: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.purple),
+            borderSide: BorderSide(color: Colors.blue),
           ),
         ),
       ),
