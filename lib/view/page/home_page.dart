@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
           setPopupVisible: (visible) => _isPopupVisible = visible,
           message: 'Sua equipe está congelada por 10 minutos',
           iconContent: const Icon(Icons.ac_unit,
-              size: 50, color: Colors.blue), // Ícone de congelamento
+              size: 50, color: Colors.white), // Ícone de congelamento
         );
         await _checkUserStatus(
           isStatusActive: currentUser!.isPrisionBreak == true,
@@ -176,7 +176,8 @@ class _HomePageState extends State<HomePage> {
       }
     }
     if (context.mounted) {
-      ToolsController.scafoldMensage(context, Colors.red, 'Código inválido!');
+      ToolsController.scafoldMensage(
+          context, Colors.redAccent, 'Código inválido!');
     }
   }
 
@@ -187,7 +188,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: Image.asset(
-          'images/logo.png',
+          'images/logo2.png',
         ),
         title: Text(
           'SHERLOCK',
@@ -208,18 +209,18 @@ class _HomePageState extends State<HomePage> {
               },
               icon: const Icon(
                 Icons.info,
-                color: Colors.purple,
+                color: Colors.blue,
               )),
           IconButton(
               onPressed: () => userController.logout(context),
               icon: const Icon(
                 Icons.logout,
-                color: Colors.purple,
+                color: Colors.blue,
               )),
         ],
         shape: const Border(
           bottom: BorderSide(
-            color: Colors.white, // Cor da borda
+            color: Colors.blue, // Cor da borda
             width: 2.0, // Largura da borda
           ),
         ),
@@ -246,7 +247,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 CardFuntions(
                     icon: Symbols.map,
-                    nome: 'Mapa',
+                    nome: 'Map',
                     onTap: () {
                       playController.showFullScreenImage(
                           context, 'images/mapa.png');
@@ -256,7 +257,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 CardFuntions(
                     icon: Symbols.poker_chip,
-                    nome: 'Cartas',
+                    nome: 'Cards',
                     onTap: () {
                       ToolsController.navigateReturn(context, const CardPage());
                     }),
@@ -297,7 +298,7 @@ class _HomePageState extends State<HomePage> {
                           hintText: 'Código',
                           hintStyle: TextStyle(color: Colors.white54),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white54),
+                            borderSide: BorderSide(color: Colors.blue),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: Colors.white),
@@ -335,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
+                      backgroundColor: Colors.blue,
                     ),
                     child: const Text('Desbloquear',
                         style: TextStyle(color: Colors.white)),
@@ -345,7 +346,7 @@ class _HomePageState extends State<HomePage> {
             },
           );
         },
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.blue,
         child: const Icon(
           Icons.key,
           color: Color(0xFF212A3E),

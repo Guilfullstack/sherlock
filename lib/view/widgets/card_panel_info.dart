@@ -25,13 +25,13 @@ class CardPanelInfo extends StatefulWidget {
 
 class _CardPanelInfoState extends State<CardPanelInfo> {
   PlayController playController = PlayController();
-  late Color cortexto = Colors.white;
+  late Color cortexto = Colors.blue;
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF523B76),
+      color: Colors.black,
       shape: RoundedRectangleBorder(
-        side: const BorderSide(color: Colors.white),
+        side: const BorderSide(color: Colors.blue),
         borderRadius: BorderRadius.circular(40),
       ),
       margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
@@ -60,7 +60,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             const Padding(
               padding: EdgeInsets.only(right: 100),
               child: Divider(
-                color: Colors.purple,
+                color: Colors.blue,
                 thickness: 2,
                 //height: 30,
               ),
@@ -86,7 +86,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                   color: widget.status == Status.Jogando
                       ? Colors.greenAccent
                       : widget.status == Status.Congelado
-                          ? Colors.blueAccent
+                          ? Colors.white
                           : Colors.green,
                   size: 18,
                 ),
@@ -98,7 +98,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                     color: widget.status == Status.Jogando
                         ? Colors.greenAccent
                         : widget.status == Status.Congelado
-                            ? Colors.blueAccent
+                            ? Colors.white
                             : Colors.green,
                     fontSize: 18,
                   ),
@@ -108,7 +108,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
             const Padding(
               padding: EdgeInsets.only(right: 100),
               child: Divider(
-                color: Colors.purple,
+                color: Colors.blue,
                 thickness: 2,
                 //height: 30,
               ),

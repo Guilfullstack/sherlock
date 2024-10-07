@@ -15,9 +15,9 @@ class GameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
-        color: const Color(0xFF523B76),
+        color: Colors.blue,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
