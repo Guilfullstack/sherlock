@@ -59,10 +59,10 @@ Future<void> main() async {
       child: MaterialApp(
         home: const LoginPage(),
         theme: ThemeData(
-            primaryColorLight: Colors.black,
+            primaryColorLight: Colors.blue,
             scaffoldBackgroundColor: const Color(0xFF212A3E),
             listTileTheme: const ListTileThemeData(
-              tileColor: Color(0xFF523B76),
+              tileColor: Colors.black,
             ),
             drawerTheme: const DrawerThemeData(
               backgroundColor: Colors.black,

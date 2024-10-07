@@ -68,7 +68,7 @@ class _ManagerState extends State<Manager> {
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserTeam>(
-                  aspectRatio: 2,
+                  aspectRatio: 1.2,
                   size: 350,
                   stream: userController.teamStream,
                   emptyMessage: 'Não há equipes',
@@ -77,10 +77,15 @@ class _ManagerState extends State<Manager> {
                     return ListTeamController(
                       addValue: true,
                       configEnabled: true,
+                      listPrision: false,
                       equipe: team.name,
                       credit: team.credit,
                       usedCardFreeze: team.useCardFrezee,
                       usedCardProtect: team.useCardProtect,
+                      usedCardLaCasaDePapel: team.useCardLaCasaDePapel,
+                      isPayCardFreeze: team.isPayCardFrezee,
+                      isPayCardProtect: team.isPayCardProtected,
+                      isPayCardLaCasaDePapel: team.isPayCardLaCasaDePapel,
                       prisionBreak: team.isPrisionBreak,
                       isLoged: team.isLoged,
                       status: playController.statusToString(team.status!),
@@ -408,7 +413,7 @@ class _ManagerState extends State<Manager> {
                     : update == true
                         ? 'Atualizar Staff'
                         : 'Adicionar Staff',
-                style: const TextStyle(fontSize: 18, color: Colors.purple),
+                style: const TextStyle(fontSize: 18, color: Colors.blue),
               ),
             ),
             Padding(
@@ -451,7 +456,7 @@ class _ManagerState extends State<Manager> {
                           obscureVisible == false
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: Colors.purple,
+                          color: Colors.blue,
                         ),
                       ),
                       title: 'Senha',
@@ -476,7 +481,7 @@ class _ManagerState extends State<Manager> {
                         obsucreVisibleComfirm == false
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        color: Colors.purple,
+                        color: Colors.blue,
                       ),
                     ),
                     title: 'Confirmar Senha',
@@ -897,7 +902,7 @@ class _ManagerState extends State<Manager> {
       ),
       child: RadioListTile<String>(
         tileColor: Colors.black87,
-        activeColor: Colors.purple,
+        activeColor: Colors.blue,
         title: Text(
           titulo,
           style: const TextStyle(
@@ -1078,7 +1083,7 @@ class _ManagerState extends State<Manager> {
             Center(
               child: Text(
                 update == true ? 'Atualizar Código' : 'Adicionar Codigo',
-                style: const TextStyle(fontSize: 18, color: Colors.purple),
+                style: const TextStyle(fontSize: 18, color: Colors.blue),
               ),
             ),
             Padding(
@@ -1101,7 +1106,7 @@ class _ManagerState extends State<Manager> {
                         : playController.token.text = generateRandomCode(6);
                   },
                   icon: const Icon(Icons.generating_tokens),
-                  color: Colors.purple,
+                  color: Colors.blue,
                 ),
                 title: 'Codigo',
                 controller: update == true
@@ -1298,7 +1303,7 @@ class _ManagerState extends State<Manager> {
       ),
       child: RadioListTile<Category>(
         tileColor: Colors.black87,
-        activeColor: Colors.purple,
+        activeColor: Colors.blue,
         title: Text(
           titulo,
           style: const TextStyle(
@@ -1349,7 +1354,7 @@ class _ManagerState extends State<Manager> {
                     const Center(
                       child: Text(
                         'Lista de Provas',
-                        style: TextStyle(fontSize: 18, color: Colors.purple),
+                        style: TextStyle(fontSize: 18, color: Colors.blue),
                       ),
                     ),
                     Expanded(
@@ -1593,10 +1598,14 @@ class _ManagerState extends State<Manager> {
   ) {
     bool isSwitch1On = teams.useCardFrezee == true ? true : false;
     bool isSwitch2On = teams.useCardProtect == true ? true : false;
+    bool isUseCardLaCasaDePapel =
+        teams.useCardLaCasaDePapel == true ? true : false;
     bool isPrision = teams.isPrisionBreak == true ? true : false;
     bool isLogado = teams.isLoged == true ? true : false;
     bool isPayFreeze = teams.isPayCardFrezee == true ? true : false;
     bool isPayProtect = teams.isPayCardProtected == true ? true : false;
+    bool isPayLaCasaDePapel =
+        teams.isPayCardLaCasaDePapel == true ? true : false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1660,6 +1669,27 @@ class _ManagerState extends State<Manager> {
                               ),
                             ],
                           ),
+                          // carta La Casa De Papel
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Carta La Casa De Papel",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isUseCardLaCasaDePapel,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id,
+                                      useCardLaCasaDePapel: value));
+                                  setState(() {
+                                    isUseCardLaCasaDePapel = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                           //compra carta congelar
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1695,6 +1725,27 @@ class _ManagerState extends State<Manager> {
                                       id: teams.id, isPayCardProtected: value));
                                   setState(() {
                                     isPayProtect = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          //compra carta La Casa De Papael
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Compra carta LCP",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isPayLaCasaDePapel,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id,
+                                      isPayCardLaCasaDePapel: value));
+                                  setState(() {
+                                    isPayLaCasaDePapel = value;
                                   });
                                 },
                               ),
@@ -1752,9 +1803,11 @@ class _ManagerState extends State<Manager> {
                               "Adicionar",
                               "Subtrair",
                               "Congelar",
+                              "La Casa de Papel",
                               "Proteção",
                               "Comp. carta congelar",
                               "Comp. carta proteção",
+                              "Comp. carta LCP",
                               "Pagar Fiança",
                               "Jogando"
                             ],
@@ -1778,7 +1831,8 @@ class _ManagerState extends State<Manager> {
                                     RegExp(r'^\d*\.?\d*')),
                               ],
                             ),
-                          if (dropDonw == "Congelar")
+                          if (dropDonw == "Congelar" ||
+                              dropDonw == "La Casa de Papel")
                             StreamBuilder<List<UserTeam>>(
                               stream: user.teamStream, // Sua stream de equipes
                               builder: (context, snapshot) {
@@ -1799,13 +1853,17 @@ class _ManagerState extends State<Manager> {
                                   Map<String, UserTeam> teamDetailsMap = {
                                     for (var team in availableTeams)
                                       (team.name ?? "Sem nome"): UserTeam(
-                                          id: team.id ?? "",
-                                          name: team.name ?? "Sem nome",
-                                          status: team.status ?? Status.Jogando,
-                                          useCardFrezee: team.useCardFrezee,
-                                          useCardProtect: team.useCardProtect,
-                                          isPayCardFrezee:
-                                              team.isPayCardFrezee),
+                                        id: team.id ?? "",
+                                        name: team.name ?? "Sem nome",
+                                        status: team.status ?? Status.Jogando,
+                                        useCardFrezee: team.useCardFrezee,
+                                        useCardProtect: team.useCardProtect,
+                                        useCardLaCasaDePapel:
+                                            team.useCardLaCasaDePapel,
+                                        isPayCardFrezee: team.isPayCardFrezee,
+                                        isPayCardLaCasaDePapel:
+                                            team.isPayCardLaCasaDePapel,
+                                      ),
                                   };
 
                                   Map<String, String> teamIdMap = {
@@ -1828,7 +1886,8 @@ class _ManagerState extends State<Manager> {
                                       .toList();
 
                                   // Ajusta a lista de equipes conforme a ação selecionada
-                                  if (dropDonw == "Congelar") {
+                                  if (dropDonw == "Congelar" ||
+                                      dropDonw == "La Casa de Papel") {
                                     // Remove a equipe atual da lista para congelar
                                     teamNames.remove(teams.name);
                                   } else if (dropDonw == "Proteção") {
@@ -1858,7 +1917,9 @@ class _ManagerState extends State<Manager> {
                                   return Column(
                                     children: [
                                       Text(
-                                        "Qual Equipe vai congelar\n(${teams.name})",
+                                        teams.useCardLaCasaDePapel == false
+                                            ? "Qual Equipe vai vau usar carta LCP\nna equipe ${teams.name}"
+                                            : "Qual Equipe vai congelar\n(${teams.name})",
                                         style: const TextStyle(
                                             color: Colors.white),
                                       ),
@@ -1923,12 +1984,15 @@ class _ManagerState extends State<Manager> {
                                       idTeam: teams.id,
                                       description:
                                           "Adicionado \"${user.addValueHistoty.text}\" a Equipe \"${teams.name}\"");
-                                  user.addHistory(history);
-                                  user.updateTeams(userTeam);
-                                  ToolsController.scafoldMensage(
-                                      context,
-                                      Colors.green,
-                                      "Foi adiconado com sucesso");
+                                  await user.addHistory(history);
+                                  await user.updateTeams(userTeam);
+                                  if (context.mounted) {
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.green,
+                                        "Foi adiconado com sucesso");
+                                  }
+
                                   user.addValueStatus.clear();
                                   user.addValueHistoty.clear();
                                 }
@@ -1972,13 +2036,15 @@ class _ManagerState extends State<Manager> {
                                     );
 
                                     // Atualiza o histórico e o crédito da equipe
-                                    user.addHistory(history);
-                                    user.updateTeams(userTeam);
-                                    // ignore: use_build_context_synchronously
-                                    ToolsController.scafoldMensage(
-                                        context,
-                                        Colors.black,
-                                        "Foi retirado com sucesso");
+                                    await user.addHistory(history);
+                                    await user.updateTeams(userTeam);
+
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(
+                                          context,
+                                          Colors.green,
+                                          "Foi retirado com sucesso");
+                                    }
                                     // Limpa os campos de entrada
                                     user.addValueStatus.clear();
                                     user.addValueHistoty.clear();
@@ -1989,7 +2055,9 @@ class _ManagerState extends State<Manager> {
                               case "Congelar":
                                 user.startStatusUpdateTimer(teams, context);
                                 break;
-
+                              case "La Casa de Papel":
+                                user.userCardLaCasaDePapel(teams, context);
+                                break;
                               case "Pagar Fiança":
                                 // Verifica se a equipe está presa
                                 if (teams.isPrisionBreak == true) {
@@ -2019,11 +2087,12 @@ class _ManagerState extends State<Manager> {
                                     );
 
                                     // Exibe uma mensagem de sucesso
-                                    ToolsController.scafoldMensage(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                        Colors.green,
-                                        "Fiança paga com sucesso! Crédito restante: $newCredit");
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(
+                                          context,
+                                          Colors.green,
+                                          "Fiança paga com sucesso! Crédito restante: $newCredit");
+                                    }
                                   } else {
                                     // Caso a equipe não tenha crédito suficiente
                                     ToolsController.scafoldMensage(
@@ -2066,11 +2135,12 @@ class _ManagerState extends State<Manager> {
                                     );
 
                                     // Exibe uma mensagem de sucesso
-                                    ToolsController.scafoldMensage(
-                                        // ignore: use_build_context_synchronously
-                                        context,
-                                        Colors.green,
-                                        "Carta comprada com sucesso");
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(
+                                          context,
+                                          Colors.green,
+                                          "Carta comprada com sucesso");
+                                    }
                                   } else {
                                     // Caso a equipe não tenha crédito suficiente
                                     ToolsController.scafoldMensage(
@@ -2115,11 +2185,62 @@ class _ManagerState extends State<Manager> {
                                     );
 
                                     // Exibe uma mensagem de sucesso
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(
+                                          context,
+                                          Colors.green,
+                                          "Carta comprada com sucesso");
+                                    }
+                                  } else {
+                                    // Caso a equipe não tenha crédito suficiente
                                     ToolsController.scafoldMensage(
-                                        // ignore: use_build_context_synchronously
                                         context,
-                                        Colors.green,
-                                        "Carta comprada com sucesso");
+                                        Colors.red,
+                                        "A equipe não tem credito suficiente");
+                                  }
+                                } else {
+                                  // Caso a equipe não esteja presa
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.red,
+                                      "A equipe já comprou essa carta");
+                                }
+                                break;
+
+                              case "Comp. carta LCP":
+                                if (teams.isPayCardLaCasaDePapel == false) {
+                                  // Verifica se a equipe tem crédito suficiente
+                                  if (teams.credit! >= 150) {
+                                    final double currentCredit = teams.credit!;
+                                    final double newCredit =
+                                        currentCredit - 150;
+                                    user.addValueStatus.text =
+                                        newCredit.toString();
+                                    // Atualiza a equipe com o novo valor de crédito
+                                    await userController.updateTeams(
+                                      UserTeam(
+                                        id: teams.id,
+                                        isPayCardLaCasaDePapel: true,
+                                        credit: newCredit,
+                                      ),
+                                    );
+
+                                    // Adiciona uma entrada no histórico informando que a fiança foi paga
+                                    await userController.addHistory(
+                                      History(
+                                        idTeam: teams.id,
+                                        description:
+                                            "Equipe \"${teams.name}\" comprou carta LA CASA DE PAPEL",
+                                      ),
+                                    );
+
+                                    // Exibe uma mensagem de sucesso
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(
+                                          context,
+                                          Colors.green,
+                                          "Carta comprada com sucesso");
+                                    }
                                   } else {
                                     // Caso a equipe não tenha crédito suficiente
                                     ToolsController.scafoldMensage(

@@ -28,17 +28,19 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       listMembers: (fields[8] as List?)?.cast<dynamic>(),
       useCardFrezee: fields[9] as bool?,
       useCardProtect: fields[10] as bool?,
+      useCardLaCasaDePapel: fields[15] as bool?,
       isLoged: fields[11] as bool?,
       isPrisionBreak: fields[12] as bool?,
       isPayCardFrezee: fields[13] as bool?,
       isPayCardProtected: fields[14] as bool?,
+      isPayCardLaCasaDePapel: fields[16] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserTeam obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -68,7 +70,11 @@ class UserTeamAdapter extends TypeAdapter<UserTeam> {
       ..writeByte(13)
       ..write(obj.isPayCardFrezee)
       ..writeByte(14)
-      ..write(obj.isPayCardProtected);
+      ..write(obj.isPayCardProtected)
+      ..writeByte(15)
+      ..write(obj.useCardLaCasaDePapel)
+      ..writeByte(16)
+      ..write(obj.isPayCardLaCasaDePapel);
   }
 
   @override

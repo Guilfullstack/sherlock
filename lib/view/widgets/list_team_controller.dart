@@ -21,6 +21,10 @@ class ListTeamController extends StatefulWidget {
   final bool? valueChack;
   final bool? usedCardFreeze;
   final bool? usedCardProtect;
+  final bool? usedCardLaCasaDePapel;
+  final bool? isPayCardFreeze;
+  final bool? isPayCardProtect;
+  final bool? isPayCardLaCasaDePapel;
   final bool? isLoged;
   final bool? listStageProva;
   final bool? prisionBreak;
@@ -54,6 +58,10 @@ class ListTeamController extends StatefulWidget {
     this.listPrision,
     this.configEnabled,
     this.config,
+    this.usedCardLaCasaDePapel,
+    this.isPayCardFreeze,
+    this.isPayCardProtect,
+    this.isPayCardLaCasaDePapel,
   });
 
   @override
@@ -81,7 +89,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
         final normalText = text.substring(currentIndex, match.start);
         children.add(TextSpan(
           text: normalText,
-          style: const TextStyle(color: Colors.white), // Estilo normal
+          style: const TextStyle(color: Colors.blue), // Estilo normal
         ));
       }
 
@@ -106,7 +114,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
       final remainingText = text.substring(currentIndex);
       children.add(TextSpan(
         text: remainingText,
-        style: const TextStyle(color: Colors.white), // Estilo normal
+        style: const TextStyle(color: Colors.blue), // Estilo normal
       ));
     }
 
@@ -120,6 +128,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10), // Bordas arredondadas
+          border: Border.all(color: Colors.blue),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2), // Cor da sombra
@@ -135,8 +144,10 @@ class _ListTeamControllerState extends State<ListTeamController> {
           title: widget.history == true
               ? Text(
                   widget.equipe ?? "Sem nome",
-                  style: TextStyle(
-                    color: ThemeData().primaryColorLight,
+                  style: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
                   ),
                 )
               : RichText(
@@ -187,13 +198,126 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   ],
                 )
               : widget.user == false
-                  ? Text(
-                      "Credito: ${widget.credit?.toStringAsFixed(2) ?? '0.00'}\nEstatus: ${widget.status ?? ""}"
-                      "\nUsou Carta Congelar: ${widget.usedCardFreeze == true ? "Usada" : "Não Usada"}"
-                      "\nUsou Carta Proteção: ${widget.usedCardProtect == true ? "Usada" : "Não Usada"}"
-                      "\nPrisão: ${widget.prisionBreak == true ? "Preso" : "Livre"}"
-                      "\nEsta logado: ${widget.isLoged == true ? "Logado" : "Deslogado"}",
-                      style: const TextStyle(color: Colors.white),
+                  ? Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                              text: "Credito: ",
+                              style: TextStyle(color: Colors.white)),
+                          TextSpan(
+                            text: widget.credit?.toStringAsFixed(2) ?? '0.00',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          const TextSpan(
+                              text: "\nEstatus: ",
+                              style: TextStyle(color: Colors.white)),
+                          TextSpan(
+                            text: widget.status ?? "",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nUsou Carta Congelar: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text:
+                                  widget.usedCardFreeze == true ? "Sim" : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nUsou Carta Proteção: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text: widget.usedCardProtect == true
+                                  ? "Sim"
+                                  : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nUsou Carta LCP: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text: widget.usedCardLaCasaDePapel == true
+                                  ? "Sim"
+                                  : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nComprou Carta Congelar: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text: widget.isPayCardFreeze == true
+                                  ? "Sim"
+                                  : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nComprou Carta Proteção: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text: widget.isPayCardProtect == true
+                                  ? "Sim"
+                                  : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          if (widget.listPrision == false)
+                            const TextSpan(
+                                text: "\nComprou Carta LCP: ",
+                                style: TextStyle(color: Colors.white)),
+                          if (widget.listPrision == false)
+                            TextSpan(
+                              text: widget.isPayCardLaCasaDePapel == true
+                                  ? "Sim"
+                                  : "Não",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
+                            ),
+                          const TextSpan(
+                              text: "\nPrisão: ",
+                              style: TextStyle(color: Colors.white)),
+                          TextSpan(
+                            text:
+                                widget.prisionBreak == true ? "Preso" : "Livre",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                          const TextSpan(
+                              text: "\nEsta logado: ",
+                              style: TextStyle(color: Colors.white)),
+                          TextSpan(
+                            text:
+                                widget.isLoged == true ? "Logado" : "Deslogado",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue),
+                          ),
+                        ],
+                      ),
                     )
                   : null,
           leading: widget.history == false
@@ -216,6 +340,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
               ? null
               : PopupMenuButton<String>(
                   tooltip: "Menu",
+                  color: Colors.black,
                   itemBuilder: (BuildContext context) {
                     return [
                       if (widget.history == true || widget.listPrision == true)
@@ -223,11 +348,17 @@ class _ListTeamControllerState extends State<ListTeamController> {
                           onTap: widget.onTapEdit,
                           child: Row(
                             children: [
-                              const Icon(Icons.edit),
+                              const Icon(
+                                Icons.edit,
+                                color: Colors.blue,
+                              ),
                               const SizedBox(width: 8),
-                              Text(widget.prisionBreak == true
-                                  ? "Abrir"
-                                  : "Editar"),
+                              Text(
+                                widget.prisionBreak == true
+                                    ? "Abrir"
+                                    : "Editar",
+                                style: const TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -236,9 +367,15 @@ class _ListTeamControllerState extends State<ListTeamController> {
                           onTap: widget.onTapRemove,
                           child: const Row(
                             children: [
-                              Icon(Icons.delete),
+                              Icon(
+                                Icons.delete,
+                                color: Colors.blue,
+                              ),
                               SizedBox(width: 8),
-                              Text('Remover'),
+                              Text(
+                                'Remover',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -247,9 +384,15 @@ class _ListTeamControllerState extends State<ListTeamController> {
                           onTap: widget.onTapAddValue,
                           child: const Row(
                             children: [
-                              Icon(Icons.task),
+                              Icon(
+                                Icons.task,
+                                color: Colors.blue,
+                              ),
                               SizedBox(width: 8),
-                              Text('Gerenciar'),
+                              Text(
+                                'Gerenciar',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -258,9 +401,15 @@ class _ListTeamControllerState extends State<ListTeamController> {
                           onTap: widget.config,
                           child: const Row(
                             children: [
-                              Icon(Icons.settings_applications_outlined),
+                              Icon(
+                                Icons.settings_applications_outlined,
+                                color: Colors.blue,
+                              ),
                               SizedBox(width: 8),
-                              Text('Config.Avançadas'),
+                              Text(
+                                'Config.Avançadas',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -268,7 +417,7 @@ class _ListTeamControllerState extends State<ListTeamController> {
                   },
                   icon: const Icon(
                     Icons.more_vert,
-                    color: Colors.white,
+                    color: Colors.blue,
                   ), // Ícone do botão de ação
                 ),
         ),

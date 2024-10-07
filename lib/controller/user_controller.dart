@@ -86,8 +86,10 @@ class UserController extends ChangeNotifier {
     userTeam.id = userTeamDoc.id;
     userTeam.useCardFrezee = false;
     userTeam.useCardProtect = false;
+    userTeam.useCardLaCasaDePapel = false;
     userTeam.isPayCardFrezee = false;
     userTeam.isPayCardProtected = false;
+    userTeam.isPayCardLaCasaDePapel = false;
     userTeam.isPrisionBreak = false;
     userTeam.isLoged = false;
     userTeam.status = Status.Jogando;
@@ -220,22 +222,27 @@ class UserController extends ChangeNotifier {
           } else {
             // Armazena o usuário na caixa do Hive
             final user = UserTeam(
-                id: snapshotTeam.docs.first.id,
-                login: snapshotTeam.docs.first.data().login,
-                password: snapshotTeam.docs.first.data().password,
-                name: snapshotTeam.docs.first.data().name,
-                date: snapshotTeam.docs.first.data().date,
-                status: snapshotTeam.docs.first.data().status,
-                credit: snapshotTeam.docs.first.data().credit,
-                listTokenDesbloqued:
-                    snapshotTeam.docs.first.data().listTokenDesbloqued,
-                useCardFrezee: snapshotTeam.docs.first.data().useCardFrezee,
-                useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
-                isLoged: snapshotTeam.docs.first.data().isLoged,
-                isPrisionBreak: snapshotTeam.docs.first.data().isPrisionBreak,
-                isPayCardFrezee: snapshotTeam.docs.first.data().isPayCardFrezee,
-                isPayCardProtected:
-                    snapshotTeam.docs.first.data().isPayCardProtected);
+              id: snapshotTeam.docs.first.id,
+              login: snapshotTeam.docs.first.data().login,
+              password: snapshotTeam.docs.first.data().password,
+              name: snapshotTeam.docs.first.data().name,
+              date: snapshotTeam.docs.first.data().date,
+              status: snapshotTeam.docs.first.data().status,
+              credit: snapshotTeam.docs.first.data().credit,
+              listTokenDesbloqued:
+                  snapshotTeam.docs.first.data().listTokenDesbloqued,
+              useCardFrezee: snapshotTeam.docs.first.data().useCardFrezee,
+              useCardProtect: snapshotTeam.docs.first.data().useCardProtect,
+              useCardLaCasaDePapel:
+                  snapshotTeam.docs.first.data().useCardLaCasaDePapel,
+              isLoged: snapshotTeam.docs.first.data().isLoged,
+              isPrisionBreak: snapshotTeam.docs.first.data().isPrisionBreak,
+              isPayCardFrezee: snapshotTeam.docs.first.data().isPayCardFrezee,
+              isPayCardProtected:
+                  snapshotTeam.docs.first.data().isPayCardProtected,
+              isPayCardLaCasaDePapel:
+                  snapshotTeam.docs.first.data().isPayCardLaCasaDePapel,
+            );
             if (user.isLoged == true) {
               if (context.mounted) {
                 ToolsController.dialogMensage(context, "Erro",
@@ -337,6 +344,9 @@ class UserController extends ChangeNotifier {
         if (userTeam.useCardProtect != null) {
           data['useCardProtect'] = newUserTeam.useCardProtect;
         }
+        if (userTeam.useCardLaCasaDePapel != null) {
+          data['useCardLaCasaDePapel'] = newUserTeam.useCardLaCasaDePapel;
+        }
         if (userTeam.isLoged != null) {
           data['isLoged'] = newUserTeam.isLoged;
         }
@@ -348,6 +358,9 @@ class UserController extends ChangeNotifier {
         }
         if (userTeam.isPayCardProtected != null) {
           data['isPayCardProtected'] = newUserTeam.isPayCardProtected;
+        }
+        if (userTeam.isPayCardLaCasaDePapel != null) {
+          data['isPayCardLaCasaDePapel'] = newUserTeam.isPayCardLaCasaDePapel;
         }
         return data;
       }
@@ -540,6 +553,34 @@ class UserController extends ChangeNotifier {
     } catch (e) {
       debugPrint('Erro ao obter a lista de membros: $e');
       return [];
+    }
+  }
+
+  void userCardLaCasaDePapel(UserTeam team, BuildContext context) {
+    if (selectedUserTeam!.useCardLaCasaDePapel == false &&
+        selectedUserTeam!.isPayCardLaCasaDePapel == true) {
+      final double currentCredit = team.credit!;
+      late double newCredit = currentCredit - 100;
+      newCredit < 0 ? newCredit = 0 : newCredit = newCredit;
+      addValueStatus.text = newCredit.toString();
+
+      final userTeam = UserTeam(
+        id: team.id,
+        credit: newCredit,
+      );
+      final history = History(
+        idTeam: selectedTeamId,
+        description:
+            "Equipe \"$selectedTeam\" usou carta LA CASA DE PAPAEL e a equipe\"${team.name}\" perdeu \"100\" de credito",
+      );
+      addHistory(history);
+      updateTeams(UserTeam(id: selectedTeamId, useCardLaCasaDePapel: true));
+      updateTeams(userTeam);
+      ToolsController.scafoldMensage(context, Colors.green,
+          "Equipe ${team.name} perdeu 100 pontos pela carta LCP com sucesso");
+    } else {
+      ToolsController.scafoldMensage(context, Colors.red,
+          'A equipe já usou ou não comprou a carta de La Casa De Papel');
     }
   }
 

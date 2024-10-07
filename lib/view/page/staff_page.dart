@@ -81,6 +81,7 @@ class _StaffPageState extends State<StaffPage> {
               child: ElevatedButton(
                 onPressed: () {
                   showModalBottomSheet(
+                      backgroundColor: const Color(0xFF212A3E),
                       context: context,
                       builder: (BuildContext context) {
                         return Padding(
@@ -124,6 +125,7 @@ class _StaffPageState extends State<StaffPage> {
                 errorMessage: 'Erro ao carregar equipes',
                 itemBuilder: (context, team, index) {
                   return ExpansionTile(
+                    collapsedBackgroundColor: Colors.blue,
                     title: Text(
                       "${team.name}",
                       style: const TextStyle(color: Colors.white),
@@ -198,6 +200,10 @@ class _StaffPageState extends State<StaffPage> {
                                   description: discription,
                                 ),
                               );
+                              if (context.mounted) {
+                                ToolsController.scafoldMensage(
+                                    context, Colors.green, "Equipe foi presa");
+                              }
                             }
                             setState(() {
                               isSwitch1On = true;

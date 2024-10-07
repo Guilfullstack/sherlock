@@ -21,6 +21,7 @@ class _DashboardPanelState extends State<DashboardPanel> {
       floatingActionButton: _selectedPage == 2 || _selectedPage == 3
           ? null
           : FloatingActionButton(
+              backgroundColor: Colors.blue,
               onPressed: () {
                 showDialog(
                   context: context,
@@ -192,7 +193,7 @@ class _DashboardPanelState extends State<DashboardPanel> {
   ListTile item(String nome, int index, Function()? onTap) {
     return ListTile(
       tileColor: _selectedPage == index
-          ? const Color(0xFF523B76) // Cor quando o ListTile está selecionado
+          ? Colors.blue // Cor quando o ListTile está selecionado
           : colorTileDash(index), // Cor padrão
       title: Text(
         nome,
