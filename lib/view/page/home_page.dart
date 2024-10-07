@@ -238,6 +238,7 @@ class _HomePageState extends State<HomePage> {
                   status: currentUser?.status ?? Status.Jogando,
                   useCardFrezee: currentUser!.useCardFrezee ?? false,
                   useCardProtect: currentUser!.useCardProtect ?? false,
+                  useCardLaCasaDePapel: false,
                 )
               : const CircularProgressIndicator(),
           Padding(

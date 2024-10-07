@@ -11,6 +11,7 @@ class CardPanelInfo extends StatefulWidget {
   final Status status;
   final bool useCardFrezee;
   final bool useCardProtect;
+  final bool useCardLaCasaDePapel;
 
   const CardPanelInfo({
     super.key,
@@ -18,6 +19,7 @@ class CardPanelInfo extends StatefulWidget {
     required this.status,
     required this.useCardFrezee,
     required this.useCardProtect,
+    required this.useCardLaCasaDePapel,
   });
   @override
   State<CardPanelInfo> createState() => _CardPanelInfoState();
@@ -82,7 +84,7 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                       ? Icons.play_circle_fill // Ícone para "Jogando"
                       : widget.status == Status.Congelado
                           ? Icons.ac_unit // Ícone para "Congelado"
-                          : Icons.check_circle, // Ícone para outro status
+                          : Icons.security, // Ícone para outro status
                   color: widget.status == Status.Jogando
                       ? Colors.greenAccent
                       : widget.status == Status.Congelado
@@ -120,7 +122,10 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                   'Cards:  ',
                   style: TextStyle(color: cortexto, fontSize: 18),
                 ),
-                const Icon(Symbols.poker_chip),
+                const Icon(
+                  Symbols.poker_chip,
+                  color: Colors.blue,
+                ),
                 const SizedBox(width: 8),
                 CardPlay(
                     src: 'images/congelar.png',
@@ -131,6 +136,11 @@ class _CardPanelInfoState extends State<CardPanelInfo> {
                     src: 'images/escudo.png',
                     tipo: CartaTipo.escudo,
                     isUsed: widget.useCardProtect),
+                const SizedBox(width: 10),
+                CardPlay(
+                    src: 'images/lacasadepapel.png',
+                    tipo: CartaTipo.escudo,
+                    isUsed: widget.useCardLaCasaDePapel),
               ],
             ),
           ],

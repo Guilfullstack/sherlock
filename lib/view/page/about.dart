@@ -122,8 +122,6 @@ O aplicativo desenvolvido auxilia na gamificação dessas histórias, oferecendo
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: linkedInUrl));
-                      // Mostra uma mensagem de confirmação
-                      print('Link copiado: $linkedInUrl');
                     },
                     child: const Text(
                       'LinkedIn',

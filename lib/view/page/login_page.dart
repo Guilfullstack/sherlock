@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
+import 'package:sherlock/view/page/about.dart';
 import 'package:sherlock/view/page/dashboard_panel.dart';
 import 'package:sherlock/view/page/home_page.dart';
 import 'package:sherlock/view/widgets/imput_text.dart';
@@ -71,59 +73,89 @@ class _LoginPageState extends State<LoginPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    ImputTextFormField(
-                        title: "Login", controller: userController.login),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 600, // Define a largura máxima para o campo
+                      ),
+                      child: ImputTextFormField(
+                          title: "Login", controller: userController.login),
+                    ),
                     const SizedBox(height: 20),
-                    ImputTextFormField(
-                      title: "Senha",
-                      controller: userController.password,
-                      obscure: _obscureText == true ? true : false,
-                      icon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.blue,
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 600, // Define a largura máxima para o campo
+                      ),
+                      child: ImputTextFormField(
+                        title: "Senha",
+                        controller: userController.password,
+                        obscure: _obscureText == true ? true : false,
+                        icon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.blue,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText =
+                                  !_obscureText; // Alternar entre visível e oculto
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText =
-                                !_obscureText; // Alternar entre visível e oculto
-                          });
-                        },
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 10),
-              FractionallySizedBox(
-                widthFactor: 0.4,
-                child: TextButton(
-                  onPressed: () async {
-                    if (formKey.currentState!.validate()) {
-                      userController.loginSystem(
-                          context,
-                          userController.login.text.trim(),
-                          userController.password.text.trim());
-                    }
-                  },
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        side: const BorderSide(color: Colors.blue),
-                        borderRadius: BorderRadius.circular(18.0),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 400, // Define a largura máxima para o campo
+                ),
+                child: FractionallySizedBox(
+                  widthFactor: 0.4,
+                  child: TextButton(
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        userController.loginSystem(
+                            context,
+                            userController.login.text.trim(),
+                            userController.password.text.trim());
+                        userController.password.clear();
+                      }
+                    },
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          side: const BorderSide(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
                       ),
+                      backgroundColor: WidgetStateProperty.all(Colors.blue),
                     ),
-                    backgroundColor: WidgetStateProperty.all(Colors.blue),
+                    child: const Text('Login',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400)),
                   ),
-                  child: const Text('Login',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400)),
                 ),
               ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 400, // Define a largura máxima para o campo
+                ),
+                child: TextButton(
+                    onPressed: () {
+                      ToolsController.navigateReturn(
+                          context, const AboutPage());
+                    },
+                    child: const Text(
+                      'Saiba mais...',
+                      style: TextStyle(color: Colors.blue),
+                    )),
+              )
             ],
           ),
         ),

@@ -21,7 +21,7 @@ class CardPlay extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(5)),
         border: Border.all(
-          color: Colors.white, // Cor da borda
+          color: Colors.blue, // Cor da borda
           width: 1.0, // Largura da borda
         ),
         //borderRadius: BorderRadius.circular(5.0), // Bordas arredondadas

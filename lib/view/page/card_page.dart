@@ -21,15 +21,18 @@ class CardPage extends StatelessWidget {
             children: [
               GameCard(
                 title: 'Congelar',
-                description: 'Congela o inimigo por 10 min.',
                 imagePath:
                     'images/congelar.png', // Certifique-se de adicionar uma imagem apropriada na pasta assets
               ),
               GameCard(
                 title: 'Escudo',
-                description: 'Protege contra o próximo ataque.',
                 imagePath:
                     'images/escudo.png', // Certifique-se de adicionar uma imagem apropriada na pasta assets
+              ),
+              GameCard(
+                title: 'Lá casa de papel',
+                imagePath:
+                    'images/lacasadepapel.png', // Certifique-se de adicionar uma imagem apropriada na pasta assets
               ),
             ],
           ),

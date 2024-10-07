@@ -40,38 +40,17 @@ class CardStage extends StatelessWidget {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'SHERLOCK',
-                              style: GoogleFonts.anton(
-                                textStyle: const TextStyle(
-                                  fontSize:
-                                      48, // Aumente o tamanho para dar um impacto maior
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  letterSpacing:
-                                      2.0, // Espaçamento entre letras para efeito de manchete
-                                ),
-                              ),
+                      child: Center(
+                        child: Text(
+                          stage.puzzle ?? '',
+                          style: GoogleFonts.libreBaskerville(
+                            textStyle: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black,
                             ),
-                            const SizedBox(height: 20),
-                            Text(
-                              stage.puzzle ?? '',
-                              style: GoogleFonts.libreBaskerville(
-                                textStyle: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
@@ -85,9 +64,9 @@ class CardStage extends StatelessWidget {
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: backgrundColor,
-          borderRadius: BorderRadius.circular(15),
-        ),
+            color: backgrundColor,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.blue, width: 1)),
         child: ListTile(
           title: Text(
             stage.description ?? '',

@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 class GameCard extends StatelessWidget {
   final String title;
-  final String description;
   final String imagePath;
 
   const GameCard({
     super.key,
     required this.title,
-    required this.description,
     required this.imagePath,
   });
 
