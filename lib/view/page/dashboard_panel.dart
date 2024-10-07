@@ -43,7 +43,7 @@ class _DashboardPanelState extends State<DashboardPanel> {
           ),
         ),
         title: const Text(
-          'SHERLOK',
+          'SHERLOCK',
           style: TextStyle(color: Colors.white),
         ),
         actions: [

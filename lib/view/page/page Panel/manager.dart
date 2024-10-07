@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sherlock/controller/play_controller.dart';
+import 'package:sherlock/controller/tools_controller.dart';
 import 'package:sherlock/controller/user_controller.dart';
 import 'package:sherlock/model/code.dart';
 import 'package:sherlock/model/history.dart';
@@ -75,6 +76,7 @@ class _ManagerState extends State<Manager> {
                   itemBuilder: (context, team, index) {
                     return ListTeamController(
                       addValue: true,
+                      configEnabled: true,
                       equipe: team.name,
                       credit: team.credit,
                       usedCardFreeze: team.useCardFrezee,
@@ -112,7 +114,12 @@ class _ManagerState extends State<Manager> {
                       onTapAddValue: () {
                         userController.addValueStatus.clear();
                         addValue(teamsDropDown, context, userController, team,
-                            valueDropDown);
+                            valueDropDown, true);
+                      },
+                      config: () {
+                        userController.addValueStatus.clear();
+                        addValue(teamsDropDown, context, userController, team,
+                            valueDropDown, false);
                       },
                     );
                   },
@@ -1582,10 +1589,14 @@ class _ManagerState extends State<Manager> {
     UserController user,
     UserTeam teams,
     String dropDonw,
+    bool config,
   ) {
     bool isSwitch1On = teams.useCardFrezee == true ? true : false;
     bool isSwitch2On = teams.useCardProtect == true ? true : false;
+    bool isPrision = teams.isPrisionBreak == true ? true : false;
     bool isLogado = teams.isLoged == true ? true : false;
+    bool isPayFreeze = teams.isPayCardFrezee == true ? true : false;
+    bool isPayProtect = teams.isPayCardProtected == true ? true : false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1605,266 +1616,551 @@ class _ManagerState extends State<Manager> {
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    //siwtch
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Carta  de Congelar",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Switch(
-                          value: isSwitch1On,
-                          onChanged: (value) async {
-                            await user.updateTeams(
-                                UserTeam(id: teams.id, useCardFrezee: value));
-                            setState(() {
-                              isSwitch1On = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-
-                    // Segundo Switch
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Carta de Proteção",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Switch(
-                          value: isSwitch2On,
-                          onChanged: (value) async {
-                            await user.updateTeams(
-                                UserTeam(id: teams.id, useCardProtect: value));
-                            setState(() {
-                              isSwitch2On = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Esta logado",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Switch(
-                          value: isLogado,
-                          onChanged: (value) async {
-                            await user.updateTeams(
-                                UserTeam(id: teams.id, isLoged: value));
-                            setState(() {
-                              isLogado = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-
-                    CustomDropdown(
-                      items: const [
-                        "Adicionar",
-                        "Subtrair",
-                        "Congelar",
-                        "Proteção",
-                        "Jogando"
-                      ],
-                      title: "Selecione",
-                      value: dropDonw,
-                      onChanged: (value) {
-                        setState(() {
-                          dropDonw = value!;
-                        });
-                      },
-                    ),
-                    if (dropDonw == "Adicionar" || dropDonw == "Subtrair")
-                      ImputTextFormField(
-                        title: "Valor",
-                        controller: user.addValueHistoty,
-                        keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d*')),
+                    Visibility(
+                      visible: config == true ? false : true,
+                      child: Column(
+                        children: [
+                          //siwtch
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Carta  de Congelar",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isSwitch1On,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id, useCardFrezee: value));
+                                  setState(() {
+                                    isSwitch1On = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          // Segundo Switch
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Carta de Proteção",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isSwitch2On,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id, useCardProtect: value));
+                                  setState(() {
+                                    isSwitch2On = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          //compra carta congelar
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Compra carta congelar",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isPayFreeze,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id, isPayCardFrezee: value));
+                                  setState(() {
+                                    isPayFreeze = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          //compra carta proteção
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Compra carta proteção",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isPayProtect,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id, isPayCardProtected: value));
+                                  setState(() {
+                                    isPayProtect = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          //prisão
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Prisão",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isPrision,
+                                onChanged: (value) async {
+                                  await user.updateTeams(UserTeam(
+                                      id: teams.id, isPrisionBreak: value));
+                                  setState(() {
+                                    isPrision = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          //esta logado
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "Esta logado",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Switch(
+                                value: isLogado,
+                                onChanged: (value) async {
+                                  await user.updateTeams(
+                                      UserTeam(id: teams.id, isLoged: value));
+                                  setState(() {
+                                    isLogado = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    if (dropDonw == "Congelar")
-                      StreamBuilder<List<UserTeam>>(
-                        stream: user.teamStream, // Sua stream de equipes
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text(
-                                'Erro ao carregar equipes: ${snapshot.error}');
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return const Text('Nenhuma equipe disponível');
-                          } else {
-                            List<UserTeam> availableTeams = snapshot.data!;
-
-                            Map<String, UserTeam> teamDetailsMap = {
-                              for (var team in availableTeams)
-                                (team.name ?? "Sem nome"): UserTeam(
-                                    id: team.id ?? "",
-                                    name: team.name ?? "Sem nome",
-                                    status: team.status ?? Status.Jogando,
-                                    useCardFrezee: team.useCardFrezee,
-                                    useCardProtect: team.useCardProtect),
-                            };
-
-                            Map<String, String> teamIdMap = {
-                              for (var team in availableTeams)
-                                (team.name ?? "Sem nome"): team.id ?? ""
-                            };
-                            Map<Status, Status> teamStatusMap = {
-                              for (var team in availableTeams)
-                                (team.status ?? Status.Jogando):
-                                    team.status ?? Status.Jogando
-                            };
-
-                            Map<String, String> teamNameMap = {
-                              for (var team in availableTeams)
-                                (team.name ?? ""): team.name ?? ""
-                            };
-
-                            List<String> teamNames = availableTeams
-                                .map((team) => team.name ?? "Sem nome")
-                                .toList();
-
-                            // Ajusta a lista de equipes conforme a ação selecionada
-                            if (dropDonw == "Congelar") {
-                              // Remove a equipe atual da lista para congelar
-                              teamNames.remove(teams.name);
-                            } else if (dropDonw == "Proteção") {
-                              // Adiciona a equipe selecionada na lista e usa como valor
-                              teamNames = [teams.name ?? "Sem nome"];
-                            }
-
-                            // Garantir que o valor inicial do dropdown seja um dos itens da lista
-                            user.selectedTeam = user.teamDropDownHistory;
-                            if (dropDonw == "Proteção" &&
-                                teamNames.isNotEmpty) {
-                              user.selectedTeam = teamNames.first;
-                            } else if (!teamNames.contains(user.selectedTeam)) {
-                              user.selectedTeam =
-                                  teamNames.isNotEmpty ? teamNames.first : null;
-                            }
-                            user.selectedUserTeam =
-                                teamDetailsMap[user.selectedTeam];
-                            user.selectedTeamId = teamIdMap[user.selectedTeam];
-                            user.selectedTeamStatus =
-                                teamStatusMap[teams.status];
-                            user.selectedTeamName = user.selectedTeam;
-
-                            return Column(
-                              children: [
-                                Text(
-                                  "Qual Equipe vai congelar\n(${teams.name})",
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                CustomDropdown(
-                                  value: user
-                                      .selectedTeam, // Certifique-se de que value não é nulo
-                                  title: "Selecione a equipe",
-                                  items: teamNames,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      user.teamDropDownHistory = newValue!;
-                                      user.selectedTeam = newValue;
-                                      user.selectedTeamId = teamIdMap[newValue];
-                                      user.selectedTeamStatus =
-                                          // ignore: collection_methods_unrelated_type
-                                          teamStatusMap[newValue];
-                                      user.selectedTeamName =
-                                          teamNameMap[newValue];
-                                    });
-                                  },
-                                ),
+                    ),
+                    Visibility(
+                      visible: config == true ? true : false,
+                      child: Column(
+                        children: [
+                          CustomDropdown(
+                            items: const [
+                              "Adicionar",
+                              "Subtrair",
+                              "Congelar",
+                              "Proteção",
+                              "Comp. carta congelar",
+                              "Comp. carta proteção",
+                              "Pagar Fiança",
+                              "Jogando"
+                            ],
+                            title: "Selecione",
+                            value: dropDonw,
+                            onChanged: (value) {
+                              setState(() {
+                                dropDonw = value!;
+                              });
+                            },
+                          ),
+                          if (dropDonw == "Adicionar" || dropDonw == "Subtrair")
+                            ImputTextFormField(
+                              title: "Valor",
+                              controller: user.addValueHistoty,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d*\.?\d*')),
                               ],
-                            );
-                          }
-                        },
+                            ),
+                          if (dropDonw == "Congelar")
+                            StreamBuilder<List<UserTeam>>(
+                              stream: user.teamStream, // Sua stream de equipes
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text(
+                                      'Erro ao carregar equipes: ${snapshot.error}');
+                                } else if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return const Text(
+                                      'Nenhuma equipe disponível');
+                                } else {
+                                  List<UserTeam> availableTeams =
+                                      snapshot.data!;
+
+                                  Map<String, UserTeam> teamDetailsMap = {
+                                    for (var team in availableTeams)
+                                      (team.name ?? "Sem nome"): UserTeam(
+                                          id: team.id ?? "",
+                                          name: team.name ?? "Sem nome",
+                                          status: team.status ?? Status.Jogando,
+                                          useCardFrezee: team.useCardFrezee,
+                                          useCardProtect: team.useCardProtect,
+                                          isPayCardFrezee:
+                                              team.isPayCardFrezee),
+                                  };
+
+                                  Map<String, String> teamIdMap = {
+                                    for (var team in availableTeams)
+                                      (team.name ?? "Sem nome"): team.id ?? ""
+                                  };
+                                  Map<Status, Status> teamStatusMap = {
+                                    for (var team in availableTeams)
+                                      (team.status ?? Status.Jogando):
+                                          team.status ?? Status.Jogando
+                                  };
+
+                                  Map<String, String> teamNameMap = {
+                                    for (var team in availableTeams)
+                                      (team.name ?? ""): team.name ?? ""
+                                  };
+
+                                  List<String> teamNames = availableTeams
+                                      .map((team) => team.name ?? "Sem nome")
+                                      .toList();
+
+                                  // Ajusta a lista de equipes conforme a ação selecionada
+                                  if (dropDonw == "Congelar") {
+                                    // Remove a equipe atual da lista para congelar
+                                    teamNames.remove(teams.name);
+                                  } else if (dropDonw == "Proteção") {
+                                    // Adiciona a equipe selecionada na lista e usa como valor
+                                    teamNames = [teams.name ?? "Sem nome"];
+                                  }
+
+                                  // Garantir que o valor inicial do dropdown seja um dos itens da lista
+                                  user.selectedTeam = user.teamDropDownHistory;
+                                  if (dropDonw == "Proteção" &&
+                                      teamNames.isNotEmpty) {
+                                    user.selectedTeam = teamNames.first;
+                                  } else if (!teamNames
+                                      .contains(user.selectedTeam)) {
+                                    user.selectedTeam = teamNames.isNotEmpty
+                                        ? teamNames.first
+                                        : null;
+                                  }
+                                  user.selectedUserTeam =
+                                      teamDetailsMap[user.selectedTeam];
+                                  user.selectedTeamId =
+                                      teamIdMap[user.selectedTeam];
+                                  user.selectedTeamStatus =
+                                      teamStatusMap[teams.status];
+                                  user.selectedTeamName = user.selectedTeam;
+
+                                  return Column(
+                                    children: [
+                                      Text(
+                                        "Qual Equipe vai congelar\n(${teams.name})",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      CustomDropdown(
+                                        value: user
+                                            .selectedTeam, // Certifique-se de que value não é nulo
+                                        title: "Selecione a equipe",
+                                        items: teamNames,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            user.teamDropDownHistory =
+                                                newValue!;
+                                            user.selectedTeam = newValue;
+                                            user.selectedTeamId =
+                                                teamIdMap[newValue];
+                                            user.selectedTeamStatus =
+                                                // ignore: collection_methods_unrelated_type
+                                                teamStatusMap[newValue];
+                                            user.selectedTeamName =
+                                                teamNameMap[newValue];
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
+                              },
+                            ),
+                        ],
                       ),
+                    ),
                   ],
                 ),
                 actions: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      switch (dropDonw) {
-                        case "Adicionar":
-                          user.addValueStatus.text = user.addValueHistoty.text;
-                          final credit =
-                              double.parse(user.addValueStatus.text) +
-                                  teams.credit!;
-                          user.addValueStatus.text = credit.toString();
-                          final userTeam = UserTeam(
-                            id: teams.id,
-                            credit: double.parse(user.addValueStatus.text),
-                          );
+                  Visibility(
+                    visible: config == true ? true : false,
+                    child: Wrap(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            switch (dropDonw) {
+                              case "Adicionar":
+                                if (teams.status == Status.Congelado) {
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.red,
+                                      "Não pode adicionar uma equipe que está congelada");
+                                } else {
+                                  user.addValueStatus.text =
+                                      user.addValueHistoty.text;
+                                  final credit =
+                                      double.parse(user.addValueStatus.text) +
+                                          teams.credit!;
+                                  user.addValueStatus.text = credit.toString();
+                                  final userTeam = UserTeam(
+                                    id: teams.id,
+                                    credit:
+                                        double.parse(user.addValueStatus.text),
+                                  );
 
-                          final history = History(
-                              idTeam: teams.id,
-                              description:
-                                  "Adicionado \"${user.addValueHistoty.text}\" a Equipe \"${teams.name}\"");
-                          await user.addHistory(history);
-                          await user.updateTeams(userTeam);
-                          user.addValueStatus.clear();
-                          user.addValueHistoty.clear();
-                          break;
-                        case "Subtrair":
-                          final double enteredValue =
-                              double.parse(user.addValueHistoty.text);
-                          final double currentCredit = teams.credit!;
-                          // Calcula o novo valor do crédito após a subtração
-                          final double newCredit = currentCredit - enteredValue;
-                          // Garante que o crédito não seja menor que zero
-                          final double credit =
-                              newCredit < 0 ? teams.credit! : newCredit;
-                          user.addValueStatus.text = credit.toString();
-                          final userTeam = UserTeam(
-                            id: teams.id,
-                            credit: double.parse(user.addValueStatus.text),
-                          );
-                          final history = History(
-                              idTeam: teams.id,
-                              description:
-                                  "Subtraido \"${user.addValueHistoty.text}\" a equipe \"${teams.name}\"");
-                          await user.addHistory(history);
-                          await user.updateTeams(userTeam);
-                          user.addValueStatus.clear();
-                          user.addValueHistoty.clear();
-                          break;
-                        case "Congelar":
-                          user.startStatusUpdateTimer(teams, context);
-                          break;
-                        case "Proteção":
-                          user.startProtectUpdateTimer(teams, context);
-                          break;
-                        case "Jogando":
-                          user.statusTeams = Status.Jogando;
-                          final userTeam = UserTeam(
-                            id: teams.id,
-                            status: user.statusTeams,
-                          );
-                          await user.updateTeams(userTeam);
-                        default:
-                      }
-                      exit();
-                    },
-                    child: const Text("Aplicar"),
+                                  final history = History(
+                                      idTeam: teams.id,
+                                      description:
+                                          "Adicionado \"${user.addValueHistoty.text}\" a Equipe \"${teams.name}\"");
+                                  user.addHistory(history);
+                                  user.updateTeams(userTeam);
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.green,
+                                      "Foi adiconado com sucesso");
+                                  user.addValueStatus.clear();
+                                  user.addValueHistoty.clear();
+                                }
+
+                                break;
+
+                              case "Subtrair":
+                                if (teams.status == Status.Congelado) {
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.red,
+                                      "Não pode subtrair enquanto estiver congelado");
+                                } else {
+                                  final double enteredValue =
+                                      double.parse(user.addValueHistoty.text);
+                                  final double currentCredit = teams.credit!;
+
+                                  // Verifica se o valor a ser subtraído é maior do que o crédito atual
+                                  if (enteredValue > currentCredit) {
+                                    // Exibe o diálogo se o valor for maior que o crédito atual
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.green,
+                                        "Não pode tirar mais do que a equipe possui");
+                                  } else {
+                                    // Calcula o novo valor do crédito após a subtração
+                                    final double newCredit =
+                                        currentCredit - enteredValue;
+                                    user.addValueStatus.text =
+                                        newCredit.toString();
+
+                                    final userTeam = UserTeam(
+                                      id: teams.id,
+                                      credit: newCredit,
+                                    );
+
+                                    final history = History(
+                                      idTeam: teams.id,
+                                      description:
+                                          "Subtraído \"${user.addValueHistoty.text}\" da equipe \"${teams.name}\"",
+                                    );
+
+                                    // Atualiza o histórico e o crédito da equipe
+                                    user.addHistory(history);
+                                    user.updateTeams(userTeam);
+                                    // ignore: use_build_context_synchronously
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.black,
+                                        "Foi retirado com sucesso");
+                                    // Limpa os campos de entrada
+                                    user.addValueStatus.clear();
+                                    user.addValueHistoty.clear();
+                                  }
+                                }
+                                break;
+
+                              case "Congelar":
+                                user.startStatusUpdateTimer(teams, context);
+                                break;
+
+                              case "Pagar Fiança":
+                                // Verifica se a equipe está presa
+                                if (teams.isPrisionBreak == true) {
+                                  // Verifica se a equipe tem crédito suficiente para pagar a fiança
+                                  if (teams.credit! >= 200) {
+                                    final double currentCredit = teams.credit!;
+                                    final double newCredit =
+                                        currentCredit - 200;
+                                    user.addValueStatus.text =
+                                        newCredit.toString();
+                                    // Atualiza a equipe com o novo valor de crédito e marca como "não presa"
+                                    await userController.updateTeams(
+                                      UserTeam(
+                                        id: teams.id,
+                                        isPrisionBreak: false,
+                                        credit: newCredit,
+                                      ),
+                                    );
+
+                                    // Adiciona uma entrada no histórico informando que a fiança foi paga
+                                    userController.addHistory(
+                                      History(
+                                        idTeam: teams.id,
+                                        description:
+                                            "Equipe \"${teams.name}\" pagou a fiança",
+                                      ),
+                                    );
+
+                                    // Exibe uma mensagem de sucesso
+                                    ToolsController.scafoldMensage(
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        Colors.green,
+                                        "Fiança paga com sucesso! Crédito restante: $newCredit");
+                                  } else {
+                                    // Caso a equipe não tenha crédito suficiente
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.red,
+                                        "Crédito insuficiente para pagar a fiança");
+                                  }
+                                } else {
+                                  // Caso a equipe não esteja presa
+                                  ToolsController.scafoldMensage(context,
+                                      Colors.red, "A equipe não está presa");
+                                }
+                                break;
+
+                              case "Comp. carta congelar":
+                                if (teams.isPayCardFrezee == false) {
+                                  // Verifica se a equipe tem crédito suficiente
+                                  if (teams.credit! >= 120) {
+                                    final double currentCredit = teams.credit!;
+                                    final double newCredit =
+                                        currentCredit - 120;
+                                    user.addValueStatus.text =
+                                        newCredit.toString();
+                                    // Atualiza a equipe com o novo valor de crédito
+                                    await userController.updateTeams(
+                                      UserTeam(
+                                        id: teams.id,
+                                        isPayCardFrezee: true,
+                                        credit: newCredit,
+                                      ),
+                                    );
+
+                                    // Adiciona uma entrada no histórico informando que a fiança foi paga
+                                    userController.addHistory(
+                                      History(
+                                        idTeam: teams.id,
+                                        description:
+                                            "Equipe \"${teams.name}\" comprou carta de CONGELAR",
+                                      ),
+                                    );
+
+                                    // Exibe uma mensagem de sucesso
+                                    ToolsController.scafoldMensage(
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        Colors.green,
+                                        "Carta comprada com sucesso");
+                                  } else {
+                                    // Caso a equipe não tenha crédito suficiente
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.red,
+                                        "A equipe não tem credito suficiente");
+                                  }
+                                } else {
+                                  // Caso a equipe não esteja presa
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.red,
+                                      "A equipe já comprou essa carta");
+                                }
+                                break;
+
+                              case "Comp. carta proteção":
+                                if (teams.isPayCardProtected == false) {
+                                  // Verifica se a equipe tem crédito suficiente
+                                  if (teams.credit! >= 120) {
+                                    final double currentCredit = teams.credit!;
+                                    final double newCredit =
+                                        currentCredit - 120;
+                                    user.addValueStatus.text =
+                                        newCredit.toString();
+                                    // Atualiza a equipe com o novo valor de crédito
+                                    await userController.updateTeams(
+                                      UserTeam(
+                                        id: teams.id,
+                                        isPayCardProtected: true,
+                                        credit: newCredit,
+                                      ),
+                                    );
+
+                                    // Adiciona uma entrada no histórico informando que a fiança foi paga
+                                    userController.addHistory(
+                                      History(
+                                        idTeam: teams.id,
+                                        description:
+                                            "Equipe \"${teams.name}\" comprou carta de PROTEÇÂO",
+                                      ),
+                                    );
+
+                                    // Exibe uma mensagem de sucesso
+                                    ToolsController.scafoldMensage(
+                                        // ignore: use_build_context_synchronously
+                                        context,
+                                        Colors.green,
+                                        "Carta comprada com sucesso");
+                                  } else {
+                                    // Caso a equipe não tenha crédito suficiente
+                                    ToolsController.scafoldMensage(
+                                        context,
+                                        Colors.red,
+                                        "A equipe não tem credito suficiente");
+                                  }
+                                } else {
+                                  // Caso a equipe não esteja presa
+                                  ToolsController.scafoldMensage(
+                                      context,
+                                      Colors.red,
+                                      "A equipe já comprou essa carta");
+                                }
+                                break;
+
+                              case "Proteção":
+                                user.startProtectUpdateTimer(teams, context);
+                                break;
+
+                              case "Jogando":
+                                user.statusTeams = Status.Jogando;
+                                final userTeam = UserTeam(
+                                  id: teams.id,
+                                  status: user.statusTeams,
+                                );
+                                await user.updateTeams(userTeam);
+                              default:
+                            }
+                            exit();
+                          },
+                          child: const Text("Aplicar"),
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Cancelar"))
+                      ],
+                    ),
                   ),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Cancelar"))
                 ],
               ),
             );

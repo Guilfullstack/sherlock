@@ -6,6 +6,7 @@ class ListTeamController extends StatefulWidget {
   final Function()? onTapEdit;
   final Function()? onTapRemove;
   final Function()? onTapAddValue;
+  final Function()? config;
   final Function(bool?)? onChanged;
   final double? credit;
   final String? status;
@@ -24,6 +25,7 @@ class ListTeamController extends StatefulWidget {
   final bool? listStageProva;
   final bool? prisionBreak;
   final bool? listPrision;
+  final bool? configEnabled;
   final DateTime? dateHistory;
   const ListTeamController({
     super.key,
@@ -48,7 +50,10 @@ class ListTeamController extends StatefulWidget {
     this.usedCardProtect,
     this.isLoged,
     this.listStageProva,
-    this.prisionBreak, this.listPrision,
+    this.prisionBreak,
+    this.listPrision,
+    this.configEnabled,
+    this.config,
   });
 
   @override
@@ -216,11 +221,13 @@ class _ListTeamControllerState extends State<ListTeamController> {
                       if (widget.history == true || widget.listPrision == true)
                         PopupMenuItem<String>(
                           onTap: widget.onTapEdit,
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.edit),
-                              SizedBox(width: 8),
-                              Text('Editar'),
+                              const Icon(Icons.edit),
+                              const SizedBox(width: 8),
+                              Text(widget.prisionBreak == true
+                                  ? "Abrir"
+                                  : "Editar"),
                             ],
                           ),
                         ),
@@ -246,17 +253,17 @@ class _ListTeamControllerState extends State<ListTeamController> {
                             ],
                           ),
                         ),
-                      // PopupMenuItem<String>(
-                      //   enabled: widget.onDesktop == false ? true : false,
-                      //   onTap: widget.onTapHistory,
-                      //   child: const Row(
-                      //     children: [
-                      //       Icon(Icons.history),
-                      //       SizedBox(width: 8),
-                      //       Text('Historico'),
-                      //     ],
-                      //   ),
-                      // ),
+                      if (widget.configEnabled == true)
+                        PopupMenuItem<String>(
+                          onTap: widget.config,
+                          child: const Row(
+                            children: [
+                              Icon(Icons.settings_applications_outlined),
+                              SizedBox(width: 8),
+                              Text('Config.Avançadas'),
+                            ],
+                          ),
+                        ),
                     ];
                   },
                   icon: const Icon(
