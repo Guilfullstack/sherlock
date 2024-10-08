@@ -1559,13 +1559,13 @@ class _ManagerState extends State<Manager> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (update == true) {
                               final newMembers = UserTeam(
                                 id: idTeams,
                                 listMembers: member,
                               );
-                              userController.updateTeams(newMembers);
+                              await userController.updateTeams(newMembers);
                               setStateDialog(() {
                                 hasLoadedMembers = false;
                               });

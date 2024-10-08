@@ -93,8 +93,6 @@ class UserController extends ChangeNotifier {
     userTeam.isPrisionBreak = false;
     userTeam.isLoged = false;
     userTeam.status = Status.Jogando;
-    userTeam.listTokenDesbloqued = [];
-    userTeam.listMembers = [];
     userTeam.date = DateTime.now();
     await userTeamDoc.set(userTeam);
     listTeamn.insert(0, userTeam);
@@ -672,7 +670,9 @@ class UserController extends ChangeNotifier {
   void startProtectUpdateTimer(UserTeam team, BuildContext context) async {
     statusTeams = Status.Protegido;
 
-    if (team.useCardProtect == false && team.isPayCardProtected == true) {
+    if (team.useCardProtect == false &&
+        team.isPayCardProtected == true &&
+        team.status == Status.Protegido) {
       final userTeam = UserTeam(
         id: team.id,
         status: statusTeams,
@@ -690,7 +690,7 @@ class UserController extends ChangeNotifier {
       // Cria um temporizador de proteção para esta equipe
     } else {
       ToolsController.scafoldMensage(context, Colors.red,
-          'A equipe já usou ou não comprou carta de proteção');
+          'A equipe já usou ou não comprou carta de proteção ou está congelada');
     }
   }
 
