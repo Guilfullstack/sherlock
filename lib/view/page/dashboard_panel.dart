@@ -29,7 +29,7 @@ class _DashboardPanelState extends State<DashboardPanel> {
                     return AlertDialog(
                       backgroundColor: Colors.black,
                       content: SizedBox(
-                          height: 400,
+                          //height: 400,
                           width: _selectedPage == 0 ? 400 : 800,
                           child: pageCreate(_selectedPage)),
                     );
@@ -103,22 +103,22 @@ class _DashboardPanelState extends State<DashboardPanel> {
                 ),
                 child: ListView(
                   children: [
-                    item('Home', 0, () {
+                    item('Home', 0, Icons.home, () {
                       setState(() {
                         _selectedPage = 0; // Muda para a página Dashboard
                       });
                     }),
-                    item('Colaboradores', 1, () {
+                    item('Colaboradores', 1, Icons.group, () {
                       setState(() {
                         _selectedPage = 1; // Muda para a página Usuários
                       });
                     }),
-                    item('Provas', 2, () {
+                    item('Provas', 2, Icons.task, () {
                       setState(() {
                         _selectedPage = 2; // Muda para a página Vendas
                       });
                     }),
-                    item('Hitorico', 3, () {
+                    item('Hitorico', 3, Icons.history, () {
                       setState(() {
                         _selectedPage = 3; // Muda para a página Relatórios
                       });
@@ -144,18 +144,31 @@ class _DashboardPanelState extends State<DashboardPanel> {
 
   // Retorna o conteúdo da página baseado no índice selecionado
   Widget _getSelectedPage() {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
     switch (_selectedPage) {
       //pagina home
       case 0:
         return const Manager(create: false, pageList: 1);
       // pagina Colaboradores
       case 1:
-        return const Row(
-          children: [
-            Expanded(child: Manager(create: false, pageList: 2)),
-            Expanded(child: Manager(create: false, pageList: 3)),
-          ],
-        );
+        return w < 800
+            ? ListView(
+                children: [
+                  SizedBox(
+                      height: (h / 2) - 50,
+                      child: const Manager(create: false, pageList: 2)),
+                  SizedBox(
+                      height: (h / 2) - 50,
+                      child: const Manager(create: false, pageList: 3)),
+                ],
+              )
+            : const Row(
+                children: [
+                  Expanded(child: Manager(create: false, pageList: 2)),
+                  Expanded(child: Manager(create: false, pageList: 3)),
+                ],
+              );
       //pagina provas
       case 2:
         return const Manager(create: false, pageList: 4);
@@ -172,16 +185,29 @@ class _DashboardPanelState extends State<DashboardPanel> {
   }
 
   Widget pageCreate(int page) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
     switch (page) {
       case 0:
         return const Manager(pageList: 1, create: true);
       case 1:
-        return const Row(
-          children: [
-            Manager(pageList: 2, create: true),
-            Manager(pageList: 3, create: true),
-          ],
-        );
+        return w < 800
+            ? ListView(
+                children: [
+                  SizedBox(
+                      height: (h / 2) - 50,
+                      child: const Manager(pageList: 2, create: true)),
+                  SizedBox(
+                      height: (h / 2) - 50,
+                      child: const Manager(pageList: 3, create: true)),
+                ],
+              )
+            : const Row(
+                children: [
+                  Manager(pageList: 2, create: true),
+                  Manager(pageList: 3, create: true),
+                ],
+              );
       case 2:
         return const Manager(pageList: 4, create: true);
       default:
@@ -190,15 +216,22 @@ class _DashboardPanelState extends State<DashboardPanel> {
   }
 
   // Método para criar os itens do Drawer
-  ListTile item(String nome, int index, Function()? onTap) {
+  ListTile item(String nome, int index, IconData icon, Function()? onTap) {
+    double w = MediaQuery.of(context).size.width;
     return ListTile(
       tileColor: _selectedPage == index
           ? Colors.blue // Cor quando o ListTile está selecionado
           : colorTileDash(index), // Cor padrão
-      title: Text(
-        nome,
-        style: const TextStyle(color: Colors.white), // Cor do texto ajustada
-      ),
+      title: w < 800
+          ? Icon(
+              icon,
+              color: Colors.white,
+            )
+          : Text(
+              nome,
+              style:
+                  const TextStyle(color: Colors.white), // Cor do texto ajustada
+            ),
       onTap: onTap,
     );
   }

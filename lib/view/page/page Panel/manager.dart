@@ -59,6 +59,8 @@ class _ManagerState extends State<Manager> {
   }
 
   Widget changeList(int page) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
     switch (page) {
       case 1:
         return Column(
@@ -68,7 +70,7 @@ class _ManagerState extends State<Manager> {
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserTeam>(
-                  aspectRatio: 1.2,
+                  aspectRatio: w < 800 ? 0.7 : 1.2,
                   size: 350,
                   stream: userController.teamStream,
                   emptyMessage: 'Não há equipes',
@@ -136,14 +138,14 @@ class _ManagerState extends State<Manager> {
       case 2:
         return Column(
           children: [
-            titleList("Administrado"),
+            titleList("Administrador"),
             Expanded(
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<UserAdm>(
                   columGrid: 1,
                   size: 150,
-                  aspectRatio: 9.0,
+                  aspectRatio: w < 800 ? 4 : 9.0,
                   stream: userController.admStream,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -194,7 +196,7 @@ class _ManagerState extends State<Manager> {
                 child: ListUsers<UserStaff>(
                   columGrid: 1,
                   size: 150,
-                  aspectRatio: 9.0,
+                  aspectRatio: w < 800 ? 4 : 9.0,
                   stream: userController.staffStream,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -241,21 +243,24 @@ class _ManagerState extends State<Manager> {
           ],
         );
       case 4:
-        return Row(
+        return Wrap(
           children: [
-            Expanded(
+            SizedBox(
+              height: w < 800 ? (h / 2) - 100 : h,
               child: Form(
                 key: playController.formKeyPlay,
                 child: _addTolkien(context, playController, false, false),
               ),
             ),
-            Expanded(
+            SizedBox(
+              height: w < 800 ? (h / 2) : h,
+              width: w > 800 ? (w / 2) - 100 : w,
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<Stage>(
                   columGrid: 1,
                   size: 150,
-                  aspectRatio: 7.0,
+                  aspectRatio: w < 800 ? 3.8 : 7.0,
                   stream: playController.codeStreamFilter,
                   emptyMessage: 'Não há nenhum colaborador',
                   errorMessage: 'Erro ao carregar colaboradores',
@@ -318,11 +323,11 @@ class _ManagerState extends State<Manager> {
               child: Card.filled(
                 color: const Color.fromARGB(0, 0, 0, 0),
                 child: ListUsers<History>(
-                    aspectRatio: 6,
+                    aspectRatio: w < 800 ? 2 : 6,
                     size: 400,
                     stream: userController.historyStream,
-                    emptyMessage: 'Não há nenhum colaborador',
-                    errorMessage: 'Erro ao carregar colaboradores',
+                    emptyMessage: 'Não há nenhum historico',
+                    errorMessage: 'Erro ao carregar historico',
                     itemBuilder: (context, team, index) {
                       if (userController.teamDropDownHistory == 'Todos' ||
                           team.idTeam == userController.teamIdHistory) {
@@ -1634,10 +1639,11 @@ class _ManagerState extends State<Manager> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Carta  de Congelar",
+                                "Usou carta  de Congelar",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isSwitch1On,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1654,10 +1660,11 @@ class _ManagerState extends State<Manager> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Carta de Proteção",
+                                "Usou carta de Proteção",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isSwitch2On,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1674,10 +1681,11 @@ class _ManagerState extends State<Manager> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Carta La Casa De Papel",
+                                "Usou carta LCP",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isUseCardLaCasaDePapel,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1690,15 +1698,16 @@ class _ManagerState extends State<Manager> {
                               ),
                             ],
                           ),
-                          //compra carta congelar
+                          //comprou carta congelar
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Compra carta congelar",
+                                "Comprou carta congelar",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isPayFreeze,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1710,15 +1719,16 @@ class _ManagerState extends State<Manager> {
                               ),
                             ],
                           ),
-                          //compra carta proteção
+                          //comprou carta proteção
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Compra carta proteção",
+                                "Comprou carta proteção",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isPayProtect,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1730,15 +1740,16 @@ class _ManagerState extends State<Manager> {
                               ),
                             ],
                           ),
-                          //compra carta La Casa De Papael
+                          //comprou carta La Casa De Papael
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Compra carta LCP",
+                                "Comprou carta LCP",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isPayLaCasaDePapel,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1760,6 +1771,7 @@ class _ManagerState extends State<Manager> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isPrision,
                                 onChanged: (value) async {
                                   await user.updateTeams(UserTeam(
@@ -1771,15 +1783,16 @@ class _ManagerState extends State<Manager> {
                               ),
                             ],
                           ),
-                          //esta logado
+                          // logado
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                "Esta logado",
+                                "Logado",
                                 style: TextStyle(color: Colors.white),
                               ),
                               Switch(
+                                activeColor: Colors.blue,
                                 value: isLogado,
                                 onChanged: (value) async {
                                   await user.updateTeams(

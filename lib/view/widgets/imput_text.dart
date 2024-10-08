@@ -49,6 +49,7 @@ class ImputTextFormField extends StatelessWidget {
         style: const TextStyle(color: Colors.white),
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
+        cursorColor: Colors.blue,
         decoration: InputDecoration(
           suffixIcon: icon,
           enabled: enabled ?? true,

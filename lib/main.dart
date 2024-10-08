@@ -61,6 +61,15 @@ Future<void> main() async {
         theme: ThemeData(
             primaryColorLight: Colors.blue,
             scaffoldBackgroundColor: const Color(0xFF212A3E),
+            textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.all(Colors.blue),
+            )),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            )),
             listTileTheme: const ListTileThemeData(
               tileColor: Colors.black,
             ),
