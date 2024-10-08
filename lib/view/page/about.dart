@@ -59,7 +59,7 @@ O aplicativo desenvolvido auxilia na gamificação dessas histórias, oferecendo
                       linkedInUrl:
                           'https://www.linkedin.com/in/%C3%ADtalo-ferreira-383a4b1a7/'),
                   _buildCollaboratorCard(
-                      imageUrl: 'images/colab/guilherme.jpg',
+                      imageUrl: 'images/colab/guilherme.jpeg',
                       name: 'Guilherme Almeida',
                       position: 'Desenvolvedor',
                       linkedInUrl:

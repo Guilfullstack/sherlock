@@ -87,14 +87,7 @@ class _HomePageState extends State<HomePage> {
           isPopupVisible: _isPop2Visible,
           setPopupVisible: (visible) => _isPop2Visible = visible,
           message: 'Sua equipe está presa, pague a fiança',
-          iconContent: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.local_police,
-                  size: 50, color: Colors.blue), // Ícones de prisão
-              Icon(Icons.lock, size: 50, color: Colors.blue),
-            ],
-          ),
+          iconContent: Image.asset('images/prisao.png'),
         );
       }
     });
@@ -238,7 +231,8 @@ class _HomePageState extends State<HomePage> {
                   status: currentUser?.status ?? Status.Jogando,
                   useCardFrezee: currentUser!.useCardFrezee ?? false,
                   useCardProtect: currentUser!.useCardProtect ?? false,
-                  useCardLaCasaDePapel: false,
+                  useCardLaCasaDePapel:
+                      currentUser!.useCardLaCasaDePapel ?? false,
                 )
               : const CircularProgressIndicator(),
           Padding(
