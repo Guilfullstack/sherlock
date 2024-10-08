@@ -1930,7 +1930,7 @@ class _ManagerState extends State<Manager> {
                                   return Column(
                                     children: [
                                       Text(
-                                        teams.useCardLaCasaDePapel == false
+                                        dropDonw != "Congelar"
                                             ? "Qual Equipe vai vau usar carta LCP\nna equipe ${teams.name}"
                                             : "Qual Equipe vai congelar\n(${teams.name})",
                                         style: const TextStyle(
