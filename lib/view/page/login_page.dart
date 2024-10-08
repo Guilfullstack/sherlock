@@ -115,47 +115,59 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: FractionallySizedBox(
                   widthFactor: 0.4,
-                  child: TextButton(
-                    onPressed: () async {
-                      if (formKey.currentState!.validate()) {
-                        userController.loginSystem(
-                            context,
-                            userController.login.text.trim(),
-                            userController.password.text.trim());
-                        userController.password.clear();
-                      }
-                    },
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          side: const BorderSide(color: Colors.blue),
-                          borderRadius: BorderRadius.circular(18.0),
+                  child: userController.loading == true
+                      ? const LinearProgressIndicator()
+                      : TextButton(
+                          onPressed: () async {
+                            if (formKey.currentState!.validate()) {
+                              setState(() {
+                                userController.loading = true;
+                              });
+
+                              await userController.loginSystem(
+                                  context,
+                                  userController.login.text.trim(),
+                                  userController.password.text.trim());
+                              userController.password.clear();
+                              setState(() {
+                                userController.loading = false;
+                              });
+                            }
+                          },
+                          style: ButtonStyle(
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                side: const BorderSide(color: Colors.blue),
+                                borderRadius: BorderRadius.circular(18.0),
+                              ),
+                            ),
+                            backgroundColor:
+                                WidgetStateProperty.all(Colors.blue),
+                          ),
+                          child: const Text('Login',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400)),
                         ),
-                      ),
-                      backgroundColor: WidgetStateProperty.all(Colors.blue),
-                    ),
-                    child: const Text('Login',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400)),
-                  ),
                 ),
               ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400, // Define a largura máxima para o campo
-                ),
-                child: TextButton(
-                    onPressed: () {
-                      ToolsController.navigateReturn(
-                          context, const AboutPage());
-                    },
-                    child: const Text(
-                      'Saiba mais...',
-                      style: TextStyle(color: Colors.blue),
-                    )),
-              )
+              if (userController.loading == false)
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 400, // Define a largura máxima para o campo
+                  ),
+                  child: TextButton(
+                      onPressed: () {
+                        ToolsController.navigateReturn(
+                            context, const AboutPage());
+                      },
+                      child: const Text(
+                        'Saiba mais...',
+                        style: TextStyle(color: Colors.blue),
+                      )),
+                )
             ],
           ),
         ),
