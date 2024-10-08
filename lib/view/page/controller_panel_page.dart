@@ -339,7 +339,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           credit: team.credit,
                           status: playController.statusToString(team.status!),
                           onTapRemove: () {
-                            userController.removeUser(0, team.id.toString());
+                            userController.removeUser(context, 0, team.id.toString());
                           },
                           onTapEdit: () {
                             showDialog(
@@ -429,7 +429,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                     equipe: team.login,
                     //credit: team.credit,
                     onTapRemove: () {
-                      userController.removeUser(1, team.id.toString());
+                      userController.removeUser(context, 1, team.id.toString());
                     },
                     onTapEdit: () {
                       showDialog(
@@ -512,7 +512,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                       equipe: staff.login,
                       //credit: staff.credit,
                       onTapRemove: () {
-                        userController.removeUser(2, staff.id.toString());
+                        userController.removeUser(context, 2, staff.id.toString());
                       },
                       onTapEdit: () {
                         showDialog(
@@ -618,7 +618,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                           category: playController
                               .categoryToString(code.category as Category),
                           onTapRemove: () {
-                            playController.removePlay(0, code.id.toString());
+                            playController.removePlay(context, 0, code.id.toString());
                           },
                           onTapEdit: () {
                             showDialog(
@@ -717,7 +717,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                             // category: playController
                             //     .categoryToString(code.category as Category),
                             onTapRemove: () {
-                              playController.removePlay(1, code.id.toString());
+                              playController.removePlay(context, 1, code.id.toString());
                             },
                             onTapEdit: () {
                               showDialog(
@@ -824,7 +824,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                     equipe: history.description,
                                     onTapRemove: () {
                                       userController.removeUser(
-                                          3, history.id.toString());
+                                        context,   3, history.id.toString());
                                     },
                                   );
                                 } else {
@@ -1482,7 +1482,7 @@ class _ControllerPanelPageState extends State<ControllerPanelPage>
                                     //     .categoryToString(code.category as Category),
                                     onTapRemove: () {
                                       playController.removePlay(
-                                          1, code.id.toString());
+                                        context,   1, code.id.toString());
                                     },
                                     onTapEdit: () {
                                       showDialog(

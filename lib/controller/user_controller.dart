@@ -48,7 +48,7 @@ class UserController extends ChangeNotifier {
   final FocusNode addMemberFocusNode = FocusNode();
   late String? selectionStaff;
   String selectionStaffEdit = 'Prova';
-  late String? teamIdHistory;
+  String? teamIdHistory;
   String teamDropDownHistory = 'Todos';
   Future<void>? protectTimer;
 
@@ -292,21 +292,49 @@ class UserController extends ChangeNotifier {
     }
   }
 
-  Future removeUser(int category, String id) async {
-    switch (category) {
-      case 0:
-        await userTeamref.doc(id).delete();
-        break;
-      case 1:
-        await userAdmRef.doc(id).delete();
-        break;
-      case 2:
-        await userStaffRef.doc(id).delete();
-        break;
-      case 3:
-        await historyRef.doc(id).delete();
-      default:
-    }
+  Future removeUser(BuildContext context, int category, String id) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text(
+            "Tem certeza que deseja deletar?",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                switch (category) {
+                  case 0:
+                    await userTeamref.doc(id).delete();
+                    break;
+                  case 1:
+                    await userAdmRef.doc(id).delete();
+                    break;
+                  case 2:
+                    await userStaffRef.doc(id).delete();
+                    break;
+                  case 3:
+                    await historyRef.doc(id).delete();
+                  default:
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("Deletar"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future updateTeams(UserTeam newUserTeam) async {

@@ -129,8 +129,22 @@ class PlayController extends ChangeNotifier {
     }
   }
 
-  Future removePlay(int category, String id) async {
-    switch (category) {
+  Future removePlay(BuildContext context, int category, String id) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text(
+            "Tem certeza que deseja deletar?",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                switch (category) {
       case 0:
         await userCodeRef.doc(id).delete();
         break;
@@ -139,6 +153,21 @@ class PlayController extends ChangeNotifier {
         break;
       default:
     }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text("Deletar"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+          ],
+        );
+      },
+    );
+    
   }
 
   Future updateCode(Code code) async {

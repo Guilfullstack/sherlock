@@ -92,7 +92,8 @@ class _ManagerState extends State<Manager> {
                       isLoged: team.isLoged,
                       status: playController.statusToString(team.status!),
                       onTapRemove: () {
-                        userController.removeUser(0, team.id.toString());
+                        userController.removeUser(
+                            context, 0, team.id.toString());
                       },
                       onTapEdit: () {
                         showDialog(
@@ -154,7 +155,8 @@ class _ManagerState extends State<Manager> {
                       user: true,
                       equipe: team.login,
                       onTapRemove: () {
-                        userController.removeUser(1, team.id.toString());
+                        userController.removeUser(
+                            context, 1, team.id.toString());
                       },
                       onTapEdit: () {
                         showDialog(
@@ -205,7 +207,8 @@ class _ManagerState extends State<Manager> {
                       user: true,
                       equipe: team.login,
                       onTapRemove: () {
-                        userController.removeUser(2, team.id.toString());
+                        userController.removeUser(
+                            context, 2, team.id.toString());
                       },
                       onTapEdit: () {
                         showDialog(
@@ -273,7 +276,8 @@ class _ManagerState extends State<Manager> {
                       status: team.token,
                       credit: 0,
                       onTapRemove: () {
-                        playController.removePlay(1, team.id.toString());
+                        playController.removePlay(
+                            context, 1, team.id.toString());
                       },
                       onTapEdit: () {
                         showDialog(
@@ -337,7 +341,8 @@ class _ManagerState extends State<Manager> {
                           history: false,
                           equipe: team.description,
                           onTapRemove: () {
-                            userController.removeUser(3, team.id.toString());
+                            userController.removeUser(
+                                context, 3, team.id.toString());
                           },
                         );
                       } else {
@@ -981,7 +986,7 @@ class _ManagerState extends State<Manager> {
                                         code.category as Category),
                                     onTapRemove: () {
                                       playController.removePlay(
-                                          1, code.id.toString());
+                                          context, 1, code.id.toString());
                                     },
                                     onTapEdit: () {
                                       showDialog(
@@ -1001,7 +1006,7 @@ class _ManagerState extends State<Manager> {
                                               key: playController
                                                   .formKeyPlayEdit,
                                               child: AlertDialog(
-                                                backgroundColor: Colors.grey,
+                                                backgroundColor: Colors.black,
                                                 content: SizedBox(
                                                   height: 500,
                                                   width: 450,
@@ -1375,7 +1380,8 @@ class _ManagerState extends State<Manager> {
                             status: code.token,
                             credit: 0,
                             onTapRemove: () {
-                              playController.removePlay(1, code.id.toString());
+                              playController.removePlay(
+                                  context, 1, code.id.toString());
                             },
                             onTapEdit: () {
                               showDialog(
@@ -1393,7 +1399,7 @@ class _ManagerState extends State<Manager> {
                                     return Form(
                                       key: playController.formKeyPlayEdit,
                                       child: AlertDialog(
-                                        backgroundColor: Colors.grey,
+                                        backgroundColor: Colors.black,
                                         content: SizedBox(
                                           height: 500,
                                           width: 450,
