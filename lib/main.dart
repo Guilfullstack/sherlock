@@ -61,6 +61,9 @@ Future<void> main() async {
         theme: ThemeData(
             primaryColorLight: Colors.blue,
             scaffoldBackgroundColor: const Color(0xFF212A3E),
+            progressIndicatorTheme: const ProgressIndicatorThemeData(
+              color: Colors.blue,
+            ),
             textButtonTheme: TextButtonThemeData(
                 style: ButtonStyle(
               foregroundColor: WidgetStateProperty.all(Colors.blue),

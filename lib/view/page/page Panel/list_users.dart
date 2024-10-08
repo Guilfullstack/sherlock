@@ -30,10 +30,20 @@ class ListUsers<T> extends StatelessWidget {
         }
         if (snapshot.hasError) {
           debugPrint("${snapshot.error}");
-          return Center(child: Text(errorMessage));
+          return Center(
+            child: Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text(emptyMessage));
+          return Center(
+            child: Text(
+              emptyMessage,
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
         }
 
         final listData = snapshot.data!;

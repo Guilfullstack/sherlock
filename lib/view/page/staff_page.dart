@@ -186,32 +186,40 @@ class _StaffPageState extends State<StaffPage> {
                           "Prisão",
                           style: TextStyle(color: Colors.white),
                         ),
-                        Switch(
-                          value: isSwitch1On,
-                          onChanged: (value) async {
-                            await userController.updateTeams(
-                                UserTeam(id: team.id, isPrisionBreak: true));
-                            String discription =
-                                "Equipe \"${team.name}\" foi presa";
-                            if (team.isPrisionBreak == false) {
-                              await userController.addHistory(
-                                History(
-                                  idTeam: team.id,
-                                  description: discription,
-                                ),
-                              );
-                              if (context.mounted) {
-                                ToolsController.scafoldMensage(
-                                    context, Colors.green, "Equipe foi presa");
-                              }
-                            }
-                            setState(() {
-                              isSwitch1On = true;
+                        userController.loading == true
+                            ? const CircularProgressIndicator()
+                            : Switch(
+                                activeColor: Colors.blue,
+                                value: isSwitch1On,
+                                onChanged: (value) async {
+                                  setState(() {
+                                    userController.loading = true;
+                                  });
 
-                              Navigator.pop(context);
-                            });
-                          },
-                        ),
+                                  await userController.updateTeams(UserTeam(
+                                      id: team.id, isPrisionBreak: true));
+                                  String discription =
+                                      "Equipe \"${team.name}\" foi presa";
+                                  if (team.isPrisionBreak == false) {
+                                    await userController.addHistory(
+                                      History(
+                                        idTeam: team.id,
+                                        description: discription,
+                                      ),
+                                    );
+                                    if (context.mounted) {
+                                      ToolsController.scafoldMensage(context,
+                                          Colors.green, "Equipe foi presa");
+                                    }
+                                  }
+
+                                  setState(() {
+                                    isSwitch1On = true;
+                                    userController.loading = false;
+                                    Navigator.pop(context);
+                                  });
+                                },
+                              ),
                       ],
                     ),
                   ),
