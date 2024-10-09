@@ -162,8 +162,10 @@ class UserController extends ChangeNotifier {
       }
     } else {
       try {
-        UserTeam? user = await getUserHive();
-        if (user != null) {
+        UserTeam? userDb = await getUserHive();
+        UserTeam user = UserTeam();
+        if (userDb != null) {
+          user.id = userDb.id;
           user.isLoged = false;
           await updateTeams(user);
           var userTeamBox = Hive.box<UserTeam>('userTeamBox');
@@ -231,7 +233,7 @@ class UserController extends ChangeNotifier {
             }
           } else {
             // Armazena o usuário na caixa do Hive
-            final user = UserTeam(
+            final userDb = UserTeam(
               id: snapshotTeam.docs.first.id,
               login: snapshotTeam.docs.first.data().login,
               password: snapshotTeam.docs.first.data().password,
@@ -253,15 +255,17 @@ class UserController extends ChangeNotifier {
               isPayCardLaCasaDePapel:
                   snapshotTeam.docs.first.data().isPayCardLaCasaDePapel,
             );
-            if (user.isLoged == true) {
+            if (userDb.isLoged == true) {
               if (context.mounted) {
                 ToolsController.dialogMensage(context, "Erro",
                     "Usuário já está logado em outro dispositivo");
               }
             } else {
+              UserTeam user = UserTeam();
+              user.id = userDb.id;
               user.isLoged = true;
               await updateTeams(user);
-              saveUserHive(user);
+              await saveUserHive(userDb);
               await _saveLoginState(true, login, 'Team');
               List<Stage> stageList = await playController.getStageList();
               await playController.saveStageListToHive(stageList);
