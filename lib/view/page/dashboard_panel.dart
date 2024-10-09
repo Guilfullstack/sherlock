@@ -105,22 +105,27 @@ class _DashboardPanelState extends State<DashboardPanel> {
                   children: [
                     item('Home', 0, Icons.home, () {
                       setState(() {
-                        _selectedPage = 0; // Muda para a página Dashboard
+                        _selectedPage = 0;
                       });
                     }),
                     item('Colaboradores', 1, Icons.group, () {
                       setState(() {
-                        _selectedPage = 1; // Muda para a página Usuários
+                        _selectedPage = 1;
                       });
                     }),
                     item('Provas', 2, Icons.task, () {
                       setState(() {
-                        _selectedPage = 2; // Muda para a página Vendas
+                        _selectedPage = 2;
                       });
                     }),
                     item('Hitorico', 3, Icons.history, () {
                       setState(() {
-                        _selectedPage = 3; // Muda para a página Relatórios
+                        _selectedPage = 3;
+                      });
+                    }),
+                    item('Loja', 4, Icons.sell, () {
+                      setState(() {
+                        _selectedPage = 4;
                       });
                     }),
                   ],
@@ -175,6 +180,9 @@ class _DashboardPanelState extends State<DashboardPanel> {
       //Pagina historico
       case 3:
         return const Manager(create: false, pageList: 5);
+      //pagina loja
+      case 4:
+        return const Manager(create: false, pageList: 6);
       default:
         return const Center(
             child: Text(
@@ -208,6 +216,7 @@ class _DashboardPanelState extends State<DashboardPanel> {
                   Manager(pageList: 3, create: true),
                 ],
               );
+
       case 2:
         return const Manager(pageList: 4, create: true);
       default:

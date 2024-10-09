@@ -51,6 +51,18 @@ class UserController extends ChangeNotifier {
   String? teamIdHistory;
   String teamDropDownHistory = 'Todos';
   Future<void>? protectTimer;
+  List buyItem = [
+    {
+      "nome": "Pá",
+      "valor": "100",
+      "imagem": 'images/logo.png',
+    },
+    {
+      "nome": "Pen-drive",
+      "valor": "150",
+      "imagem": 'images/logo2.png',
+    },
+  ];
 
   late String? staffId;
   late String? staffOffice;
@@ -647,7 +659,7 @@ class UserController extends ChangeNotifier {
       if (selectedTeamStatus == Status.Jogando) {
         // Cria um temporizador para esta equipe
         freezeTimers[team.id ?? ""] =
-            Future.delayed(const Duration(seconds: 30), () async {
+            Future.delayed(const Duration(minutes: 10), () async {
           if (statusUpdateNotifier.value) {
             // Atualiza o status da equipe e adiciona o histórico
             await updateTeamStatus(team);
@@ -672,7 +684,7 @@ class UserController extends ChangeNotifier {
 
     if (team.useCardProtect == false &&
         team.isPayCardProtected == true &&
-        team.status == Status.Protegido) {
+        team.status != Status.Protegido) {
       final userTeam = UserTeam(
         id: team.id,
         status: statusTeams,

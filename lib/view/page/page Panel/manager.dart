@@ -353,7 +353,64 @@ class _ManagerState extends State<Manager> {
             ),
           ],
         );
-
+      case 6:
+        return Column(
+          children: [
+            titleList("Itens de compra"),
+            Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 5,
+              runSpacing: 5,
+              children: [
+                for (int i = 0; i < userController.buyItem.length; i++)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: w < 800 ? w - 120 : w / 3,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(10), // Bordas arredondadas
+                          border: Border.all(color: Colors.blue),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(0.2), // Cor da sombra
+                              spreadRadius: 2, // Espalhamento da sombra
+                              blurRadius: 5, // Desfoque da sombra
+                              offset: const Offset(
+                                  0, 3), // Posição da sombra (x, y)
+                            ),
+                          ],
+                        ),
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          title: Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundImage: AssetImage(
+                                    userController.buyItem[i]["imagem"]),
+                                radius: 30,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "${userController.buyItem[i]["nome"]}"
+                                  "\nValor: ${userController.buyItem[i]["valor"]}",
+                                  style: const TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ],
+        );
       default:
     }
     return const Text("Nada encontrado");
